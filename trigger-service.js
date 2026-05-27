@@ -33,6 +33,8 @@ function syncEventsToCalendar() {
     flightSyncService.sync();
     log.info('hotel-sync-started', `Calendar-publicatie voor 'hotels' gestart.`, '');
     hotelSyncService.sync();
+    log.info('blocked-date-sync-started', `Calendar-publicatie voor 'blocked-dates' gestart.`, '');
+    blockedDateSyncService.sync();
     log.info('sync-completed', 'Calendar-publicatie afgerond.', '');
   } finally {
     lock.releaseLock();

@@ -56,6 +56,25 @@ const onEditContextProvider = (() => {
    */
   function getProviders_() {
     return {
+      [CONFIG.entities.blockedDate.sheetName]: {
+        syncStatusColumn: CONFIG.entities.blockedDate.columns.syncStatus,
+        columns: CONFIG.entities.blockedDate.columns,
+        ignoredColumns: [
+          CONFIG.entities.blockedDate.columns.blockId,
+          CONFIG.entities.blockedDate.columns.syncStatus,
+          CONFIG.entities.blockedDate.columns.calendarEventId,
+          CONFIG.entities.blockedDate.columns.lastSyncedAt,
+          CONFIG.entities.blockedDate.columns.lastError,
+          CONFIG.entities.blockedDate.columns.createdAt,
+          CONFIG.entities.blockedDate.columns.updatedAt
+        ],
+        auditEntryFactory: entry.blockedDate,
+        auditActions: {
+          created: 'BLOCKED_DATE_CREATED',
+          changedAfterPublication: 'BLOCKED_DATE_CHANGED_AFTER_PUBLICATION'
+        }
+      },
+
       [CONFIG.entities.gig.sheetName]: {
         syncStatusColumn: CONFIG.entities.gig.columns.syncStatus,
         columns: CONFIG.entities.gig.columns,
