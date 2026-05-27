@@ -32,9 +32,21 @@ const entry = (() => {
     return new HotelAuditEntry(params);
   }
 
+
+  /**
+   * Bouwt een BlockedDateAuditEntry.
+   *
+   * @param {Object} params Audit parameters.
+   * @returns {BlockedDateAuditEntry} Audit-entry.
+   */
+  function blockedDate(params) {
+    return new BlockedDateAuditEntry(params);
+  }
+
   return {
     gig,
     flight,
-    hotel
+    hotel,
+    blockedDate
   };
 })();

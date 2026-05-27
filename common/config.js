@@ -31,6 +31,32 @@ const CONFIG = {
    * Domeinconfiguratie per type record.
    */
   entities: {
+    blockedDate: {
+      columns: {
+        name: 'Name',
+        startDate: 'Startdate',
+        endDate: 'Enddate',
+        reason: 'Reason',
+        syncStatus: 'SyncStatus',
+        blockId: 'Block ID',
+        calendarEventId: 'CalendarEventId',
+        lastSyncedAt: 'LastSyncedAt',
+        lastError: 'LastError',
+        createdAt: 'CreatedAt',
+        updatedAt: 'UpdatedAt'
+      },
+      technicalColumnKeys: [
+        'syncStatus',
+        'blockId',
+        'calendarEventId',
+        'lastSyncedAt',
+        'lastError',
+        'createdAt',
+        'updatedAt'
+      ],
+      sheetName: 'blocked-date-input',
+      syncStatusColumnIndex: 5
+    },
     gig: {
       columns: {
         gigId: 'Gig ID',
@@ -139,7 +165,7 @@ const CONFIG = {
     },
     user: {
       columns: {
-        name: 'Naam',
+        name: 'Name',
         email: 'Email',
         userId: 'User ID'
       },
