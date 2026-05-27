@@ -20,8 +20,12 @@ const onEditService = (() => {
  * @returns {void}
  */
 function handle(e) {
-  const log = getLog_();
+  const handledAsUserEdit = userOnEditService.handle(e);
+  if (handledAsUserEdit) {
+    return;
+  }
 
+  const log = getLog_();
   try {
     const context = onEditContextProvider.getContext(e);
 

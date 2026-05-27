@@ -136,6 +136,14 @@ const CONFIG = {
       },
       sheetName: 'hotel-input',
       syncStatusColumnIndex: 8
+    },
+    user: {
+      columns: {
+        name: 'Naam',
+        email: 'Email',
+        userId: 'User ID'
+      },
+      sheetName: 'user-input'
     }
   },
 
