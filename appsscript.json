@@ -1,0 +1,27 @@
+{
+  "timeZone": "Europe/Brussels",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "Flight",
+        "libraryId": "1Pif5lz4qyXcynHMI7svOOVteIggKOl4bITQv65SX4wgtSoJH6MCx_3tj",
+        "version": "0",
+        "developmentMode": true
+      },
+      {
+        "userSymbol": "Hotel",
+        "libraryId": "1KZP326gL9bFQmI06WmqGRafrMPUuSYLWZf7fI5x7AbttpAEXrZYFx7vT",
+        "version": "0",
+        "developmentMode": true
+      },
+      {
+        "userSymbol": "Notify",
+        "libraryId": "1FB9cH2bDXWRetbpSp6FO0GSvtF7pfrUA6MXs7ut57YMl36a0mavTVEm8",
+        "version": "0",
+        "developmentMode": true
+      }
+    ]
+  }
+}
