@@ -3,7 +3,7 @@
  *
  * Vereist:
  * - bestaande event-list rij voor GIG_PUBLISHED
- * - actieve event-subscription voor minimaal één bandmember
+ * - actieve event-subscription voor minimaal één user
  * - geldige kolommen in event-queue
  *
  * @returns {void}

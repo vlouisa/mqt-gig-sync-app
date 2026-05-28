@@ -176,7 +176,7 @@ const blockedDateSyncService = (() => {
     );
 
     const transition = syncStatusService.setStatus(
-      refreshedRow.rowNumber,
+      row.rowNumber,
       CONFIG.syncStatuses.deleted,
       CONFIG.entities.blockedDate.sheetName,
       columns.syncStatus
@@ -217,7 +217,7 @@ const blockedDateSyncService = (() => {
     );
 
     const transition = syncStatusService.setStatus(
-      refreshedRow.rowNumber,
+      row.rowNumber,
       CONFIG.syncStatuses.error,
       CONFIG.entities.blockedDate.sheetName,
       columns.syncStatus
