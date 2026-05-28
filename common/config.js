@@ -46,7 +46,6 @@ const CONFIG = {
         updatedAt: 'UpdatedAt'
       },
       technicalColumnKeys: [
-        'syncStatus',
         'blockId',
         'calendarEventId',
         'lastSyncedAt',
@@ -226,7 +225,7 @@ const CONFIG = {
 
       eventSubscriptions: {
         eventCode: 'Event Code',
-        bandmember: 'Bandmember',
+        userId: 'User ID',
         active: 'Active'
       },
 
@@ -234,7 +233,7 @@ const CONFIG = {
         queueId: 'Queue ID',
         eventCode: 'Event Code',
         event: 'Event',
-        bandmember: 'Bandmember',
+        userId: 'User ID',
         recipientProperty: 'Recipient Property',
         title: 'Title',
         message: 'Message',
