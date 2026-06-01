@@ -1,4 +1,5 @@
 function onOpen() {
+  const log = logService.forModule('menu');
   const userEmail = Session.getActiveUser().getEmail();
   if (userEmail !== CONFIG.adminEmail) return;
 
@@ -45,6 +46,6 @@ function onOpen() {
 
     .addToUi();
 
-  logService.info('menu', 'on-open', 'MQT Gig Sync menu opgebouwd.');
+  log.info('menu', 'on-open', 'MQT Gig Sync menu opgebouwd.');
 }
 
