@@ -2,7 +2,7 @@
  * Service voor het ophalen en opslaan van flightdata in de flight-input sheet.
  */
 const flightImportToSheetService = (() => {
-  const MODULE_NAME = 'flight-api-to-sheet-service';
+  const MODULE_NAME = 'flight-import-to-sheet-service';
 
   /**
    * Haalt de logger voor deze service op.
@@ -24,9 +24,9 @@ const flightImportToSheetService = (() => {
     const log = getLog_();
 
     log.info(
-      'flight-import-started',
-      'Flight import gestart.',
-      `Flight: ${flightNumber}, Date: ${departureDate}`
+      'flight-number-import-started',
+      'Flight import via vluchtnummer gestart.',
+      `${flightNumber}, ${departureDate}`
     );
 
     const apiResponse = flightApi.getFlightByNumberAndDate(
@@ -61,32 +61,71 @@ const flightImportToSheetService = (() => {
   }
 
   /**
-   * Zet flight API-data om naar een sheetrecord.
+   * Importeert vluchtdata op basis van route en vertrektijd.
    *
-   * @param {Object} flight Flight API-response.
-   * @param {string} fallbackFlightNumber Fallback vluchtnummer.
-   * @returns {Object} Sheetrecord.
+   * Route/time wordt alleen gebruikt om het vluchtnummer te vinden.
+   * Daarna wordt de normale flight-number lookup gebruikt voor volledige flightdata.
+   *
+   * @param {Object} search Route/time zoekopdracht.
+   * @param {string} search.departureAirport Vertrek IATA-code.
+   * @param {string} search.arrivalAirport Aankomst IATA-code.
+   * @param {string} search.departureDate Vertrekdatum in yyyy-MM-dd.
+   * @param {string} search.departureTime Vertrektijd in HH:mm.
+   * @returns {{success: boolean, rowNumber: number, flight: Object}} Resultaatobject.
    */
-  function mapFlightToSheetRow_(flight, fallbackFlightNumber) {
-    const columns = CONFIG.entities.flight.columns;
+  function importByRouteAndTime(search) {
+    const log = getLog_();
 
-    const departureLocal = flight.departure?.scheduledTime?.local || '';
-    const arrivalLocal = flight.arrival?.scheduledTime?.local || '';
+    log.info(
+      'flight-route-time-import-started',
+      'Flight import via route/tijd gestart.',
+      `${search.departureAirport} → ${search.arrivalAirport}, ${search.departureDate} ${search.departureTime}`
+    );
 
-    return {
-      [columns.flightId]: Utilities.getUuid(),
-      [columns.flightNumber]: flight.number || fallbackFlightNumber,
-      [columns.airline]: flight.airline?.name || '',
-      [columns.departureAirport]: flight.departure?.airport?.iata || '',
-      [columns.arrivalAirport]: flight.arrival?.airport?.iata || '',
-      [columns.departureDate]: departureLocal ? departureLocal.slice(0, 10) : '',
-      [columns.departureTime]: departureLocal ? departureLocal.slice(11, 16) : '',
-      [columns.arrivalDate]: arrivalLocal ? arrivalLocal.slice(0, 10) : '',
-      [columns.arrivalTime]: arrivalLocal ? arrivalLocal.slice(11, 16) : '',
-      [columns.syncStatus]: CONFIG.syncStatuses.needsSync,
-      [columns.createdAt]: new Date(),
-      [columns.updatedAt]: new Date()
-    };
+    const candidates = flightApi.getFlightsByRouteAndTime(search);
+
+    if (!Array.isArray(candidates) || candidates.length === 0) {
+      throw new Error(
+        `Geen vlucht gevonden voor ${search.departureAirport} → ${search.arrivalAirport} rond ${search.departureDate} ${search.departureTime}`
+      );
+    }
+
+    if (candidates.length > 1) {
+      throw new Error(
+        `Meerdere mogelijke vluchten gevonden voor ${search.departureAirport} → ${search.arrivalAirport} rond ${search.departureDate} ${search.departureTime}. Handmatige controle nodig.`
+      );
+    }
+
+    const resolvedFlightNumber = normalizeResolvedFlightNumber_(candidates[0]);
+
+    log.info(
+      'flight-route-time-resolved',
+      'Route/time lookup heeft vluchtnummer gevonden.',
+      resolvedFlightNumber
+    );
+
+    return importByFlightNumberAndDate(
+      resolvedFlightNumber,
+      search.departureDate
+    );
+  }
+
+  /**
+   * Normaliseert het vluchtnummer uit een route/time candidate.
+   *
+   * @param {Object} candidate AeroDataBox route/time candidate.
+   * @returns {string} Genormaliseerd vluchtnummer.
+   */
+  function normalizeResolvedFlightNumber_(candidate) {
+    const flightNumber = String(candidate.number || '')
+      .replace(/\s+/g, '')
+      .toUpperCase();
+
+    if (!flightNumber) {
+      throw new Error('Route/time lookup vond een kandidaat zonder vluchtnummer.');
+    }
+
+    return flightNumber;
   }
 
   /**
@@ -107,6 +146,7 @@ const flightImportToSheetService = (() => {
   }
 
   return {
-    importByFlightNumberAndDate
+    importByFlightNumberAndDate,
+    importByRouteAndTime
   };
 })();
