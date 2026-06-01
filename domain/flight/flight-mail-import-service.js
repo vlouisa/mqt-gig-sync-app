@@ -43,7 +43,7 @@ const flightMailImportService = (() => {
    * Verwerkt één Gmail-thread.
    *
    * Een thread kan meerdere berichten bevatten en een parser kan meerdere
-   * flights teruggeven.
+   * flight candidates teruggeven.
    *
    * @param {GoogleAppsScript.Gmail.GmailThread} thread Gmail-thread.
    * @returns {void}
@@ -58,6 +58,7 @@ const flightMailImportService = (() => {
 
         flights.forEach(parsedFlight => {
           if (isDuplicateFlight_(parsedFlight)) {
+            logDuplicateFlight_(parsedFlight, thread);
             return;
           }
 
@@ -78,10 +79,14 @@ const flightMailImportService = (() => {
   }
 
   /**
-   * Parse een flight-mail naar één of meer flights.
+   * Parse een flight-mail naar één of meer flight candidates.
+   *
+   * Mogelijke candidates:
+   * - FLIGHT_NUMBER: flightNumber + departureDate;
+   * - ROUTE_TIME: departureAirport + arrivalAirport + departureDate + departureTime.
    *
    * @param {GoogleAppsScript.Gmail.GmailMessage} message Gmail-message.
-   * @returns {Array<{flightNumber: string, departureDate: string}>} Parsed flights.
+   * @returns {Object[]} Parsed flight candidates.
    */
   function parseFlightMail_(message) {
     const rawText = message.getPlainBody();
@@ -91,22 +96,57 @@ const flightMailImportService = (() => {
   }
 
   /**
-   * Controleert of een flight al bestaat.
+   * Controleert of een parsed flight al bestaat.
    *
-   * @param {{flightNumber: string, departureDate: string}} parsedFlight Parsed flightdata.
+   * @param {Object} parsedFlight Parsed flightdata.
    * @returns {boolean} True als de flight al bestaat.
    */
   function isDuplicateFlight_(parsedFlight) {
-    const columns = CONFIG.entities.flight.columns;
+    const strategy = getLookupStrategy_(parsedFlight);
 
-    const rows = sheetService.getRowsAsObjects(
-      CONFIG.entities.flight.sheetName
-    );
+    if (strategy === 'ROUTE_TIME') {
+      return isDuplicateRouteTimeFlight_(parsedFlight);
+    }
+
+    return isDuplicateFlightNumberFlight_(parsedFlight);
+  }
+
+  /**
+   * Controleert duplicaat op basis van vluchtnummer + vertrekdatum.
+   *
+   * @param {Object} parsedFlight Parsed flightdata.
+   * @returns {boolean} True als duplicaat.
+   */
+  function isDuplicateFlightNumberFlight_(parsedFlight) {
+    const columns = CONFIG.entities.flight.columns;
+    const rows = sheetService.getRowsAsObjects(CONFIG.entities.flight.sheetName);
 
     return rows.some(row => {
       return (
-        String(row[columns.flightNumber]).trim() === String(parsedFlight.flightNumber).trim() &&
+        normalizeFlightNumber_(row[columns.flightNumber]) === normalizeFlightNumber_(parsedFlight.flightNumber) &&
         normalizeDate_(row[columns.departureDate]) === normalizeDate_(parsedFlight.departureDate)
+      );
+    });
+  }
+
+  /**
+   * Controleert duplicaat op basis van route + vertrekdatum + vertrektijd.
+   *
+   * Dit is vooral een fallback voordat route/time is resolved naar een echt vluchtnummer.
+   *
+   * @param {Object} parsedFlight Parsed flightdata.
+   * @returns {boolean} True als duplicaat.
+   */
+  function isDuplicateRouteTimeFlight_(parsedFlight) {
+    const columns = CONFIG.entities.flight.columns;
+    const rows = sheetService.getRowsAsObjects(CONFIG.entities.flight.sheetName);
+
+    return rows.some(row => {
+      return (
+        normalizeAirport_(row[columns.departureAirport]) === normalizeAirport_(parsedFlight.departureAirport) &&
+        normalizeAirport_(row[columns.arrivalAirport]) === normalizeAirport_(parsedFlight.arrivalAirport) &&
+        normalizeDate_(row[columns.departureDate]) === normalizeDate_(parsedFlight.departureDate) &&
+        normalizeTime_(row[columns.departureTime]) === normalizeTime_(parsedFlight.departureTime)
       );
     });
   }
@@ -114,14 +154,73 @@ const flightMailImportService = (() => {
   /**
    * Importeert een parsed flight naar de flight-input sheet.
    *
-   * @param {{flightNumber: string, departureDate: string}} parsedFlight Parsed flightdata.
+   * Ondersteunt:
+   * - FLIGHT_NUMBER lookup via vluchtnummer + datum;
+   * - ROUTE_TIME lookup via route + vertrekdatum/tijd.
+   *
+   * @param {Object} parsedFlight Parsed flightdata uit de parser-library.
    * @returns {void}
    */
   function importFlight_(parsedFlight) {
-    flightImportToSheetService.importByFlightNumberAndDate(
-      parsedFlight.flightNumber,
-      parsedFlight.departureDate
+    const strategy = getLookupStrategy_(parsedFlight);
+    const flightNumber = normalizeFlightNumber_(parsedFlight.flightNumber);
+
+    getLog_().info(
+      'flight-mail-parsed-flight',
+      'Parsed flight candidate.',
+      JSON.stringify(parsedFlight)
     );
+
+    if (strategy === 'ROUTE_TIME') {
+      flightImportToSheetService.importByRouteAndTime({
+        departureAirport: parsedFlight.departureAirport,
+        arrivalAirport: parsedFlight.arrivalAirport,
+        departureDate: parsedFlight.departureDate,
+        departureTime: parsedFlight.departureTime
+      });
+      return;
+    }
+
+    if (strategy === 'FLIGHT_NUMBER' || flightNumber) {
+      flightImportToSheetService.importByFlightNumberAndDate(
+        flightNumber,
+        parsedFlight.departureDate
+      );
+      return;
+    }
+
+    throw new Error(`Onbekende flight lookup strategy: ${strategy || '-'}`);
+  }
+
+  /**
+   * Bepaalt de lookup strategy voor een parsed flight.
+   *
+   * @param {Object} parsedFlight Parsed flightdata.
+   * @returns {string} Lookup strategy.
+   */
+  function getLookupStrategy_(parsedFlight) {
+    const strategy = String(parsedFlight.lookupStrategy || '')
+      .trim()
+      .toUpperCase();
+
+    if (strategy) {
+      return strategy;
+    }
+
+    if (normalizeFlightNumber_(parsedFlight.flightNumber)) {
+      return 'FLIGHT_NUMBER';
+    }
+
+    if (
+      parsedFlight.departureAirport &&
+      parsedFlight.arrivalAirport &&
+      parsedFlight.departureDate &&
+      parsedFlight.departureTime
+    ) {
+      return 'ROUTE_TIME';
+    }
+
+    return '';
   }
 
   /**
@@ -215,13 +314,40 @@ const flightMailImportService = (() => {
   }
 
   /**
+   * Normaliseert een vluchtnummer.
+   *
+   * @param {*} value Vluchtnummerwaarde.
+   * @returns {string} Genormaliseerd vluchtnummer.
+   */
+  function normalizeFlightNumber_(value) {
+    return String(value || '')
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, '');
+  }
+
+  /**
+   * Normaliseert een airport code.
+   *
+   * @param {*} value Airportwaarde.
+   * @returns {string} Genormaliseerde airport code.
+   */
+  function normalizeAirport_(value) {
+    return String(value || '')
+      .trim()
+      .toUpperCase();
+  }
+
+  /**
    * Normaliseert een datumwaarde naar yyyy-MM-dd.
    *
    * @param {*} value Datumwaarde.
    * @returns {string} Genormaliseerde datum.
    */
   function normalizeDate_(value) {
-    if (!value) return '';
+    if (!value) {
+      return '';
+    }
 
     if (value instanceof Date) {
       return Utilities.formatDate(
@@ -232,6 +358,51 @@ const flightMailImportService = (() => {
     }
 
     return String(value).trim().slice(0, 10);
+  }
+
+  /**
+   * Normaliseert een tijdwaarde naar HH:mm.
+   *
+   * @param {*} value Tijdwaarde.
+   * @returns {string} Genormaliseerde tijd.
+   */
+  function normalizeTime_(value) {
+    if (!value) {
+      return '';
+    }
+
+    const match = String(value).trim().match(/\b(\d{1,2}):(\d{2})\b/);
+
+    if (!match) {
+      return '';
+    }
+
+    return `${String(match[1]).padStart(2, '0')}:${match[2]}`;
+  }
+
+  /**
+   * Logt dat een parsed flight is overgeslagen omdat deze al bestaat.
+   *
+   * @param {Object} parsedFlight Parsed flightdata.
+   * @param {GoogleAppsScript.Gmail.GmailThread} thread Gmail-thread.
+   * @returns {void}
+   */
+  function logDuplicateFlight_(parsedFlight, thread) {
+    const strategy = getLookupStrategy_(parsedFlight);
+
+    getLog_().info(
+      'flight-mail-duplicate-skipped',
+      'Flight import overgeslagen omdat deze al bestaat.',
+      JSON.stringify({
+        strategy,
+        flightNumber: parsedFlight.flightNumber || '',
+        departureDate: parsedFlight.departureDate || '',
+        departureTime: parsedFlight.departureTime || '',
+        departureAirport: parsedFlight.departureAirport || '',
+        arrivalAirport: parsedFlight.arrivalAirport || '',
+        threadId: thread.getId()
+      })
+    );
   }
 
   return {
