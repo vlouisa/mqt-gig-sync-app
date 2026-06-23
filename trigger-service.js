@@ -178,6 +178,12 @@ function installFlightMailImportTrigger() {
   ScriptApp.newTrigger('scanFlightEmailsAndImport')
     .timeBased()
     .everyDays(1)
+    .atHour(14)
+    .create();
+
+  ScriptApp.newTrigger('scanFlightEmailsAndImport')
+    .timeBased()
+    .everyDays(1)
     .atHour(20)
     .create();
 
@@ -220,6 +226,12 @@ function installHotelMailImportTrigger() {
     .timeBased()
     .everyDays(1)
     .atHour(7)
+    .create();
+
+  ScriptApp.newTrigger('scanHotelEmailsAndImport')
+    .timeBased()
+    .everyDays(1)
+    .atHour(13)
     .create();
 
   ScriptApp.newTrigger('scanHotelEmailsAndImport')
@@ -345,13 +357,13 @@ function installSystemStatusTrigger() {
 
   ScriptApp.newTrigger(TRIGGER_HANDLERS.systemStatus)
     .timeBased()
-    .everyMinutes(1)
+    .everyMinutes(30)
     .create();
 
   log.info(
     'system-status-trigger-installed',
     'System-status trigger geïnstalleerd.',
-    'Interval: 1 minuut'
+    'Interval: 30 minuten'
   );
 }
 
@@ -416,3 +428,19 @@ function ensureCreatedAt(rowNumber) {
 }
 
 
+function toonTriggerIdsEnNamen() {
+  const triggers = ScriptApp.getProjectTriggers();
+
+  if (triggers.length === 0) {
+    Logger.log('Geen triggers gevonden voor dit project.');
+    return;
+  }
+
+  triggers.forEach(trigger => {
+    Logger.log(
+      'Trigger ID: %s | Functie: %s',
+      trigger.getUniqueId(),
+      trigger.getHandlerFunction()
+    );
+  });
+}

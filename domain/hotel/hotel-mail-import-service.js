@@ -110,8 +110,8 @@ const hotelMailImportService = (() => {
     return rows.some(row => {
       return (
         row[columns.hotel] === parsedHotel.hotel &&
-        row[columns.checkIn] === parsedHotel.checkIn &&
-        row[columns.checkOut] === parsedHotel.checkOut
+        row[columns.checkInDate] === parsedHotel.checkInDate &&
+        row[columns.checkOutDate] === parsedHotel.checkOutDate
       );
     });
   }
