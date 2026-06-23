@@ -99,12 +99,12 @@ const systemStatusService = (() => {
       {
         name: 'Flight Mail Import',
         handlerFunction: TRIGGER_HANDLERS.flightMailImport,
-        expectedTriggerCount: 2
+        expectedTriggerCount: 3
       },
       {
         name: 'Hotel Mail Import',
         handlerFunction: TRIGGER_HANDLERS.hotelMailImport,
-        expectedTriggerCount: 2
+        expectedTriggerCount: 3
       },
       {
         name: 'Notification Worker',
