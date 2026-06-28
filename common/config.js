@@ -120,7 +120,11 @@ const CONFIG = {
         inboxLabel: 'Flights/Inbox',
         processedLabel: 'Flights/Processed',
         discardedLabel: 'Flights/Discarded',
-        errorLabel: 'Flights/Error'
+        errorLabel: 'Flights/Error',
+        autoSync: {
+          /** Ondersteunde waarden: 1, 5, 10, 15 of 30 minuten. */
+          everyMinutes: 15
+        }
       },
       sheetName: 'flight-input',
       syncStatusColumnIndex: 10
@@ -157,7 +161,11 @@ const CONFIG = {
         inboxLabel: 'Hotels/Inbox',
         processedLabel: 'Hotels/Processed',
         discardedLabel: 'Hotels/Discarded',
-        errorLabel: 'Hotels/Error'
+        errorLabel: 'Hotels/Error',
+        autoSync: {
+          /** Ondersteunde waarden: 1, 5, 10, 15 of 30 minuten. */
+          everyMinutes: 15
+        }
       },
       sheetName: 'hotel-input',
       syncStatusColumnIndex: 8

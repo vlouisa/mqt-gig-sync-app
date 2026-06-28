@@ -130,8 +130,7 @@ function installAutoSyncTrigger() {
     .create();
 
   systemStatusService.update();  
-  log.info('auto-sync-trigger-installed', 'Auto-sync trigger geïnstalleerd.', `Interval: ${minutes} minuten`
-);
+  log.info('auto-sync-trigger-installed', 'Auto-sync trigger geïnstalleerd.', `Interval: ${minutes} minuten`);
 }
 
 /**
@@ -156,11 +155,7 @@ function removeAutoSyncTriggers() {
 
 
 /**
- * Installeert twee dagelijkse time-based triggers voor flight mail import.
- *
- * De import draait standaard:
- * - 08:00
- * - 20:00
+ * Installeert time-based triggers voor flight mail import.
  *
  * Verwijdert eerst bestaande flight mail import triggers om dubbele triggers
  * te voorkomen.
@@ -169,26 +164,19 @@ function installFlightMailImportTrigger() {
   const log = logService.forModule('trigger-service');
   removeFlightMailImportTriggers();
 
-  ScriptApp.newTrigger('scanFlightEmailsAndImport')
-    .timeBased()
-    .everyDays(1)
-    .atHour(8)
-    .create();
+  const minutes = CONFIG.entities.flight.mailImport.autoSync.everyMinutes;
+
+  if (![1, 5, 10, 15, 30].includes(minutes)) {
+    throw new Error('Ongeldige auto-sync periode. Gebruik 1, 5, 10, 15 of 30 minuten.');
+  }
 
   ScriptApp.newTrigger('scanFlightEmailsAndImport')
     .timeBased()
-    .everyDays(1)
-    .atHour(14)
+    .everyMinutes(minutes)
     .create();
 
-  ScriptApp.newTrigger('scanFlightEmailsAndImport')
-    .timeBased()
-    .everyDays(1)
-    .atHour(20)
-    .create();
-
-  systemStatusService.update();
-  log.info('flight-mail-import-triggers-installed', 'Flight mail import triggers geïnstalleerd.', 'Runs: 08:00 en 20:00');
+  systemStatusService.update();  
+  log.info('flight-mail-import-triggers-installed', 'FlightMailImport trigger geïnstalleerd.', `Interval: ${minutes} minuten`);
 }
 
 
@@ -212,36 +200,28 @@ function removeFlightMailImportTriggers() {
 
 
 /**
- * Installeert twee dagelijkse time-based triggers voor hotel mail import.
+ * Installeert time-based triggers voor hotel mail import.
  *
- * De import draait:
- * - 08:00
- * - 20:00
+ * Verwijdert eerst bestaande flight mail import triggers om dubbele triggers
+ * te voorkomen.
  */
 function installHotelMailImportTrigger() {
   const log = logService.forModule('trigger-service');
   removeHotelMailImportTriggers();
 
-  ScriptApp.newTrigger('scanHotelEmailsAndImport')
-    .timeBased()
-    .everyDays(1)
-    .atHour(7)
-    .create();
+  const minutes = CONFIG.entities.hotel.mailImport.autoSync.everyMinutes;
+
+  if (![1, 5, 10, 15, 30].includes(minutes)) {
+    throw new Error('Ongeldige auto-sync periode. Gebruik 1, 5, 10, 15 of 30 minuten.');
+  }
 
   ScriptApp.newTrigger('scanHotelEmailsAndImport')
     .timeBased()
-    .everyDays(1)
-    .atHour(13)
+    .everyMinutes(minutes)
     .create();
 
-  ScriptApp.newTrigger('scanHotelEmailsAndImport')
-    .timeBased()
-    .everyDays(1)
-    .atHour(19)
-    .create();
-
-   systemStatusService.update();
-   log.info('hotel-mail-import-triggers-installed', 'Hotel mail import triggers geïnstalleerd.', 'Runs: 08:00 en 20:00');
+  systemStatusService.update();  
+  log.info('hotel-mail-import-triggers-installed', 'HotelMailImport trigger geïnstalleerd.', `Interval: ${minutes} minuten`);
 }
 
 /**
