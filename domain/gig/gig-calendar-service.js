@@ -25,8 +25,10 @@ const gigCalendarService = (() => {
 
     const calendar = CalendarApp.getCalendarById(CONFIG.calendarId);
 
-    const startDateTime = buildStartDateTime_(gig);
-    const endDateTime = buildEndDateTime_(gig);
+    const dateTimes = buildDateTimes_(gig);
+
+    const startDateTime = dateTimes.startDateTime;
+    const endDateTime = dateTimes.endDateTime;
 
     const eventPayload = buildEventPayload_(gig);
 
@@ -99,31 +101,21 @@ const gigCalendarService = (() => {
   }
 
   /**
-   * Bouwt de startdatum+tijd van een gig.
+   * Bouwt de start- en einddatum+tijd van een gig.
+   *
+   * Gebruikt gig-specifieke datum/tijd-logica:
+   * als de eindtijd kleiner is dan de starttijd,
+   * wordt de eindtijd gezien als tijd op de volgende dag.
    *
    * @param {Object} gig Gig-record uit de Sheet.
-   * @returns {Date} Startdatum+tijd.
+   * @returns {{startDateTime: Date, endDateTime: Date}} Start- en einddatum+tijd.
    */
-  function buildStartDateTime_(gig) {
+  function buildDateTimes_(gig) {
     const columns = CONFIG.entities.gig.columns;
 
-    return calendarService.buildDateTime(
+    return gigDateTimeService.buildStartEnd(
       gig[columns.date],
-      gig[columns.start]
-    );
-  }
-
-  /**
-   * Bouwt de einddatum+tijd van een gig.
-   *
-   * @param {Object} gig Gig-record uit de Sheet.
-   * @returns {Date} Einddatum+tijd.
-   */
-  function buildEndDateTime_(gig) {
-    const columns = CONFIG.entities.gig.columns;
-
-    return calendarService.buildDateTime(
-      gig[columns.date],
+      gig[columns.start],
       gig[columns.end]
     );
   }

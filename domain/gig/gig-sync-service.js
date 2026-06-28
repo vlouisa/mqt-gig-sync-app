@@ -266,17 +266,13 @@ const gigSyncService = (() => {
       }
     });
 
-    const startDateTime = calendarService.buildDateTime(
+    const dateTimes = gigDateTimeService.buildStartEnd(
       row[columns.date],
-      row[columns.start]
-    );
-
-    const endDateTime = calendarService.buildDateTime(
-      row[columns.date],
+      row[columns.start],
       row[columns.end]
     );
 
-    if (endDateTime <= startDateTime) {
+    if (dateTimes.endDateTime <= dateTimes.startDateTime) {
       throw new Error('End moet later zijn dan Start.');
     }
   }
