@@ -88,7 +88,9 @@ Het Apps Script-manifest configureert momenteel:
 
 `.clasp.json` neemt submappen mee en bevat geen expliciete `filePushOrder`.
 
-Er is momenteel geen `package.json`, lokale buildstap, CI-pipeline of lokale geautomatiseerde testrunner.
+Er is een `package.json` met `npm run test:unit`. De lokale Node.js-runner staat in
+`scripts/run-unit-tests.cjs`, met expliciete suites in `scripts/unit-test-suites.cjs`.
+Er is geen lokale buildstap, CI-pipeline of extern testframework.
 
 ---
 
@@ -118,6 +120,51 @@ Een normale wijzigingsworkflow is:
 Gebruik `clasp pull` niet automatisch wanneer lokaal niet-gecommitte wijzigingen
 aanwezig zijn. Controleer eerst of hierdoor lokale wijzigingen kunnen worden
 overschreven.
+
+### Expliciete releasecommando's
+
+Na review van wijzigingen kan de gebruiker de volgende korte opdrachten geven.
+
+#### `git commit`
+
+Dit betekent:
+
+1. controleer de huidige wijzigingen met Git;
+2. commit alleen de wijzigingen die bij de huidige taak horen;
+3. gebruik een korte, duidelijke commit message die de wijziging beschrijft;
+4. voer geen `clasp push` uit;
+5. rapporteer de gebruikte commit message en of de commit succesvol was.
+
+#### `clasp push`
+
+Dit betekent:
+
+1. voer geen nieuwe inhoudelijke codewijzigingen uit;
+2. push de gereviewde lokale Apps Script-code met `clasp push`;
+3. maak geen Git-commit;
+4. rapporteer of de push succesvol was.
+
+#### `git commit + clasp push`
+
+Dit betekent:
+
+1. controleer de huidige wijzigingen met Git;
+2. commit alleen de wijzigingen die bij de huidige taak horen;
+3. gebruik een korte, duidelijke commit message die de wijziging beschrijft;
+4. voer alleen na een succesvolle commit `clasp push` uit;
+5. stop wanneer de commit mislukt en voer dan geen `clasp push` uit;
+6. rapporteer de gebruikte commit message en het resultaat van zowel de commit als de push.
+
+Deze drie opdrachten gelden als expliciete toestemming voor uitsluitend de
+hierboven beschreven Git- en/of clasp-operaties.
+
+Voer zonder een van deze opdrachten of een andere expliciete toestemming
+geen `git commit` of `clasp push` uit.
+
+Voer nooit automatisch `git push`, `clasp deploy`, `clasp redeploy` of andere
+remote/deployment-operaties uit wanneer alleen bovenstaande opdrachten zijn gegeven.
+
+### `authenticatie`
 
 `clasp` gebruikt lokaal opgeslagen Google OAuth-credentials.
 
@@ -524,9 +571,12 @@ Controleer vóór het hernoemen of verwijderen van een globale handler:
 
 ## Veilig testen
 
-Tests in deze repository zijn Apps Script-functies en geen volledig geïsoleerde lokale unit tests.
+Tests zijn Apps Script-functies. De unit-tests onder `test/unit/` kunnen ook lokaal
+in geïsoleerde VM-contexten met mocks worden uitgevoerd. Integratiehulpen staan
+onder `test/integration/`; gedeelde assertions onder `test/helpers/`.
 
-Er is geen centrale testrunner of extern testframework.
+De lokale runner voert uitsluitend expliciet geselecteerde unit-tests uit, zonder
+Google-services of externe libraries. Er is geen extern testframework.
 
 Sommige tests en diagnostische helpers hebben echte externe side effects.
 
