@@ -1,6 +1,34 @@
 {
   "private": true,
   "scripts": {
-    "test:unit": "node scripts/run-unit-tests.cjs"
+    "test:unit": "node scripts/run-unit-tests.cjs",
+    "test:coverage": "c8 node scripts/run-unit-tests.cjs"
+  },
+  "c8": {
+    "all": true,
+    "include": [
+      "appInit.js",
+      "trigger-service.js",
+      "common/**/*.js",
+      "domain/**/*.js",
+      "infrastructure/**/*.js",
+      "util/**/*.js"
+    ],
+    "exclude": [
+      "test/**",
+      "scripts/**",
+      "node_modules/**",
+      "coverage/**"
+    ],
+    "reporter": [
+      "text",
+      "html",
+      "json-summary",
+      "json"
+    ],
+    "reports-dir": "coverage"
+  },
+  "devDependencies": {
+    "c8": "^12.0.0"
   }
 }

@@ -8,8 +8,36 @@ Installeer Node.js met npm en voer vanuit de repository uit:
 npm run test:unit
 ```
 
-Er zijn geen dependencies; `npm install` is niet nodig. Rechtstreeks uitvoeren kan
+Gewone unit-tests hebben geen dependencies nodig. Rechtstreeks uitvoeren kan
 ook met `node scripts/run-unit-tests.cjs`.
+
+## Coverage
+
+Installeer de development dependencies vanuit de lockfile en voer uit:
+
+```sh
+npm ci
+npm run test:coverage
+```
+
+Dit draait dezelfde unit-tests met c8/V8-coverage. De terminal toont statements,
+branches, functies en regels. Open `coverage/index.html` voor het HTML-rapport.
+Machineleesbare resultaten staan in `coverage/coverage-summary.json` en
+`coverage/coverage-final.json`. Er geldt geen minimaal dekkingspercentage.
+
+De selectie in `package.json` omvat alle productie-JavaScript, inclusief niet
+geladen bestanden met 0% dekking. Tests, mocks en runner tellen niet mee.
+Niet-geteste bestanden worden alleen gelezen voor het rapport, niet uitgevoerd.
+Absolute VM-bestandsnamen koppelen de metingen aan de bronbestanden.
+
+Coverage meet uitvoering, niet de kwaliteit van assertions. V8/c8 gebruikt voor
+volledig ongeladen bestanden synthetische nuldekking; vooral totale functie- en
+branchpercentages zijn daarom geen exacte telling van alle functies en beslissingen
+in die bestanden. Beoordeel ook de afzonderlijke bestanden en hun ontbrekende paden.
+
+De rapporten en `node_modules/` worden uitgesloten van Git en clasp. De lockfile
+wordt wel gecommit, maar niet geüpload naar Apps Script. Zie ook de
+[c8-documentatie](https://github.com/bcoe/c8).
 
 De runner voert de unit-tests uit met tijdzone `Europe/Brussels`.
 Elke test krijgt een nieuwe VM-context. Alleen expliciet vermelde bronbestanden

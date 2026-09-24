@@ -36,8 +36,10 @@ for (const suite of suites) {
       vm.runInContext(suite.setup, context, { timeout, filename: `${suite.name}-setup` });
 
       for (const source of suite.sources) {
-        const code = fs.readFileSync(path.join(projectRoot, source), 'utf8');
-        vm.runInContext(code, context, { timeout, filename: source });
+        // Absolute bestandsnamen koppelen V8-coverage aan de echte bronbestanden.
+        const filename = path.join(projectRoot, source);
+        const code = fs.readFileSync(filename, 'utf8');
+        vm.runInContext(code, context, { timeout, filename });
       }
 
       vm.runInContext(`${testName}();`, context, { timeout, filename: testName });
