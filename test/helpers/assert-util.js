@@ -3,11 +3,13 @@
  *
  * @param {*} expected Verwachte waarde.
  * @param {*} actual Werkelijke waarde.
+ * @param {string} [label] Optioneel label voor de foutmelding.
  * @returns {void}
  */
-function assertEquals(expected, actual) {
+function assertEquals(expected, actual, label = '') {
   if (expected !== actual) {
     throw new Error(
+      (label ? label + ': ' : '') +
       'Assertion failed. Expected: ' + expected + ', actual: ' + actual
     );
   }
@@ -68,4 +70,27 @@ function assertNotEmpty(value) {
       'Assertion failed. Expected non-empty value, actual: ' + value
     );
   }
+}
+
+/**
+ * Controleert of een functie de verwachte foutmelding gooit.
+ *
+ * @param {Function} fn Functie die een error moet gooien.
+ * @param {string} expectedMessage Verwachte foutmelding.
+ * @returns {void}
+ */
+function assertThrows(fn, expectedMessage) {
+  try {
+    fn();
+  } catch (error) {
+    if (error.message !== expectedMessage) {
+      throw new Error(
+        `Onverwachte foutmelding. Verwacht: ${expectedMessage}, gekregen: ${error.message}`
+      );
+    }
+
+    return;
+  }
+
+  throw new Error(`Verwachte fout werd niet gegooid: ${expectedMessage}`);
 }

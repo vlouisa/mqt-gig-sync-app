@@ -32,6 +32,7 @@ const suites = [
     sources: [
       'common/config.js',
       'domain/flight/flight-to-record-mapper.js',
+      'test/helpers/assert-util.js',
       'test/unit/flight-to-record-mapper-tests.js'
     ],
     setup: `
