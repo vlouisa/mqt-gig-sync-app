@@ -111,4 +111,21 @@ suites.push(
   }
 );
 
+const infrastructureSetup = require('./infrastructure-test-support.cjs');
+suites.push(
+  {
+    name: 'system-status', setup: infrastructureSetup,
+    sources: ['common/config.js', 'trigger-service.js', 'infrastructure/system/system-status-service.js',
+      'test/helpers/assert-util.js', 'test/unit/system-status-service-tests.js'],
+    tests: ['testSystemStatusAllOk', 'testSystemStatusMissingCreatesSheet', 'testSystemStatusMixedTriggers']
+  },
+  {
+    name: 'notification-message', setup: infrastructureSetup,
+    sources: ['infrastructure/notification/notification-events.js', 'infrastructure/notification/notification-message-factory.js',
+      'test/helpers/assert-util.js', 'test/unit/notification-message-factory-tests.js'],
+    tests: ['testNotificationMessageGig', 'testNotificationMessageDates', 'testNotificationMessageGigFallbacks',
+      'testNotificationMessageSyncFailures', 'testNotificationMessageUnknownEvent']
+  }
+);
+
 module.exports = suites;
