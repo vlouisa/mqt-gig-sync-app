@@ -5,7 +5,7 @@ const onEditSyncStatusService = (() => {
   /**
    * Verwerkt een handmatige wijziging van de SyncStatus kolom.
    *
-   * @param {Object} context onEdit context.
+   * @param {EditContext} context onEdit context.
    * @returns {boolean} True als de wijziging een SyncStatus-edit was.
    */
   function handleSyncStatusEdit(context) {
@@ -21,7 +21,7 @@ const onEditSyncStatusService = (() => {
   /**
    * Controleert of de gewijzigde kolom de SyncStatus kolom is.
    *
-   * @param {Object} context onEdit context.
+   * @param {EditContext} context onEdit context.
    * @returns {boolean} True als de SyncStatus kolom gewijzigd werd.
    */
   function isSyncStatusColumn_(context) {
@@ -33,9 +33,11 @@ const onEditSyncStatusService = (() => {
    *
    * Zet bij een ongeldige overgang de oude waarde terug.
    *
-   * @param {Object} context onEdit context.
+   * @param {EditContext} context onEdit context.
    * @throws {Error} Als de overgang ongeldig is.
    * @returns {void}
+   * Een lege nieuwe status wordt overgeslagen, zonder validatie of herstel.
+   * Een afgewezen niet-lege status wordt hersteld en geaudit vóór de fout wordt gegooid.
    */
   function validateManualStatusChange_(context) {
     const oldStatus = normalizeStatus_(context.event.oldValue);
@@ -66,7 +68,7 @@ const onEditSyncStatusService = (() => {
   /**
    * Zet de oude SyncStatus terug in de bewerkte cel.
    *
-   * @param {Object} context onEdit context.
+   * @param {EditContext} context onEdit context.
    * @param {string} oldStatus Oude SyncStatus.
    * @returns {void}
    */

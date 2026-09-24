@@ -4,7 +4,10 @@
  * Verwachting:
  * - geeft een array terug;
  * - array bevat minimaal één vlucht;
- * - vlucht wordt daarna opgeslagen in flight-cache.
+ * - bij een cache-miss wordt de response opgeslagen in flight-cache.
+ *
+ * Controleert alleen arraytype en minimaal één resultaat, niet de cache-inhoud.
+ * Kan de externe API aanroepen en de cache wijzigen; expliciete toestemming vereist.
  */
 function testflightApiGetFlightByNumberAndDate() {
   const result = flightApi.getFlightByNumberAndDate('HV6036', '2025-12-20');
@@ -27,7 +30,10 @@ function testflightApiGetFlightByNumberAndDate() {
  * - geeft een array terug;
  * - array bevat precies één of meer flight candidates;
  * - candidates zijn gefilterd op FCO → BRU rond 2026-06-05 10:10;
- * - resultaat wordt opgeslagen in flight-cache.
+ * - bij een cache-miss wordt het resultaat opgeslagen in flight-cache.
+ *
+ * Controleert alleen arraytype en minimaal één resultaat, niet route, tijd of cache-inhoud.
+ * Kan de externe API aanroepen en de cache wijzigen; expliciete toestemming vereist.
  *
  * Deze test gebruikt het Brussels Airlines scenario zonder vluchtnummer.
  *

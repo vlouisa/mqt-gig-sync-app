@@ -1,3 +1,7 @@
+/**
+ * Logt kolomindexen voor gig, flight en hotel; vult bij cache-miss de Script Cache.
+ * @returns {void}
+ */
 function getColumnIndexMapCaches() {
   const gigMap = sheetService.getColumnIndexMapCached(CONFIG.entities.gig.sheetName);
   const flightMap = sheetService.getColumnIndexMapCached(CONFIG.entities.flight.sheetName);
@@ -8,6 +12,10 @@ function getColumnIndexMapCaches() {
   console.log('Hotel column map:', JSON.stringify(hotelMap, null, 2));
 }
 
+/**
+ * Leest en logt bestaande kolomcaches voor gig, flight en hotel zonder ze te vullen.
+ * @returns {void}
+ */
 function showCachedColumns() {
     const cache = CacheService.getScriptCache();
   
@@ -20,6 +28,10 @@ function showCachedColumns() {
     console.log('Hotel column map:', hotelMap);
 
 }
+/**
+ * Verwijdert de kolomcaches voor gig, flight en hotel; niet voor blocked dates.
+ * @returns {void}
+ */
 function clearAllColumnIndexMapCaches() {
   sheetService.clearColumnIndexMapCache(CONFIG.entities.gig.sheetName);
   sheetService.clearColumnIndexMapCache(CONFIG.entities.flight.sheetName);

@@ -17,6 +17,9 @@ const flightMailImportService = (() => {
    * Scant flight-mails en importeert herkende vluchten.
    *
    * @returns {void}
+   * Leest alle threads van het inboxlabel; lookbackDays en maxThreads worden niet toegepast.
+   * Kan Sheet-rijen toevoegen en Gmail-labels wijzigen.
+   * Eerdere imports blijven bestaan wanneer een latere stap in een thread faalt.
    */
   function scanAndImport() {
     const log = getLog_();

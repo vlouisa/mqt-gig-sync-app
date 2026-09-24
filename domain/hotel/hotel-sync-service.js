@@ -17,6 +17,9 @@ const hotelSyncService = (() => {
    * Synchroniseert alle hotel-rijen met een verwerkbare SyncStatus.
    *
    * @returns {void}
+   * Verwerkt NEEDS_SYNC en DELETE_REQUESTED; wijzigt Calendar, Sheet-velden en auditlog.
+   * Fouten worden per rij afgehandeld zolang de foutafhandeling zelf slaagt.
+   * Eerdere mutaties worden niet teruggedraaid; falende foutafhandeling kan de run stoppen.
    */
   function sync() {
     const rows = sheetService.getRowsAsObjects(CONFIG.entities.hotel.sheetName);

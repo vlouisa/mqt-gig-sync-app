@@ -7,10 +7,12 @@ const TRIGGER_HANDLERS = {
 };
 
 /**
- * Synchroniseert alle events (gigs & flights) met SyncStatus = NEEDS_SYNC naar Google Calendar.
+ * Verwerkt NEEDS_SYNC en DELETE_REQUESTED voor gigs, flights, hotels en blocked dates.
  *
  * Gebruikt een script lock om te voorkomen dat meerdere sync-runs tegelijk draaien.
- * De daadwerkelijke sync-logica zit in syncService.sync().
+ * Roept achtereenvolgens de vier domeinsyncservices aan. Deze wijzigen Calendar,
+ * technische Sheet-velden, statussen en auditregels en publiceren waar van toepassing notificaties.
+ * Een fout die een domeinservice verlaat stopt de resterende domeinen; eerdere mutaties blijven bestaan.
  *
  * Wordt aangeroepen door:
  * - menu-item "Publiceer events naar Calendar"
@@ -112,7 +114,8 @@ function protectTechnicalColumns() {
  * Installeert de automatische time-based trigger voor Calendar-publicatie.
  *
  * Verwijdert eerst bestaande auto-sync triggers om dubbele triggers te voorkomen.
- * Werkt daarna de visuele AutoSync-indicator in de header van SyncStatus bij.
+ * Werkt daarna de system-status sheet bij.
+ * @throws {Error} Bij een ongeldig interval; bestaande triggers zijn dan al verwijderd.
  */
 function installAutoSyncTrigger() {
   const log = logService.forModule('trigger-service');
@@ -137,7 +140,7 @@ function installAutoSyncTrigger() {
  * Verwijdert alle bestaande auto-sync triggers voor syncEventsToCalendar().
  *
  * Wordt gebruikt om automatische publicatie tijdelijk uit te schakelen.
- * Werkt daarna de visuele AutoSync-indicator bij.
+ * Werkt daarna de system-status sheet bij.
  */
 function removeAutoSyncTriggers() {
   const log = logService.forModule('trigger-service');
@@ -200,9 +203,9 @@ function removeFlightMailImportTriggers() {
 
 
 /**
- * Installeert time-based triggers voor hotel mail import.
+ * Installeert een time-based trigger voor hotel mail import.
  *
- * Verwijdert eerst bestaande flight mail import triggers om dubbele triggers
+ * Verwijdert eerst bestaande hotel mail import triggers om dubbele triggers
  * te voorkomen.
  */
 function installHotelMailImportTrigger() {
@@ -369,6 +372,14 @@ function removeSystemStatusTriggers() {
 }
 
 
+/**
+ * Controleert het actieve gebruikersadres tegen CONFIG.adminEmail.
+ *
+ * @param {string} action Naam van de beheeractie voor logging en foutmelding.
+ * @returns {void}
+ * @throws {Error} Bij een afwijkend adres. De huidige logService.warn-aanroep
+ * bestaat niet op de service en kan vóór de bedoelde autorisatiefout falen.
+ */
 function assertAdminUser(action) {
   const userEmail = Session.getActiveUser().getEmail();
 
@@ -378,6 +389,11 @@ function assertAdminUser(action) {
   }
 }
 
+/**
+ * Schrijft een UUID naar een lege Gig ID-cel op het gig-input tabblad.
+ * @param {number} rowNumber 1-based rijnummer.
+ * @returns {void}
+ */
 function ensureGigId(rowNumber) {
   const sheet = sheetService.getSheet(CONFIG.entities.gig.sheetName);
   const headers = sheetService.getHeaders(sheet);
@@ -395,6 +411,11 @@ function ensureGigId(rowNumber) {
   gigIdCell.setValue(newGigId);
 }
 
+/**
+ * Vult een lege CreatedAt-cel op gig-input met het huidige tijdstip.
+ * @param {number} rowNumber 1-based rijnummer.
+ * @returns {void}
+ */
 function ensureCreatedAt(rowNumber) {
   const sheet = sheetService.getSheet(CONFIG.entities.gig.sheetName);
   const headers = sheetService.getHeaders(sheet);
@@ -408,6 +429,11 @@ function ensureCreatedAt(rowNumber) {
 }
 
 
+/**
+ * Logt IDs en handlernamen van de voor de uitvoerende gebruiker beschikbare projecttriggers.
+ * Wijzigt geen triggers.
+ * @returns {void}
+ */
 function toonTriggerIdsEnNamen() {
   const triggers = ScriptApp.getProjectTriggers();
 

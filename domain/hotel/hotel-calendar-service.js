@@ -100,6 +100,8 @@ const hotelCalendarService = (() => {
    *
    * @param {*} value Datumwaarde.
    * @returns {Date} Lokale datum.
+   * Verwacht Date of een string beginnend met yyyy-MM-dd; gebruikt lokale kalenderdelen.
+   * Controleert niet expliciet op Invalid Date of overlopende kalenderdelen.
    */
   function buildLocalDate_(value) {
     if (value instanceof Date) {
@@ -132,6 +134,7 @@ const hotelCalendarService = (() => {
    *
    * @param {Object} hotel Hotel-record.
    * @returns {Date} Check-out datum.
+   * De check-outdatum is de exclusieve all-day einddatum; er komt geen dag bij.
    */
   function buildCheckOutDate_(hotel) {
     return buildLocalDate_(

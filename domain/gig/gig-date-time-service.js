@@ -17,6 +17,8 @@ const gigDateTimeService = (() => {
    * @param {Date|string} start Starttijd.
    * @param {Date|string} end Eindtijd.
    * @returns {{startDateTime: Date, endDateTime: Date}} Start- en einddatumtijd.
+   * Gelijke tijden blijven gelijk; gigSyncService wijst ze bij publicatie af.
+   * @throws {Error} Als calendarService de datum of een tijd afwijst.
    */
   function buildStartEnd(date, start, end) {
     const startDateTime = calendarService.buildDateTime(date, start);

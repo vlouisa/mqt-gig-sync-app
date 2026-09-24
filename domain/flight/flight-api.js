@@ -35,6 +35,8 @@ const flightApi = (() => {
    * @param {string} flightNumber Vluchtnummer, bijvoorbeeld HV6036.
    * @param {Date|string} departureDate Vertrekdatum als Date of yyyy-MM-dd.
    * @returns {Object[]} AeroDataBox flight response.
+   * Kan het cachetabblad aanmaken/verbergen; bij een cache-miss volgt API-opvraag en opslag.
+   * @throws {Error} Bij ongeschikte zoekwaarden, ontbrekende API-key of API-/cachefouten.
    */
   function getFlightByNumberAndDate(flightNumber, departureDate) {
     const log = getLog_();
@@ -95,6 +97,8 @@ const flightApi = (() => {
    * @param {Date|string} search.departureDate Vertrekdatum als Date of yyyy-MM-dd.
    * @param {string} search.departureTime Vertrektijd in HH:mm.
    * @returns {Object[]} Gefilterde AeroDataBox flight candidates.
+   * Leest de flight-cache; bij een miss worden de API gebruikt en ook lege resultaten gecachet.
+   * @throws {Error} Bij ongeschikte zoekwaarden, ontbrekende API-key of API-/cachefouten.
    */
   function getFlightsByRouteAndTime(search) {
     const log = getLog_();
@@ -210,6 +214,7 @@ const flightApi = (() => {
    * @param {string} url API URL.
    * @param {string} apiKey RapidAPI key.
    * @returns {*} JSON response.
+   * @throws {Error} Bij niet-2xx HTTP-status, ongeldige JSON of een fetchfout.
    */
   function fetchJsonFromAeroDataBox_(url, apiKey) {
     const response = UrlFetchApp.fetch(url, {
@@ -450,7 +455,8 @@ const flightApi = (() => {
    * Normaliseert een datumwaarde naar yyyy-MM-dd.
    *
    * @param {*} value Datumwaarde.
-   * @throws {Error} Als de datum ontbreekt of ongeldig is.
+   * @throws {Error} Als de datum ontbreekt of een string niet de vorm yyyy-MM-dd heeft.
+   * Stringwaarden worden niet op bestaande kalenderdatums gecontroleerd.
    * @returns {string} Datum in yyyy-MM-dd formaat.
    */
   function normalizeDate_(value) {
@@ -481,7 +487,8 @@ const flightApi = (() => {
    * Normaliseert een tijdwaarde naar HH:mm.
    *
    * @param {*} value Tijdwaarde.
-   * @throws {Error} Als de tijd ontbreekt of ongeldig is.
+   * @throws {Error} Als de tijd ontbreekt of niet de vorm H:mm of HH:mm heeft.
+   * Uren en minuten worden niet op hun geldige bereik gecontroleerd.
    * @returns {string} Tijd in HH:mm formaat.
    */
   function normalizeTime_(value) {

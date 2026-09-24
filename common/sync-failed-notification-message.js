@@ -7,6 +7,12 @@ const syncFailedNotificationService = (() => {
    *
    * @param {string} eventCode Notificatie-eventcode.
    * @param {Object} payload Payload.
+   * @param {string} payload.sourceId Bronrecord-ID, vereist door Notify.
+   * @param {string} payload.entity Domeinnaam.
+   * @param {string} payload.recordTitle Weergegeven recordidentificatie.
+   * @param {number} payload.rowNumber 1-based Sheet-rijnummer.
+   * @param {string} payload.errorMessage Foutmelding, ook onderdeel van de fingerprint.
+   * @throws {Error} Als initialisatie of publicatie via Notify faalt.
    * @returns {void}
    */
   function publish(eventCode, payload) {
@@ -29,7 +35,7 @@ const syncFailedNotificationService = (() => {
   }
 
    /**
-   * Formatteert een datum .
+   * Formatteert een tijdstip als dd-MM-yyyy hh:mm:ss in de scripttijdzone.
    *
    * @param {*} value Datumwaarde.
    * @returns {string} Geformatteerde datum of fallback.
@@ -49,7 +55,9 @@ const syncFailedNotificationService = (() => {
 
    /**
    * Formatteert een datum tbv de fingerprint.
-   * Dit zorgt ervoor dat de message ten hoogste eenmaal per uur wordt getriggerd
+   * Gebruikt dd-MM-yyyy hh in de scripttijdzone. Notify dedupliceert queue-entries
+   * op eventcode, bronrecord, fingerprint en ontvanger. Andere foutmeldingen
+   * kunnen binnen hetzelfde uur nieuwe entries opleveren. Dit is geen afleverlimiet.
    *
    * @param {*} value Datumwaarde.
    * @returns {string} Geformatteerde datum of fallback.

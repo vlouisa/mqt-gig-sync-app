@@ -5,7 +5,7 @@ const onEditRecordService = (() => {
   /**
    * Verwerkt een wijziging in een recordrij.
    *
-   * @param {Object} context onEdit context.
+   * @param {EditContext} context onEdit context.
    * @returns {void}
    */
   function handleRecordEdit(context) {
@@ -31,7 +31,7 @@ const onEditRecordService = (() => {
   /**
    * Bepaalt of de wijziging genegeerd moet worden.
    *
-   * @param {Object} context onEdit context.
+   * @param {EditContext} context onEdit context.
    * @returns {boolean} True als de wijziging genegeerd moet worden.
    */
   function shouldIgnoreEdit_(context) {
@@ -44,7 +44,7 @@ const onEditRecordService = (() => {
    * Controleert of het record nog geen SyncStatus heeft.
    *
    * @param {Object} row Rij-object.
-   * @param {Object} provider Providerconfiguratie.
+   * @param {EditProvider} provider Providerconfiguratie.
    * @returns {boolean} True als het een nieuw record is.
    */
   function isNewRecord_(row, provider) {
@@ -57,7 +57,7 @@ const onEditRecordService = (() => {
    * Geldt voor records die al gepubliceerd zijn of in ERROR staan.
    *
    * @param {Object} row Rij-object.
-   * @param {Object} provider Providerconfiguratie.
+   * @param {EditProvider} provider Providerconfiguratie.
    * @returns {boolean} True als het record naar NEEDS_SYNC moet.
    */
   function shouldMarkNeedsSync_(row, provider) {
@@ -73,7 +73,7 @@ const onEditRecordService = (() => {
    * Handelt een nieuw record af.
    *
    * @param {Object} row Rij-object.
-   * @param {Object} context onEdit context.
+   * @param {EditContext} context onEdit context.
    * @returns {void}
    */
   function handleCreatedRecord_(row, context) {
@@ -97,7 +97,7 @@ const onEditRecordService = (() => {
    * Handelt een wijziging af op een al gepubliceerd of gefaald record.
    *
    * @param {Object} row Rij-object.
-   * @param {Object} context onEdit context.
+   * @param {EditContext} context onEdit context.
    * @returns {void}
    */
   function handleChangedAfterPublication_(row, context) {

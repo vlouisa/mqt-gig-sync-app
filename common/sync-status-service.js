@@ -18,6 +18,8 @@ const syncStatusService = (() => {
    * @param {string} fromStatus Huidige SyncStatus.
    * @param {string} toStatus Gewenste nieuwe SyncStatus.
    * @returns {boolean} True als de overgang is toegestaan.
+   * Trimt statussen. Gelijke waarden zijn toegestaan, ook leeg of onbekend.
+   * Van leeg is alleen DRAFT toegestaan; overige overgangen volgen CONFIG.
    */
   function canTransition(fromStatus, toStatus) {
     const from = normalizeStatus(fromStatus);
@@ -58,6 +60,8 @@ const syncStatusService = (() => {
    * @param {string} sheetName Naam van het tabblad.
    * @param {string} syncStatusColumnName Headernaam van de SyncStatus-kolom.
    * @returns {{fromStatus: string, toStatus: string, changed: boolean}} De uitgevoerde statusovergang.
+   * Schrijft alleen bij een gewijzigde, toegestane status; lezen kan de kolomcache vullen.
+   * @throws {Error} Bij ontbrekende sheetnaam/statuskolom, onbekende kolom of verboden overgang.
    */
   function setStatus(rowNumber, toStatus, sheetName, syncStatusColumnName) {
     if (!sheetName) {

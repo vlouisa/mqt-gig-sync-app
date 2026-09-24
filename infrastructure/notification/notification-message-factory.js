@@ -8,6 +8,9 @@ const notificationMessageFactory = (() => {
    * @param {string} eventCode Code van het notificatie-event.
    * @param {Object} payload Eventpayload.
    * @returns {{title: string, message: string}} Notificatiebericht.
+   * Ondersteunt GIG_PUBLISHED, GIG_SYNC_FAILED, FLIGHT_SYNC_FAILED en HOTEL_SYNC_FAILED.
+   * Maakt alleen tekst; publiceert zelf geen notificatie.
+   * @throws {Error} Als voor de eventcode geen template bestaat.
    */
   function create(eventCode, payload) {
     switch (eventCode) {
@@ -31,6 +34,13 @@ const notificationMessageFactory = (() => {
    *
    * @param {Object} payload Eventpayload.
    * @returns {{title: string, message: string}} Notificatiebericht.
+   * @param {string} [payload.title] Gigtitel.
+   * @param {Date|string} [payload.date] Datum in de scripttijdzone.
+   * @param {Date|string} [payload.start] Starttijd als Date of HH:mm-string.
+   * @param {Date|string} [payload.end] Eindtijd als Date of HH:mm-string.
+   * @param {string} [payload.location] Locatie.
+   * @param {string} [payload.soundEngineer] Geluidstechnicus.
+   * @param {string} [payload.description] Beschrijving.
    */
   function createGigPublishedMessage_(payload) {
     return {
@@ -55,6 +65,11 @@ const notificationMessageFactory = (() => {
    * @param {string} title Titel van de notificatie.
    * @param {Object} payload Eventpayload.
    * @returns {{title: string, message: string}} Notificatiebericht.
+   * @param {string} [payload.date] Reeds geformatteerd tijdstip.
+   * @param {string} [payload.entity] Domeinnaam.
+   * @param {number} [payload.rowNumber] 1-based rijnummer.
+   * @param {string} [payload.recordTitle] Recordidentificatie.
+   * @param {string} [payload.errorMessage] Foutmelding.
    */
   function createSyncFailedMessage_(title, payload) {
     return {

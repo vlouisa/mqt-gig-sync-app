@@ -1,3 +1,8 @@
+/**
+ * Bouwt het spreadsheetmenu uitsluitend voor het actieve adminaccount.
+ * Simple onOpen-trigger; wijzigt de spreadsheet-UI.
+ * @returns {void}
+ */
 function onOpen() {
   const log = logService.forModule('menu');
   const userEmail = Session.getActiveUser().getEmail();

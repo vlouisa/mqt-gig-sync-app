@@ -9,7 +9,12 @@ process.env.TZ = 'Europe/Brussels';
 const projectRoot = path.resolve(__dirname, '..');
 const timeout = 5000;
 
-// Alleen terminaluitvoer kleuren; respecteer expliciet uitgeschakelde kleuren.
+/**
+ * Kleurt een terminalstatus tenzij NO_COLOR is ingesteld.
+ * @param {'PASS'|'FAIL'} status Teststatus.
+ * @param {{isTTY?: boolean}} stream Uitvoerstroom voor terminaldetectie.
+ * @returns {string} Status met ANSI-kleurcodes of ongewijzigde tekst.
+ */
 function formatStatus(status, stream) {
   if (!stream.isTTY || process.env.NO_COLOR !== undefined) {
     return status;

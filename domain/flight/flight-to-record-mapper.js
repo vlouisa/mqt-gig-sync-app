@@ -7,6 +7,9 @@ const flightToRecordMapper = (() => {
    *
    * @param {Object} flight Flightdata.
    * @returns {Object} Sheetrecord.
+   * Genereert UUID en timestamps en zet NEEDS_SYNC; schrijft zelf niet naar Sheets.
+   * Snijdt lokale datum-/tijddelen uit timestampstrings zonder offsetconversie.
+   * @throws {Error} Als flight.number ontbreekt.
    */
   function map(flight) {
     validateFlight_(flight);

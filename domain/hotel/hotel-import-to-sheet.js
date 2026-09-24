@@ -22,6 +22,8 @@ const hotelImportToSheetService = (() => {
    *
    * @param {Object} parsedHotel Parsed hoteldata.
    * @returns {{success: boolean, rowNumber: number}} Resultaatobject.
+   * Voegt een NEEDS_SYNC-rij toe met UUID en timestamps; controleert zelf geen duplicaten.
+   * @throws {Error} Bij ontbrekende hotelnaam/check-in/check-out of falende Sheet-operaties.
    */
   function importHotel(parsedHotel) {
     const log = getLog_();

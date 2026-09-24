@@ -19,6 +19,9 @@ const flightImportToSheetService = (() => {
    * @param {string} flightNumber Vluchtnummer.
    * @param {string} departureDate Vertrekdatum.
    * @returns {{success: boolean, rowNumber: number, flight: Object}} Resultaatobject.
+   * Gebruikt bij een array de eerste kandidaat en voegt een NEEDS_SYNC-rij toe.
+   * flight in het resultaat is de API-flight, niet het gemapte Sheetrecord.
+   * @throws {Error} Bij ontbrekende vluchtdata of falende mapping, API- of Sheet-operaties.
    */
   function importByFlightNumberAndDate(flightNumber, departureDate) {
     const log = getLog_();
@@ -72,6 +75,7 @@ const flightImportToSheetService = (() => {
    * @param {string} search.departureDate Vertrekdatum in yyyy-MM-dd.
    * @param {string} search.departureTime Vertrektijd in HH:mm.
    * @returns {{success: boolean, rowNumber: number, flight: Object}} Resultaatobject.
+   * @throws {Error} Bij nul/meerdere kandidaten, ontbrekend vluchtnummer of falende import.
    */
   function importByRouteAndTime(search) {
     const log = getLog_();

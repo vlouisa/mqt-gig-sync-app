@@ -63,7 +63,8 @@ class BaseAuditEntry {
   /**
    * Zet de audit entry om naar een rij voor het audit-log tabblad.
    *
-   * @param {string} userEmail Uitvoerende gebruiker.
+   * @param {string} [userEmail] Ongebruikt argument, behouden voor compatibiliteit.
+   * Het adres komt uit Session: actieve gebruiker, effectieve gebruiker, daarna unknown.
    * @returns {Array<*>} Audit-log rij.
    */
   toRow(userEmail) {

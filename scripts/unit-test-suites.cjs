@@ -1,4 +1,15 @@
-// Expliciete selectie: integratietests en appInit worden nooit ingeladen.
+/**
+ * @typedef {Object} TestSuite
+ * @property {string} name Naam voor diagnostiek.
+ * @property {string[]} sources Bronpaden relatief aan de repository, in laadvolgorde.
+ * @property {string} setup JavaScript voor in-memory mocks per nieuwe testcontext.
+ * @property {string[]} tests Namen van synchrone globale testfuncties.
+ */
+
+/**
+ * Expliciete selectie zonder integratietests en appInit.
+ * @type {TestSuite[]}
+ */
 const suites = [
   {
     name: 'gig-date-time',

@@ -1,10 +1,10 @@
 /**
- * Audit entry voor hotel-acties.
+ * Audit entry voor flight-acties.
  */
 class FlightAuditEntry extends BaseAuditEntry {
   /**
    * @param {Object} params Audit parameters.
-   * @param {Object} params.record Hotel-record.
+   * @param {Object} params.record Flight-record.
    */
   constructor(params) {
     super(params);
@@ -19,14 +19,14 @@ class FlightAuditEntry extends BaseAuditEntry {
   }
 
   /**
-   * @returns {string} Hotel ID.
+   * @returns {string} Flight ID.
    */
   getEntityId() {
     return this.record[CONFIG.entities.flight.columns.flightId] || '';
   }
 
   /**
-   * @returns {string} Hotelnaam.
+   * @returns {string} Route als vertrekcode -> aankomstcode.
    */
   getEntityTitle() {
     return `${this.record[CONFIG.entities.flight.columns.departureAirport]} -> ${this.record[CONFIG.entities.flight.columns.arrivalAirport]}` || '';

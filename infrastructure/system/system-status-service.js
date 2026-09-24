@@ -17,6 +17,8 @@ const systemStatusService = (() => {
    * Werkt de volledige system-status sheet bij.
    *
    * @returns {void}
+   * Maakt het tabblad zo nodig aan, wist alle celinhoud en schrijft statusrijen en kleuren.
+   * Status is gebaseerd op triggeraantallen, niet op geslaagde uitvoeringen.
    */
   function update() {
     const log = getLog_();

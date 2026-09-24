@@ -1,4 +1,9 @@
 /**
+ * Handmatige integratiehulpen met echte services; expliciete toestemming vereist.
+ * Kunnen Sheets, Gmail-labels, API-cache of notificatiequeue wijzigen, afhankelijk
+ * van de aangeroepen service. Eerdere mutaties worden niet teruggedraaid bij fouten.
+ */
+/**
  * Test de hotel mail import flow handmatig.
  *
  * Scant alle threads met label Hotels/Inbox en probeert deze te importeren.

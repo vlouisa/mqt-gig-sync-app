@@ -25,6 +25,9 @@ const blockedDateSyncService = (() => {
    * Verwerkt alle blocked dates die klaarstaan voor publicatie of verwijdering.
    *
    * @returns {void}
+   * Verwerkt NEEDS_SYNC en DELETE_REQUESTED; wijzigt Calendar, Sheet-velden en auditlog.
+   * Fouten worden per rij afgehandeld zolang de foutafhandeling zelf slaagt.
+   * Eerdere mutaties worden niet teruggedraaid; falende foutafhandeling kan de run stoppen.
    */
   function sync() {
     const rows = sheetService.getRowsAsObjects(CONFIG.entities.blockedDate.sheetName);
@@ -237,7 +240,8 @@ const blockedDateSyncService = (() => {
    * Valideert of een blocked date voldoende gegevens bevat om gepubliceerd te worden.
    *
    * @param {Object} row Blocked-date record uit de Sheet.
-   * @throws {Error} Als verplichte velden ontbreken of datums ongeldig zijn.
+   * @throws {Error} Als verplichte velden ontbreken, datums geen Date-objecten zijn
+   * of de einddatum vóór de startdatum ligt. Invalid Date wordt niet expliciet afgewezen.
    * @returns {void}
    */
   function validateBlockedDate_(row) {

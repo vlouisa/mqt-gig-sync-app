@@ -8,6 +8,8 @@ const calendarService = (() => {
    * @param {*} dateValue Datumwaarde.
    * @param {*} timeValue Tijdwaarde.
    * @returns {Date} Samengevoegde datum+tijd.
+   * Gebruikt lokale datum-/klokvelden. Tijdstrings: HH:mm[:ss]; datumstrings via new Date.
+   * @throws {Error} Als datum of tijd niet naar een geldige Date kan worden omgezet.
    */
   function buildDateTime(dateValue, timeValue) {
     const date = normalizeDate_(dateValue);

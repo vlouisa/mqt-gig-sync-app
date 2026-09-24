@@ -1,12 +1,28 @@
 /**
  * Provider voor generieke onEdit-contextinformatie.
+ *
+ * @typedef {Object} EditProvider
+ * @property {string} syncStatusColumn Statusheader.
+ * @property {Object<string, string>} columns Domeinkolommen.
+ * @property {string[]} ignoredColumns Headers die geen recordwijziging veroorzaken.
+ * @property {function(Object): BaseAuditEntry} auditEntryFactory Auditfactory.
+ * @property {{created: string, changedAfterPublication: string}} auditActions Actiecodes.
+ *
+ * @typedef {Object} EditContext
+ * @property {GoogleAppsScript.Events.SheetsOnEdit} event Origineel event.
+ * @property {GoogleAppsScript.Spreadsheet.Sheet} sheet Bewerkt tabblad.
+ * @property {string} sheetName Tabbladnaam.
+ * @property {number} rowNumber 1-based eerste rijnummer van de edit.
+ * @property {number} columnNumber 1-based eerste kolomnummer van de edit.
+ * @property {string} columnName Header van de eerste bewerkte kolom.
+ * @property {EditProvider} provider Domeinconfiguratie.
  */
 const onEditContextProvider = (() => {
   /**
    * Geeft contextinformatie terug voor een onEdit event.
    *
    * @param {GoogleAppsScript.Events.SheetsOnEdit} e Apps Script onEdit event.
-   * @returns {Object|null} Contextobject of null als de sheet niet ondersteund wordt.
+   * @returns {EditContext|null} Context of null bij ontbrekend event/range of onbekend tabblad.
    */
   function getContext(e) {
     if (!e || !e.range) {

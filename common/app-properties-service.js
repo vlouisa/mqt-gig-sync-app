@@ -6,6 +6,7 @@ const appPropertiesService = (() => {
    * Geeft de MQT Calendar ID terug.
    *
    * @returns {string} Calendar ID.
+   * @throws {Error} Als MQT_CALENDAR_ID ontbreekt of leeg is.
    */
   function getCalendarId() {
     return getRequiredProperty_('MQT_CALENDAR_ID');
@@ -15,6 +16,7 @@ const appPropertiesService = (() => {
    * Geeft het admin e-mailadres terug.
    *
    * @returns {string} Admin e-mailadres.
+   * @throws {Error} Als MQT_ADMIN_EMAIL ontbreekt of leeg is.
    */
   function getAdminEmail() {
     return getRequiredProperty_('MQT_ADMIN_EMAIL');

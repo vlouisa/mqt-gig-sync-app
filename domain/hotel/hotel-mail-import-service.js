@@ -17,6 +17,9 @@ const hotelMailImportService = (() => {
    * Scant hotel-mails en importeert herkende boekingen.
    *
    * @returns {void}
+   * Leest alle threads van het inboxlabel; lookbackDays en maxThreads worden niet toegepast.
+   * Kan Sheet-rijen toevoegen en Gmail-labels wijzigen.
+   * Eerdere imports blijven bestaan wanneer een latere stap in een thread faalt.
    */
   function scanAndImport() {
     const log = getLog_();
@@ -86,7 +89,8 @@ const hotelMailImportService = (() => {
    * Parse een hotel-mail naar gestructureerde data.
    *
    * @param {GoogleAppsScript.Gmail.GmailMessage} message Gmail-message.
-   * @returns {Object|null} Parsed hoteldata of null.
+   * @returns {Object} Parsed hoteldata volgens de beschikbare lokale Hotel-library.
+   * @throws {Error} Bij ontbreken van een geschikte parser of hoteldata, of bij een parsefout.
    */
   function parseHotelMail_(message) {
     const rawText = message.getPlainBody();

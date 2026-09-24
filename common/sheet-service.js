@@ -60,6 +60,7 @@ const sheetService = (() => {
    *
    * @param {string} sheetName Naam van het tabblad.
    * @returns {Object.<string, number>} Mapping van kolomnaam naar kolomindex.
+   * Bij een cache-miss worden headers uit Sheets gelezen en in Script Cache opgeslagen.
    */
   function getColumnIndexMapCached(sheetName) {
     const cache = CacheService.getScriptCache();
@@ -105,6 +106,8 @@ const sheetService = (() => {
    *
    * @param {string} sheetName Naam van het tabblad.
    * @returns {Object[]} Array met rij-objecten.
+   * Objectkeys zijn exacte headers; elk object bevat het 1-based rowNumber.
+   * Lege datarijen binnen het gelezen bereik worden niet weggefilterd.
    */
   function getRowsAsObjects(sheetName) {
     const sheet = getSheet(sheetName);
@@ -143,6 +146,8 @@ const sheetService = (() => {
    * @param {string} sheetName Naam van het tabblad.
    * @param {Object.<string, *>} rowObject Object met kolomnaam → waarde.
    * @returns {void}
+   * Volgt de headervolgorde; ontbrekende keys worden lege strings.
+   * Bestaande waarden zoals 0 en false blijven behouden.
    */
   function appendRowFromObject(sheetName, rowObject) {
     const sheet = getSheet(sheetName);
@@ -160,6 +165,7 @@ const sheetService = (() => {
    * @param {*} value Waarde die geschreven moet worden.
    * @param {string} sheetName Naam van het tabblad.
    * @returns {void}
+   * @throws {Error} Als het tabblad of de opgegeven kolom ontbreekt.
    */
   function updateCell(rowNumber, columnName, value, sheetName) {
     const sheet = getSheet(sheetName);
