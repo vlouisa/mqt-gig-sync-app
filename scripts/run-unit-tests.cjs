@@ -8,6 +8,16 @@ process.env.TZ = 'Europe/Brussels';
 const projectRoot = path.resolve(__dirname, '..');
 const timeout = 5000;
 
+// Alleen terminaluitvoer kleuren; respecteer expliciet uitgeschakelde kleuren.
+function formatStatus(status, stream) {
+  if (!stream.isTTY || process.env.NO_COLOR !== undefined) {
+    return status;
+  }
+
+  const color = status === 'PASS' ? '\u001b[32m' : '\u001b[31m';
+  return `${color}${status}\u001b[0m`;
+}
+
 // Expliciete selectie: integratietests en appInit worden nooit ingeladen.
 const suites = [
   {
@@ -70,10 +80,10 @@ for (const suite of suites) {
 
       vm.runInContext(`${testName}();`, context, { timeout, filename: testName });
       passed++;
-      console.log(`PASS ${testName}`);
+      console.log(`${formatStatus('PASS', process.stdout)} ${testName}`);
     } catch (error) {
       failed++;
-      console.error(`FAIL ${testName}`);
+      console.error(`${formatStatus('FAIL', process.stderr)} ${testName}`);
       console.error(error.stack || error.message || String(error));
     }
   }
