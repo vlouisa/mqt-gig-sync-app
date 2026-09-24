@@ -11,13 +11,13 @@ npm run test:unit
 Er zijn geen dependencies; `npm install` is niet nodig. Rechtstreeks uitvoeren kan
 ook met `node scripts/run-unit-tests.cjs`.
 
-De runner voert de acht bestaande unit-tests uit met tijdzone `Europe/Brussels`.
+De runner voert de unit-tests uit met tijdzone `Europe/Brussels`.
 Elke test krijgt een nieuwe VM-context. Alleen expliciet vermelde bronbestanden
 worden geladen; Script Properties, Google-services en externe libraries worden
 niet aangeroepen. Configuratiewaarden en UUID-generatie worden gestubd.
 De runner meldt elke uitslag en geeft exitcode 1 als een test mislukt.
 
-Voeg nieuwe tests expliciet toe aan `suites` in `scripts/run-unit-tests.cjs`, met
+Voeg nieuwe tests expliciet toe aan `suites` in `scripts/unit-test-suites.cjs`, met
 de benodigde bronbestanden in laadvolgorde en eventuele in-memory mocks. Houd
 tests synchroon. De VM is bedoeld voor isolatie van vertrouwde repositorytests,
 niet als beveiligingssandbox voor onbekende code.
