@@ -53,4 +53,62 @@ const suites = [
   }
 ];
 
+const domainSetup = require('./domain-test-support.cjs');
+const domainSources = ['common/config.js', 'infrastructure/notification/notification-events.js', 'test/helpers/assert-util.js'];
+
+// Elke suite laadt één te testen service; overige externe afhankelijkheden zijn mocks.
+for (const [domain, folder] of [['gig', 'gig'], ['flight', 'flight'], ['hotel', 'hotel'], ['blockedDate', 'blocked-date']]) {
+  const dates = ['common/calendar-service.js', 'domain/gig/gig-date-time-service.js'];
+  suites.push({
+    name: `${folder}-calendar`,
+    setup: domainSetup(domain, 'calendar', `${domain}CalendarService`),
+    sources: [...domainSources, ...dates, `domain/${folder}/${folder}-calendar-service.js`, 'test/unit/domain-calendar-tests.js'],
+    tests: ['testDomainCalendarCreate', 'testDomainCalendarUpdate', 'testDomainCalendarMissingEventRecreated', 'testDomainCalendarDelete']
+  });
+  suites.push({
+    name: `${folder}-sync`,
+    setup: domainSetup(domain, 'sync', `${domain}SyncService`),
+    sources: [...domainSources, ...dates, `domain/${folder}/${folder}-sync-service.js`, 'test/unit/domain-sync-tests.js'],
+    tests: ['testDomainSyncPublish', 'testDomainSyncSkipsInactiveRows', 'testDomainSyncDelete',
+      'testDomainSyncErrorIsolation', 'testDomainSyncRequiredField',
+      ...(['gig', 'blockedDate'].includes(domain) ? ['testDomainSyncInvalidDateRange', 'testDomainSyncTechnicalFields'] : [])]
+  });
+}
+for (const domain of ['flight', 'hotel']) {
+  suites.push({
+    name: `${domain}-mail`, setup: domainSetup(domain, 'mail', `${domain}MailImportService`),
+    sources: [...domainSources, `domain/${domain}/${domain}-mail-import-service.js`, 'test/unit/domain-mail-tests.js'],
+    tests: ['testDomainMailImport', 'testDomainMailDuplicate', 'testDomainMailErrorIsolation',
+      ...(domain === 'flight' ? ['testFlightMailRouteDuplicate', 'testFlightMailEmptyAndUnknown'] : [])]
+  });
+}
+suites.push(
+  {
+    name: 'flight-import', setup: domainSetup('flight', 'import', 'flightImportToSheetService'),
+    sources: [...domainSources, 'domain/flight/flight-import-to-sheet-service.js', 'test/unit/domain-import-tests.js'],
+    tests: ['testFlightImportNumber', 'testFlightImportFailure', 'testFlightImportRoute', 'testFlightImportRouteRejected']
+  },
+  {
+    name: 'hotel-import', setup: domainSetup('hotel', 'import', 'hotelImportToSheetService'),
+    sources: [...domainSources, 'domain/hotel/hotel-import-to-sheet.js', 'test/unit/domain-import-tests.js'],
+    tests: ['testHotelImportMapping', 'testHotelImportValidation']
+  },
+  {
+    name: 'flight-api', setup: domainSetup('flight', 'api', 'flightApi'),
+    sources: [...domainSources, 'domain/flight/flight-api.js', 'test/unit/domain-api-tests.js'],
+    tests: ['testFlightApiNumberCache', 'testFlightApiCreatesCache', 'testFlightApiRouteWindow',
+      'testFlightApiHttpError', 'testFlightApiInvalidJson', 'testFlightApiValidation']
+  },
+  {
+    name: 'gig-notification', setup: domainSetup('gig', 'notification', 'gigNotificationService'),
+    sources: [...domainSources, 'domain/gig/gig-notification-service.js', 'test/unit/domain-user-notification-tests.js'],
+    tests: ['testGigNotificationPayload']
+  },
+  {
+    name: 'user-edit', setup: domainSetup('user', 'user', 'userOnEditService'),
+    sources: [...domainSources, 'domain/user/user-on-edit-service.js', 'test/unit/domain-user-notification-tests.js'],
+    tests: ['testUserEditIgnored', 'testUserEditAssignsId']
+  }
+);
+
 module.exports = suites;

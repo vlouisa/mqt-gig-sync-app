@@ -50,6 +50,23 @@ de benodigde bronbestanden in laadvolgorde en eventuele in-memory mocks. Houd
 tests synchroon. De VM is bedoeld voor isolatie van vertrouwde repositorytests,
 niet als beveiligingssandbox voor onbekende code.
 
+## Domeintests
+
+Alle 17 services onder `domain/` hebben een eigen suite, inclusief de bestaande
+gig-datum/tijd- en vluchtmappertests. De gedeelde Calendar- en synccontracttests
+worden apart voor elk domein uitgevoerd. De uitvoer vermeldt daarom ook de suitenaam.
+
+`scripts/domain-test-support.cjs` bouwt per test een nieuwe in-memory fixture voor
+Sheets, Calendar, Gmail, HTTP, logging en notificaties. Alleen de service onder
+test wordt echt geladen (met waar nodig de gedeelde datumhelpers en CONFIG).
+Parser- en Notify-libraries worden niet uitgevoerd; deze tests controleren hun
+lokale aanroepen, niet de externe implementaties. De datumformatterstub ondersteunt
+uitsluitend de gebruikte formaten en bewijst niet het gedrag van Utilities zelf.
+
+De nieuwe `domain-*-tests.js` zijn uitsluitend bedoeld voor de lokale runner.
+Een guard stopt ze vóór serviceaanroepen als de lokale fixture ontbreekt.
+Ze overschrijven geen services in het echte Apps Script-project.
+
 ## Indeling
 
 - `unit/`: tests met lokale invoer en eventueel mocks, zonder externe mutaties.

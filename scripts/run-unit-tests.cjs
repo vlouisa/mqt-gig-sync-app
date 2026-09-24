@@ -44,10 +44,10 @@ for (const suite of suites) {
 
       vm.runInContext(`${testName}();`, context, { timeout, filename: testName });
       passed++;
-      console.log(`${formatStatus('PASS', process.stdout)} ${testName}`);
+      console.log(`${formatStatus('PASS', process.stdout)} ${suite.name}: ${testName}`);
     } catch (error) {
       failed++;
-      console.error(`${formatStatus('FAIL', process.stderr)} ${testName}`);
+      console.error(`${formatStatus('FAIL', process.stderr)} ${suite.name}: ${testName}`);
       console.error(error.stack || error.message || String(error));
     }
   }
