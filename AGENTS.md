@@ -131,9 +131,22 @@ Dit betekent:
 
 1. controleer de huidige wijzigingen met Git;
 2. commit alleen de wijzigingen die bij de huidige taak horen;
-3. gebruik een korte, duidelijke commit message die de wijziging beschrijft;
-4. voer geen `clasp push` uit;
-5. rapporteer de gebruikte commit message en of de commit succesvol was.
+3. gebruik een korte, duidelijke commit message in het Nederlands;
+4. gebruik voor de commit message altijd het formaat `<onderwerp>: <message>`;
+5. schrijf zowel `<onderwerp>` als `<message>` in kleine letters, behalve waar hoofdletters inhoudelijk noodzakelijk zijn;
+6. formuleer `<message>` als een korte beschrijving van wat de commit wijzigt;
+7. voer geen `clasp push` uit;
+8. rapporteer de gebruikte commit message en of de commit succesvol was.
+
+Voorbeelden van correcte commit messages:
+
+- `test: voeg geïsoleerde unit-tests toe voor alle domeinservices`
+- `docs: actualiseer JSDoc en documenteer contracten en side-effects`
+- `fix: voorkom dubbele import van vluchtgegevens`
+- `feat: voeg ondersteuning voor geblokkeerde datums toe`
+
+Gebruik een onderwerp dat de aard van de wijziging beschrijft, bijvoorbeeld
+`feat`, `fix`, `test`, `docs`, `refactor` of `chore`.
 
 #### `clasp push`
 
@@ -150,10 +163,23 @@ Dit betekent:
 
 1. controleer de huidige wijzigingen met Git;
 2. commit alleen de wijzigingen die bij de huidige taak horen;
-3. gebruik een korte, duidelijke commit message die de wijziging beschrijft;
-4. voer alleen na een succesvolle commit `clasp push` uit;
-5. stop wanneer de commit mislukt en voer dan geen `clasp push` uit;
-6. rapporteer de gebruikte commit message en het resultaat van zowel de commit als de push.
+3. gebruik een korte, duidelijke commit message in het Nederlands;
+4. gebruik voor de commit message altijd het formaat `<onderwerp>: <message>`;
+5. schrijf zowel `<onderwerp>` als `<message>` in kleine letters, behalve waar hoofdletters inhoudelijk noodzakelijk zijn;
+6. formuleer `<message>` als een korte beschrijving van wat de commit wijzigt;
+7. voer alleen na een succesvolle commit `clasp push` uit;
+8. stop wanneer de commit mislukt en voer dan geen `clasp push` uit;
+9. rapporteer de gebruikte commit message en het resultaat van zowel de commit als de push.
+
+Voorbeelden van correcte commit messages:
+
+- `test: voeg geïsoleerde unit-tests toe voor alle domeinservices`
+- `docs: actualiseer JSDoc en documenteer contracten en side-effects`
+- `fix: voorkom dubbele import van vluchtgegevens`
+- `feat: voeg ondersteuning voor geblokkeerde datums toe`
+
+Gebruik een onderwerp dat de aard van de wijziging beschrijft, bijvoorbeeld
+`feat`, `fix`, `test`, `docs`, `refactor` of `chore`.
 
 Deze drie opdrachten gelden als expliciete toestemming voor uitsluitend de
 hierboven beschreven Git- en/of clasp-operaties.
