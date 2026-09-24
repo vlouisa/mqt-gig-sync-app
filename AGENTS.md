@@ -92,6 +92,35 @@ Er is momenteel geen `package.json`, lokale buildstap, CI-pipeline of lokale gea
 
 ---
 
+## Deployment en clasp
+
+De lokale repository is de broncode waarop wijzigingen worden uitgevoerd.
+
+Gebruik `clasp` voor synchronisatie met Google Apps Script.
+
+### Verplichte regels
+
+Voer nooit zonder expliciete toestemming van de gebruiker uit:
+
+- `clasp push`
+- `clasp deploy`
+- `clasp redeploy`
+- andere commando's die remote Apps Script-code of deployments wijzigen.
+
+Een normale wijzigingsworkflow is:
+
+1. wijzig lokale bestanden;
+2. voer veilige tests en controles uit;
+3. toon of beschrijf de relevante diff;
+4. wacht op expliciete toestemming;
+5. voer pas daarna `clasp push` uit.
+
+Gebruik `clasp pull` niet automatisch wanneer lokaal niet-gecommitte wijzigingen
+aanwezig zijn. Controleer eerst of hierdoor lokale wijzigingen kunnen worden
+overschreven.
+
+---
+
 ## Projectstructuur
 
 Belangrijke onderdelen van de repository zijn:
