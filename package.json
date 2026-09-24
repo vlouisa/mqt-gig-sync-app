@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "scripts": {
+    "test:unit": "node scripts/run-unit-tests.cjs"
+  }
+}
