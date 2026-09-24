@@ -119,6 +119,18 @@ Gebruik `clasp pull` niet automatisch wanneer lokaal niet-gecommitte wijzigingen
 aanwezig zijn. Controleer eerst of hierdoor lokale wijzigingen kunnen worden
 overschreven.
 
+`clasp` gebruikt lokaal opgeslagen Google OAuth-credentials.
+
+- Voer `clasp login` alleen interactief uit wanneer authenticatie nodig is.
+- Vraag de gebruiker zelf de Google OAuth-flow in de browser te voltooien.
+- Lees, toon, kopieer of wijzig `.clasprc.json` niet.
+- Neem OAuth-tokens nooit op in logs, prompts, commits of documentatie.
+- Probeer ontbrekende authenticatie niet automatisch te herstellen met
+  alternatieve credentials.
+
+Wanneer `clasp` een authenticatiefout geeft, rapporteer deze en laat de
+gebruiker indien nodig zelf `clasp login` uitvoeren.
+
 ---
 
 ## Projectstructuur
