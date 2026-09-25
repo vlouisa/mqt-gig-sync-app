@@ -143,4 +143,46 @@ suites.push({
     'testAuditServiceSerializationFailure', 'testAuditServiceAppendFailure']
 });
 
+const commonSetup = require('./common-test-support.cjs');
+const commonSuites = [
+  ['properties', 'app-properties-service.js', 'common-core-tests.js',
+    ['testCommonPropertiesValues', 'testCommonPropertiesMissing', 'testCommonPropertiesFreshRead']],
+  ['calendar', 'calendar-service.js', 'common-core-tests.js',
+    ['testCommonCalendarDateObjects', 'testCommonCalendarStrings', 'testCommonCalendarInvalid']],
+  ['log', '_log-service.js', 'common-core-tests.js',
+    ['testCommonLogLevels', 'testCommonLogDefaults']],
+  ['notification', 'sync-failed-notification-message.js', 'common-core-tests.js',
+    ['testCommonFailureNotification', 'testCommonFailureNotificationErrors']],
+  ['sheet', 'sheet-service.js', 'common-sheet-tests.js',
+    ['testCommonSheetReadRows', 'testCommonSheetEmptyAndMissing', 'testCommonSheetAppendMapping',
+      'testCommonSheetColumnMap', 'testCommonSheetCacheLifecycle', 'testCommonSheetUpdateCell']],
+  ['status', 'sync-status-service.js', 'common-sheet-tests.js',
+    ['testCommonStatusNormalization', 'testCommonStatusTransitions', 'testCommonStatusWrite',
+      'testCommonStatusNoChange', 'testCommonStatusInvalid']],
+  ['context', 'on-edit-context-provider.js', 'common-edit-tests.js',
+    ['testCommonContextIgnored', 'testCommonContextDomains']],
+  ['record', 'on-edit-record-service.js', 'common-edit-tests.js',
+    ['testCommonRecordIgnored', 'testCommonRecordCreated', 'testCommonRecordChanged',
+      'testCommonRecordUnchangedStatuses', 'testCommonRecordTransitionFailure']],
+  ['manual', 'on-edit-sync-status-service.js', 'common-edit-tests.js',
+    ['testCommonManualIgnored', 'testCommonManualAllowed', 'testCommonManualCleared',
+      'testCommonManualRejected', 'testCommonManualRestoreFailure']],
+  ['dispatch', 'on-edit-service.js', 'common-edit-tests.js',
+    ['testCommonDispatchUser', 'testCommonDispatchNoContext', 'testCommonDispatchStatus',
+      'testCommonDispatchRecord', 'testCommonDispatchErrors', 'testCommonDispatchUserError']],
+  ['menu', 'menu.js', 'common-ui-tests.js',
+    ['testCommonMenuNonAdmin', 'testCommonMenuAdmin']],
+  ['protection', 'sheet-protection-service.js', 'common-ui-tests.js',
+    ['testCommonProtectionAllEntities', 'testCommonProtectionReplacement',
+      'testCommonProtectionMissingColumn', 'testCommonProtectionFailure']]
+];
+for (const [kind, source, testFile, tests] of commonSuites) {
+  suites.push({
+    name: `common-${kind}`, setup: commonSetup(kind),
+    sources: [...(kind === 'properties' ? [] : ['common/config.js']), `common/${source}`,
+      'test/helpers/assert-util.js', 'test/helpers/common-unit-util.js', `test/unit/${testFile}`],
+    tests
+  });
+}
+
 module.exports = suites;

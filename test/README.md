@@ -81,6 +81,21 @@ mocks. Een guard voorkomt uitvoering buiten de lokale runner.
 De tests leggen ook het bestaande vluchtgedrag vast: ontbrekende luchthavencodes
 verschijnen als `undefined` in de routetitel.
 
+## Common-tests
+
+De `common-*` suites testen de overige services in `common/`, naast de bestaande
+audit-tests. Dit omvat Script Properties, datum/tijd, logging, Sheets en caching,
+statusovergangen, editcontext en editafhandeling, foutnotificaties, menu en
+kolombeveiliging. `config.js` wordt gebruikt door de tests voor deze contracten;
+er is geen aparte test die alleen de configuratieconstanten herhaalt.
+
+`scripts/common-test-support.cjs` levert per suite in-memory mocks. Iedere suite
+laadt de te testen service met alleen de benodigde configuratie en testhelpers.
+De guards in `test/helpers/common-unit-util.js` blokkeren uitvoering buiten de
+lokale runner. De notificatietests controleren de aanroepen aan Notify, niet de
+externe fingerprintimplementatie, queue of aflevering. Ook de datumformatter is
+een stub: de tests controleren het meegegeven formaat en de tijdzone.
+
 ## Indeling
 
 - `unit/`: tests met lokale invoer en eventueel mocks, zonder externe mutaties.
