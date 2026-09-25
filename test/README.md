@@ -56,7 +56,7 @@ niet als beveiligingssandbox voor onbekende code.
 
 ## Domeintests
 
-Alle 17 services onder `domain/` hebben een eigen suite, inclusief de bestaande
+Alle services onder `domain/` hebben een eigen suite, inclusief de bestaande
 gig-datum/tijd- en vluchtmappertests. De gedeelde Calendar- en synccontracttests
 worden apart voor elk domein uitgevoerd. De uitvoer vermeldt daarom ook de suitenaam.
 

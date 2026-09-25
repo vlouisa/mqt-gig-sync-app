@@ -746,6 +746,197 @@ Geef na afronding een overzicht van:
 
 ---
 
+## Code review
+
+Wanneer de gebruiker vraagt om code of wijzigingen te reviewen, voer dan een kritische review uit zonder de code automatisch te wijzigen.
+
+Een review heeft als doel concrete fouten, regressierisico's en relevante technische problemen te vinden. Een review is niet bedoeld om de code naar persoonlijke voorkeur te herschrijven of zonder noodzaak een andere architectuur voor te stellen.
+
+### Doel van de review
+
+Zoek primair naar concrete problemen die invloed hebben op:
+
+* correctheid;
+* bestaand gedrag;
+* regressierisico;
+* foutafhandeling;
+* side effects;
+* dataconsistentie;
+* security en secrets;
+* Apps Script-runtimegedrag;
+* Google Sheets-, Calendar- en Gmail-integraties;
+* externe MQT-librarycontracten;
+* concurrency en triggers;
+* onderhoudbaarheid wanneer dit een concreet risico oplevert.
+
+Geef functionele problemen en regressierisico's voorrang boven stijlvoorkeuren.
+
+### Scope van de review
+
+Controleer bij een review niet alleen de gewijzigde regels.
+
+Inspecteer waar relevant ook:
+
+1. de volledige gewijzigde functie of service;
+2. callers van gewijzigde publieke functies;
+3. gebruikte `CONFIG`-waarden;
+4. statusovergangen;
+5. Sheet-contracten en headers;
+6. externe librarycontracten;
+7. relevante tests;
+8. foutafhandeling en logging;
+9. mogelijke side effects;
+10. globale functies en stringreferenties wanneer namen zijn gewijzigd.
+
+Beoordeel een wijziging binnen de bestaande architectuur van het project.
+
+Adviseer geen brede refactoring wanneer de wijziging binnen de bestaande architectuur correct, begrijpelijk en voldoende onderhoudbaar is.
+
+Bestaande technische schuld buiten de scope van de wijziging is geen finding, tenzij de nieuwe wijziging deze aantoonbaar verergert of daardoor fout gedrag ontstaat.
+
+### Onafhankelijke review
+
+Voer een code review waar mogelijk uit met een ander AI-model dan het model dat de betreffende wijzigingen heeft geïmplementeerd.
+
+Het doel hiervan is een onafhankelijke beoordeling van de implementatie en het verkleinen van blinde vlekken van het implementerende model.
+
+De reviewer:
+
+* beoordeelt de daadwerkelijke wijzigingen onafhankelijk;
+* wijzigt tijdens de review geen code;
+* krijgt de relevante repository- en projectinstructies als context;
+* beoordeelt de daadwerkelijke implementatie en niet de intentie of redenering van het implementerende model;
+* rapporteert uitsluitend concrete findings volgens de regels in deze sectie;
+* neemt eerdere conclusies van het implementerende model niet automatisch over.
+
+Wanneer geen ander model beschikbaar is, mag hetzelfde model de review uitvoeren.
+
+Vermeld in dat geval expliciet dat geen onafhankelijke modelreview heeft plaatsgevonden.
+
+### Findings
+
+Rapporteer alleen concrete findings waarvoor een redelijke technische onderbouwing bestaat.
+
+Classificeer findings als:
+
+* **Kritiek** — kan leiden tot dataverlies, securityproblemen, verkeerde productiegegevens of ernstige uitval.
+* **Hoog** — waarschijnlijk functioneel probleem of aanzienlijk regressierisico.
+* **Middel** — daadwerkelijk probleem, maar met beperkte impact of alleen onder specifieke omstandigheden.
+* **Laag** — kleine maar concrete verbetering die relevant genoeg is om te melden.
+
+Vermeld per finding:
+
+* bestand en relevante functie of regel;
+* wat het probleem is;
+* onder welke omstandigheden het optreedt;
+* wat het mogelijke gevolg is;
+* een gerichte oplossingsrichting.
+
+Maak duidelijk onderscheid tussen:
+
+* een aangetoond probleem;
+* een waarschijnlijk probleem;
+* een mogelijk risico dat niet volledig uit de beschikbare code kan worden vastgesteld.
+
+Presenteer onzekerheid niet als een vastgesteld defect.
+
+### Wat geen finding is
+
+Rapporteer iets niet als finding wanneer het uitsluitend gaat om:
+
+* persoonlijke stijlvoorkeur;
+* theoretische architecturale zuiverheid;
+* formatting zonder functionele gevolgen;
+* bestaande code buiten de scope van de wijziging;
+* een hypothetisch probleem zonder realistisch uitvoeringspad;
+* een suggestie voor een bredere refactoring die niet nodig is voor de correctheid van de wijziging;
+* een afwijking van een patroon die functioneel correct is en binnen deze codebase bewust of acceptabel kan zijn.
+
+Een review moet signal-to-noise maximaliseren. Meld liever enkele goed onderbouwde findings dan een lange lijst speculatieve verbeterpunten.
+
+### Review van tests
+
+Controleer waar relevant of tests:
+
+* het gewijzigde gedrag daadwerkelijk afdekken;
+* relevante grens- en foutscenario's meenemen;
+* betekenisvolle assertions bevatten;
+* niet alleen zijn aangepast om de implementatie groen te krijgen;
+* regressies op bestaand gedrag voldoende afdekken.
+
+Ontbrekende tests zijn alleen een finding wanneer daardoor een betekenisvol regressierisico onvoldoende wordt afgedekt.
+
+Voer tests tijdens een review niet automatisch uit wanneer deze externe side effects kunnen hebben.
+
+De regels uit `## Veilig testen` blijven volledig van toepassing.
+
+### Reviewresultaat
+
+Begin het reviewresultaat met de findings, gesorteerd van hoogste naar laagste ernst.
+
+Als er geen concrete findings zijn, vermeld dit expliciet.
+
+Geef daarna indien relevant kort aan:
+
+* resterende risico's of onzekerheden;
+* tests die niet zijn uitgevoerd;
+* gedrag dat niet uit de beschikbare repository kon worden vastgesteld;
+* vragen die eerst beantwoord moeten worden voordat een mogelijke finding kan worden bevestigd.
+
+Maak tijdens een review geen codewijzigingen tenzij de gebruiker daar expliciet om vraagt.
+
+### Afhandeling na de review
+
+Na een onafhankelijke review wordt de verdere afhandeling waar mogelijk teruggegeven aan het oorspronkelijke implementerende model.
+
+Het oorspronkelijke model beoordeelt iedere finding afzonderlijk.
+
+Het implementerende model:
+
+1. controleert of de finding technisch correct is;
+2. accepteert een finding niet automatisch;
+3. controleert de finding tegen de daadwerkelijke implementatie, callers en projectcontracten;
+4. legt kort uit wanneer een finding niet van toepassing, onjuist of bewust acceptabel is;
+5. verwerkt terechte findings met de kleinst mogelijke gerichte wijziging;
+6. controleert na aanpassingen opnieuw de relevante code;
+7. past relevante tests aan of voegt deze toe wanneer dat nodig is;
+8. rapporteert welke findings zijn verwerkt en welke gemotiveerd zijn afgewezen.
+
+Een finding van het reviewmodel is advies en geen automatische opdracht tot wijziging.
+
+Wanneer het verwerken van een finding een bredere architectuurwijziging, schemawijziging, wijziging van een extern librarycontract of andere ingrijpende wijziging vereist, voer deze dan niet automatisch uit. Leg eerst de impact voor aan de gebruiker.
+
+### Herreview na aanpassingen
+
+Wanneer naar aanleiding van de review code is gewijzigd, controleer dan of de oorspronkelijke finding daadwerkelijk is opgelost en of de oplossing geen nieuwe regressie introduceert.
+
+Gebruik waar praktisch opnieuw een onafhankelijke review wanneer:
+
+* een finding met ernst **Kritiek** of **Hoog** is opgelost;
+* de oplossing meerdere onderdelen van de applicatie raakt;
+* de oplossing een publiek contract wijzigt;
+* de oplossing status-, synchronisatie- of datagedrag verandert.
+
+Voorkom eindeloze reviewcycli voor kleine wijzigingen.
+
+Wanneer alle terechte findings zijn verwerkt en geen nieuwe relevante problemen zijn gevonden, rapporteer dat de reviewafhandeling gereed is.
+
+### Review en release
+
+Een afgeronde review geeft op zichzelf geen toestemming voor een Git-commit, `clasp push` of andere releasehandeling.
+
+Ook na een succesvolle review blijven de regels uit `## Deployment en clasp` van toepassing.
+
+Wacht op expliciete toestemming van de gebruiker, bijvoorbeeld:
+
+* `git commit`
+* `clasp push`
+* `git commit + clasp push`
+
+voordat de bijbehorende handelingen worden uitgevoerd.
+
+--
+
 ## Leidende principes
 
 Bij werkzaamheden aan MQT Gig Sync gelden de volgende principes:
