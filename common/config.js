@@ -57,6 +57,10 @@ const CONFIG = {
       syncStatusColumnIndex: 5
     },
     gig: {
+      optionExpiry: {
+        notificationTime: '09:00',
+        everyMinutes: 5
+      },
       columns: {
         gigId: 'Gig ID',
         gigStatus: 'Gig Status',
@@ -68,6 +72,7 @@ const CONFIG = {
         description: 'Description',
         soundEngineer: 'Sound Engineer',
         syncStatus: 'SyncStatus',
+        optionExpiryDate: 'Option Expiry Date',
         calendarEventId: 'CalendarEventId',
         lastSyncedAt: 'LastSyncedAt',
         lastError: 'LastError',
@@ -178,6 +183,13 @@ const CONFIG = {
       },
       sheetName: 'user-input'
     }
+  },
+
+  /** Boekingsstatussen, onafhankelijk van de technische SyncStatus. */
+  gigStatuses: {
+    option: 'OPTION',
+    confirmed: 'CONFIRMED',
+    cancelled: 'CANCELLED'
   },
 
   /** Workflow-statussen voor publicatie naar Calendar. */

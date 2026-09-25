@@ -8,12 +8,14 @@ const notificationMessageFactory = (() => {
    * @param {string} eventCode Code van het notificatie-event.
    * @param {Object} payload Eventpayload.
    * @returns {{title: string, message: string}} Notificatiebericht.
-   * Ondersteunt GIG_PUBLISHED, GIG_SYNC_FAILED, FLIGHT_SYNC_FAILED en HOTEL_SYNC_FAILED.
+   * Ondersteunt gigpublicatie, vervallende gigopties en sync-foutmeldingen.
    * Maakt alleen tekst; publiceert zelf geen notificatie.
    * @throws {Error} Als voor de eventcode geen template bestaat.
    */
   function create(eventCode, payload) {
     switch (eventCode) {
+      case NOTIFICATION_EVENTS.gigOptionExpiresToday:
+        return createGigOptionExpiresTodayMessage_('Gigoptie verloopt vandaag', payload);
       case NOTIFICATION_EVENTS.gigPublished:
         return createGigPublishedMessage_(payload);
       case 'GIG_SYNC_FAILED':
@@ -27,6 +29,31 @@ const notificationMessageFactory = (() => {
       default:
         throw new Error(`Geen notificatietemplate gevonden voor event: ${eventCode}`);
     }
+  }
+
+  /**
+   * Maakt het bericht voor een gigoptie die vandaag verloopt.
+   *
+   * @param {string} title Titel van de notificatie.
+   * @param {Object} payload Eventpayload.
+   * @param {string} [payload.title] Gigtitel.
+   * @param {Date|string} [payload.date] Gigdatum in de scripttijdzone.
+   * @param {string} [payload.location] Locatie.
+   * @param {Date|string} [payload.expiryDate] Vervaldatum in de scripttijdzone.
+   * @returns {{title: string, message: string}} Notificatiebericht.
+   */
+  function createGigOptionExpiresTodayMessage_(title, payload) {
+    return {
+      title,
+      message: [
+        'De optie voor deze gig verloopt vandaag.',
+        '',
+        `Titel: ${payload.title || '-'}`,
+        `Datum: ${formatDate_(payload.date)}`,
+        `Locatie: ${payload.location || '-'}`,
+        `Vervaldatum: ${formatDate_(payload.expiryDate)}`
+      ].join('\n')
+    };
   }
 
   /**

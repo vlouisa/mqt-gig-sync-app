@@ -26,7 +26,9 @@ function testCommonContextDomains() {
     assertEquals(config.columns.syncStatus, context.provider.syncStatusColumn);
     assertEquals(entry[domain], context.provider.auditEntryFactory);
     assertCommonData_({ created: `${prefix}_CREATED`, changedAfterPublication: `${prefix}_CHANGED_AFTER_PUBLICATION` }, context.provider.auditActions);
-    assertCommonData_([idKey, 'syncStatus', 'calendarEventId', 'lastSyncedAt', 'lastError', 'createdAt', 'updatedAt'].map(key => config.columns[key]), context.provider.ignoredColumns);
+    assertCommonData_([idKey, ...(domain === 'gig' ? ['optionExpiryDate'] : []),
+      'syncStatus', 'calendarEventId', 'lastSyncedAt', 'lastError', 'createdAt', 'updatedAt']
+      .map(key => config.columns[key]), context.provider.ignoredColumns);
   });
   assertEquals(4, unit.all('headers').length);
 }

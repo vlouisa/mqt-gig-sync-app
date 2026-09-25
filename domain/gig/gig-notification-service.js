@@ -49,6 +49,25 @@ const gigNotificationService = (() => {
   }
 
   return {
+    publishOptionExpiresToday,
     publishGigPublished
   };
+
+  /**
+   * Publiceert eenmaal per gig, lokale vervaldatum en abonnee via Notify.
+   * @param {Object} gig Gig-record.
+   * @param {string} expiryDate Lokale datum als yyyy-MM-dd voor deduplicatie.
+   */
+  function publishOptionExpiresToday(gig, expiryDate) {
+    initNotifications();
+    const columns = CONFIG.entities.gig.columns;
+    Notify.notificationPublisher.publish(NOTIFICATION_EVENTS.gigOptionExpiresToday, {
+      sourceId: gig[columns.gigId],
+      notificationFingerprint: Notify.notificationFingerprintService.create([expiryDate]),
+      title: gig[columns.title],
+      date: gig[columns.date],
+      location: gig[columns.location],
+      expiryDate: gig[columns.optionExpiryDate]
+    });
+  }
 })();

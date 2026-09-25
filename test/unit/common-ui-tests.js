@@ -20,6 +20,7 @@ function testCommonMenuAdmin() {
     'installAutoSyncTrigger', 'removeAutoSyncTriggers',
     'installFlightMailImportTrigger', 'removeFlightMailImportTriggers',
     'installHotelMailImportTrigger', 'removeHotelMailImportTriggers',
+    'installGigOptionExpiryTrigger', 'removeGigOptionExpiryTriggers',
     'installNotificationWorkerTrigger', 'removeNotificationWorkerTriggers',
     'installSystemStatusTrigger', 'removeSystemStatusTriggers',
     'processEventQueueNotifications', 'protectTechnicalColumns', 'refreshSystemStatus'

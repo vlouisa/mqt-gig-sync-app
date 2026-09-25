@@ -185,4 +185,15 @@ for (const [kind, source, testFile, tests] of commonSuites) {
   });
 }
 
+suites.push({
+  name: 'gig-option-expiry', setup: require('./gig-option-expiry-test-support.cjs'),
+  sources: ['common/config.js', 'trigger-service.js',
+    'infrastructure/notification/notification-events.js',
+    'infrastructure/notification/notification-message-factory.js',
+    'domain/gig/gig-notification-service.js', 'domain/gig/gig-option-expiry-service.js',
+    'test/helpers/assert-util.js', 'test/unit/gig-option-expiry-tests.js'],
+  tests: ['testOptionExpirySelection', 'testOptionExpiryErrors', 'testOptionExpiryTimeAndExtension',
+    'testOptionExpiryMessage', 'testOptionExpiryTrigger']
+});
+
 module.exports = suites;

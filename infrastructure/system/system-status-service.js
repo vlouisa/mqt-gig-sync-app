@@ -117,6 +117,11 @@ const systemStatusService = (() => {
         name: 'System Status Refresh',
         handlerFunction: TRIGGER_HANDLERS.systemStatus,
         expectedTriggerCount: 1
+      },
+      {
+        name: 'Gig Option Expiry',
+        handlerFunction: TRIGGER_HANDLERS.gigOptionExpiry,
+        expectedTriggerCount: 1
       }
     ];
   }

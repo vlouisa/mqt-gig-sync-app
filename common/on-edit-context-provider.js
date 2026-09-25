@@ -96,6 +96,7 @@ const onEditContextProvider = (() => {
         columns: CONFIG.entities.gig.columns,
         ignoredColumns: [
           CONFIG.entities.gig.columns.gigId,
+          CONFIG.entities.gig.columns.optionExpiryDate,
           CONFIG.entities.gig.columns.syncStatus,
           CONFIG.entities.gig.columns.calendarEventId,
           CONFIG.entities.gig.columns.lastSyncedAt,

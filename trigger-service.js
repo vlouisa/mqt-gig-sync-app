@@ -1,10 +1,48 @@
 const TRIGGER_HANDLERS = {
+  gigOptionExpiry: 'checkGigOptionExpiry',
   autoSync: 'syncEventsToCalendar',
   notificationWorker: 'processEventQueueNotifications',
   flightMailImport: 'scanFlightEmailsAndImport',
   hotelMailImport: 'scanHotelEmailsAndImport',
   systemStatus: 'refreshSystemStatus'
 };
+
+/** Controleert vervallende gigopties onder hetzelfde scriptlock als de queue-worker. */
+function checkGigOptionExpiry() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) {
+    logService.forModule('trigger-service').warn('gig-option-expiry-skipped-lock',
+      'Optiecontrole overgeslagen: scriptlock bezet.', '');
+    return;
+  }
+  try {
+    gigOptionExpiryService.check();
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Installeert de periodieke optiecontrole; valideert voordat triggers worden verwijderd. */
+function installGigOptionExpiryTrigger() {
+  const minutes = CONFIG.entities.gig.optionExpiry.everyMinutes;
+  if (![1, 5, 10, 15, 30].includes(minutes)) {
+    throw new Error('Ongeldig controle-interval voor gigopties.');
+  }
+  removeGigOptionExpiryTriggers();
+  ScriptApp.newTrigger(TRIGGER_HANDLERS.gigOptionExpiry)
+    .timeBased().everyMinutes(minutes).create();
+  systemStatusService.update();
+}
+
+/** Verwijdert uitsluitend triggers voor de optiecontrole. */
+function removeGigOptionExpiryTriggers() {
+  ScriptApp.getProjectTriggers().forEach(trigger => {
+    if (trigger.getHandlerFunction() === TRIGGER_HANDLERS.gigOptionExpiry) {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  });
+  systemStatusService.update();
+}
 
 /**
  * Verwerkt NEEDS_SYNC en DELETE_REQUESTED voor gigs, flights, hotels en blocked dates.
