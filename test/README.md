@@ -71,6 +71,16 @@ De nieuwe `domain-*-tests.js` zijn uitsluitend bedoeld voor de lokale runner.
 Een guard stopt ze vóór serviceaanroepen als de lokale fixture ontbreekt.
 Ze overschrijven geen services in het echte Apps Script-project.
 
+## Audit-tests
+
+De suite `audit` test `BaseAuditEntry`, de vier domeinklassen, de entry-factory en
+`auditService`. De tests controleren de vaste auditkolommen, Session-fallbacks,
+ontbrekende recordvelden, append-only writes en foutafhandeling.
+`scripts/audit-test-support.cjs` vervangt Session, Sheets en logging door in-memory
+mocks. Een guard voorkomt uitvoering buiten de lokale runner.
+De tests leggen ook het bestaande vluchtgedrag vast: ontbrekende luchthavencodes
+verschijnen als `undefined` in de routetitel.
+
 ## Indeling
 
 - `unit/`: tests met lokale invoer en eventueel mocks, zonder externe mutaties.

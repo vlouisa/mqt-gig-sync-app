@@ -128,4 +128,19 @@ suites.push(
   }
 );
 
+const auditSetup = require('./audit-test-support.cjs');
+suites.push({
+  name: 'audit', setup: auditSetup,
+  sources: ['common/config.js', 'common/audit/_base-audit-entry.js',
+    'common/audit/gig-audit-entry.js', 'common/audit/flight-audit-entry.js',
+    'common/audit/hotel-audit-entry.js', 'common/audit/blocked-date-audit-entry-service.js',
+    'common/audit/entry.js', 'common/audit/audit-service.js',
+    'test/helpers/assert-util.js', 'test/unit/audit-tests.js'],
+  tests: ['testAuditBaseRow', 'testAuditBaseDefaults', 'testAuditEffectiveUserFallback',
+    'testAuditUnknownUserFallback', 'testAuditIgnoresUserArgument', 'testAuditDomainRows',
+    'testAuditFactories', 'testAuditMissingRecords', 'testAuditPartialFlightRoute',
+    'testAuditServiceAppend', 'testAuditServiceValidation', 'testAuditServiceToRowContract',
+    'testAuditServiceSerializationFailure', 'testAuditServiceAppendFailure']
+});
+
 module.exports = suites;
