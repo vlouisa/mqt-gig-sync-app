@@ -678,6 +678,94 @@ Dit zijn dominante conventies en geen garantie dat alle bestaande code volledig 
 Voer geen formatting-only wijzigingen uit in bestanden die niet bij de taak betrokken zijn.
 
 ---
+## Feature refinement
+
+Wanneer de gebruiker vraagt om een feature te refinen, onderzoek en ontwerp de feature dan eerst zonder code te wijzigen.
+
+Het doel van refinement is om vóór implementatie duidelijk te krijgen:
+
+* welk probleem de feature oplost;
+* welke functionele requirements gelden;
+* welke bestaande componenten geraakt worden;
+* welke bestaande infrastructuur kan worden hergebruikt;
+* welke nieuwe componenten eventueel nodig zijn;
+* welke risico's en edge cases bestaan;
+* hoe de feature getest kan worden;
+* wanneer de feature als afgerond kan worden beschouwd.
+
+### Werkwijze
+
+Voer bij een refinement eerst onderzoek uit in de bestaande repository.
+
+Bekijk daarbij alleen waar relevant:
+
+1. bestaande domeinmodellen en services;
+2. callers en afhankelijkheden van geraakte componenten;
+3. bestaande infrastructuur die voor de feature kan worden hergebruikt;
+4. Sheets en bestaande datacontracten;
+5. configuratie;
+6. triggers;
+7. logging en audit;
+8. externe MQT-libraries en hun contracten;
+9. bestaande tests;
+10. bestaande mechanismen voor foutafhandeling, idempotency en concurrency.
+
+Ga niet uit van een nieuwe architectuur wanneer de bestaande architectuur het probleem al kan ondersteunen.
+
+Geef de voorkeur aan uitbreiding en hergebruik van bestaande componenten boven het introduceren van parallelle infrastructuur.
+
+### Refinement-resultaat
+
+Werk na het repositoryonderzoek minimaal de volgende onderdelen uit:
+
+1. **Probleem en waarde**
+   Beschrijf welk concreet probleem wordt opgelost en waarom de feature waarde toevoegt.
+
+2. **Huidige situatie**
+   Beschrijf welke bestaande componenten, processen en datacontracten relevant zijn.
+
+3. **Functionele requirements**
+   Beschrijf wat de feature functioneel moet doen.
+
+4. **Voorgestelde oplossing**
+   Beschrijf hoe de feature binnen de bestaande architectuur kan worden gerealiseerd.
+
+5. **Impact op bestaande componenten**
+   Benoem welke bestaande bestanden, services, domeinobjecten, Sheets, triggers of externe libraries waarschijnlijk aangepast moeten worden.
+
+6. **Nieuwe componenten**
+   Benoem alleen nieuwe componenten die daadwerkelijk nodig zijn en leg uit waarom bestaande componenten niet volstaan.
+
+7. **Data en persistentie**
+   Beschrijf eventuele wijzigingen aan Sheets, properties, configuratie of andere persistente data.
+
+8. **Foutscenario's en edge cases**
+   Beschrijf relevante grensgevallen, foutscenario's, concurrencyproblemen en risico's op dubbele verwerking.
+
+9. **Teststrategie**
+   Beschrijf welke unit-tests en eventuele integratietests nodig zijn.
+
+10. **Acceptance criteria**
+    Formuleer concrete en verifieerbare criteria waaraan de implementatie moet voldoen.
+
+11. **Openstaande beslissingen**
+    Benoem keuzes waarvoor input van de gebruiker nodig is voordat implementatie verstandig is.
+
+### Grenzen van refinement
+
+Tijdens refinement:
+
+* wijzig geen productiecode;
+* voeg geen tests toe;
+* wijzig geen Sheets;
+* voer geen `git commit` uit;
+* voer geen `clasp push`, `clasp deploy` of `clasp redeploy` uit;
+* presenteer aannames expliciet als aannames;
+* stel gerichte vragen wanneer een functionele keuze niet uit de repository of opdracht kan worden afgeleid.
+
+Begin pas met implementeren nadat de gebruiker daar expliciet opdracht voor geeft.
+
+---
 
 ## Werkwijze bij wijzigingen
 
