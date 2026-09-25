@@ -6,159 +6,132 @@ description: Voer een kritische code review uit op wijzigingen in MQT Gig Sync. 
 
 # Code review
 
-Review de daadwerkelijke implementatie kritisch zonder de code automatisch te wijzigen.
+Review de daadwerkelijke implementatie kritisch zonder deze automatisch te wijzigen.
 
-## Doel
+Zoek naar concrete problemen in correctness, gedrag, regressierisico, foutafhandeling, side effects, consistentie, security, Apps Script-runtimegedrag en bestaande contracten.
 
-Zoek primair naar concrete problemen met:
-
-* correctheid;
-* bestaand gedrag;
-* regressierisico;
-* foutafhandeling;
-* side effects;
-* dataconsistentie;
-* security en secrets;
-* Apps Script-runtimegedrag;
-* Google Sheets-, Calendar- en Gmail-integraties;
-* externe MQT-librarycontracten;
-* concurrency en triggers.
-
-Geef functionele problemen en regressierisico's voorrang boven stijlvoorkeuren.
-
-## Scope
-
-Bekijk niet uitsluitend de gewijzigde regels.
+## Onderzoek
 
 Inspecteer waar relevant:
 
 * de volledige gewijzigde functie of service;
-* callers van gewijzigde publieke functies;
-* relevante configuratie;
+* callers en afhankelijkheden;
+* configuratie;
 * statusovergangen;
 * Sheet-contracten;
-* externe librarycontracten;
-* tests;
+* externe MQT-librarycontracten;
+* bestaande tests;
 * foutafhandeling en logging;
 * side effects;
-* globale functies en stringreferenties wanneer namen zijn gewijzigd.
+* globale en stringgebaseerde referenties.
 
-Beoordeel de wijziging binnen de bestaande architectuur.
+Gebruik de daadwerkelijke implementatie en relevante callers als primaire bron voor bestaand gedrag; vertrouw niet uitsluitend op comments of JSDoc.
 
-Adviseer geen brede refactoring wanneer de implementatie binnen die architectuur correct en voldoende onderhoudbaar is.
-
-Bestaande technische schuld buiten de wijziging is geen finding, tenzij de nieuwe wijziging hierdoor aantoonbaar fout gedrag introduceert of het probleem verergert.
+Beoordeel de wijziging binnen de bestaande architectuur. Adviseer geen brede refactoring wanneer de huidige oplossing correct en onderhoudbaar is.
 
 ## Onafhankelijke review
 
-Gebruik waar mogelijk een ander AI-model dan het model dat de wijziging heeft geïmplementeerd.
+Gebruik waar mogelijk een ander model voor een onafhankelijke review.
 
-De reviewer:
-
-* beoordeelt de daadwerkelijke implementatie onafhankelijk;
-* wijzigt tijdens de review geen code;
-* beoordeelt implementatie in plaats van de intentie of redenering van het implementerende model;
-* neemt eerdere conclusies niet automatisch over.
-
-Wanneer geen ander model beschikbaar is, mag hetzelfde model reviewen. Vermeld dan dat geen onafhankelijke modelreview heeft plaatsgevonden.
+Wanneer geen onafhankelijk model beschikbaar is, voer de review zelf uit en vermeld dat geen onafhankelijke modelreview is uitgevoerd.
 
 ## Findings
 
-Rapporteer alleen concrete findings met redelijke technische onderbouwing.
+Classificeer concrete findings als:
 
-Classificeer als:
+* Kritiek
+* Hoog
+* Middel
+* Laag
 
-* **Kritiek** — risico op dataverlies, securityproblemen, verkeerde productiegegevens of ernstige uitval;
-* **Hoog** — waarschijnlijk functioneel probleem of aanzienlijk regressierisico;
-* **Middel** — daadwerkelijk probleem met beperkte impact of specifieke omstandigheden;
-* **Laag** — kleine maar concrete relevante verbetering.
+Beschrijf per finding:
 
-Vermeld per finding:
+* bestand, functie en waar mogelijk regel;
+* het concrete probleem;
+* onder welke omstandigheden het optreedt;
+* het mogelijke gevolg;
+* een gerichte oplossing.
 
-* bestand en relevante functie of regel;
-* het probleem;
-* wanneer het optreedt;
-* mogelijk gevolg;
-* gerichte oplossingsrichting.
+Maak onderscheid tussen bewezen, waarschijnlijke en mogelijke problemen.
 
-Maak onderscheid tussen:
+Beschouw niet automatisch als finding:
 
-* aangetoond probleem;
-* waarschijnlijk probleem;
-* mogelijk risico dat niet volledig kan worden vastgesteld.
-
-Presenteer onzekerheid niet als vastgesteld defect.
-
-## Geen findings
-
-Rapporteer niet als finding wanneer iets uitsluitend gaat om:
-
-* persoonlijke stijlvoorkeur;
+* persoonlijke stijlvoorkeuren;
 * theoretische architecturale zuiverheid;
-* formatting zonder functionele gevolgen;
-* bestaande code buiten scope;
-* een hypothetisch probleem zonder realistisch uitvoeringspad;
-* onnodige brede refactoring;
-* een functioneel correcte en acceptabele afwijking van een patroon.
+* formatting;
+* bestaande problemen buiten de wijziging;
+* onrealistische hypothetische scenario's;
+* refactoring zonder concreet voordeel;
+* afwijkingen van een patroon wanneer de gekozen oplossing correct en onderhoudbaar is.
 
-Maximaliseer signal-to-noise.
+## Findings vastleggen
+
+Leg iedere concrete finding vast in de repository.
+
+Gebruik:
+
+* `docs/reviews/review-findings-overview.md` als centraal overzicht;
+* een afzonderlijk Markdown-bestand in `docs/reviews/` voor de volledige details van iedere finding.
+
+Controleer vóór het toevoegen van een finding de bestaande bestanden en volg hun huidige structuur, nummering, naamgeving en kolommen.
+
+Voeg voor iedere nieuwe finding één regel toe aan `review-findings-overview.md`.
+
+Maak daarnaast het bijbehorende detailbestand met minimaal:
+
+* identificatie van de finding;
+* severity;
+* status;
+* betrokken bestand(en) en functie(s);
+* beschrijving van het probleem;
+* omstandigheden waaronder het probleem optreedt;
+* mogelijke gevolgen;
+* voorgestelde oplossing;
+* relevante verificatie of testinformatie.
+
+Dupliceer geen bestaande finding. Controleer eerst of hetzelfde probleem al in het overzicht of een bestaand detailbestand is vastgelegd.
+
+Wanneer tijdens de review geen concrete findings worden gevonden, voeg niets toe aan het overzicht en maak geen detailbestand aan.
 
 ## Tests
 
-Controleer waar relevant of tests:
+Controleer of relevante tests:
 
-* het gewijzigde gedrag daadwerkelijk afdekken;
-* relevante grens- en foutscenario's meenemen;
+* het gewijzigde gedrag afdekken;
+* belangrijke grensgevallen afdekken;
+* relevante foutscenario's afdekken;
 * betekenisvolle assertions bevatten;
-* niet alleen zijn aangepast om de implementatie groen te krijgen;
-* regressies voldoende afdekken.
+* regressiegevoelig bestaand gedrag beschermen.
 
-Ontbrekende tests zijn alleen een finding wanneer daardoor een betekenisvol regressierisico ontstaat.
+Beschouw ontbrekende tests alleen als finding wanneer daardoor een betekenisvol regressierisico ontstaat.
 
-Volg voor het daadwerkelijk uitvoeren van tests altijd de veiligheidsregels uit `AGENTS.md`.
+Volg bij het uitvoeren van tests de veiligheidsregels uit `AGENTS.md`.
 
 ## Resultaat
 
-Begin met findings, gesorteerd van hoogste naar laagste ernst.
+Rapporteer findings op aflopende ernst.
 
-Als er geen concrete findings zijn, vermeld dit expliciet.
+Wanneer geen concrete findings zijn gevonden, vermeld dit expliciet.
 
-Benoem daarna kort waar relevant:
+Benoem daarnaast waar relevant:
 
-* resterende risico's of onzekerheden;
-* tests die niet zijn uitgevoerd;
-* gedrag dat niet kon worden vastgesteld;
-* vragen die nodig zijn om een mogelijke finding te bevestigen.
+* resterende risico's;
+* niet-uitgevoerde tests;
+* gedrag dat niet kon worden geverifieerd;
+* vragen die alleen door een functionele keuze van de gebruiker kunnen worden opgelost.
 
-Wijzig tijdens de review geen code tenzij de gebruiker daar expliciet opdracht voor geeft.
+## Findings verwerken
 
-## Afhandeling van findings
+Wanneer findings daarna worden opgelost:
 
-Wanneer de review onderdeel is van een implementatieworkflow, laat waar mogelijk het oorspronkelijke implementerende model de findings beoordelen en verwerken.
+* beoordeel iedere finding inhoudelijk;
+* accepteer een finding niet automatisch;
+* pas alleen valide findings gericht aan;
+* motiveer kort waarom een finding wordt afgewezen wanneer deze niet klopt;
+* werk na verwerking de status van de finding bij in de bestaande reviewdocumentatie.
 
-Het implementerende model:
+Leg grotere architectuur-, schema- of externe contractwijzigingen eerst aan de gebruiker voor.
 
-1. controleert iedere finding tegen implementatie, callers en contracten;
-2. accepteert findings niet automatisch;
-3. motiveert findings die niet van toepassing of bewust acceptabel zijn;
-4. verwerkt terechte findings met de kleinst mogelijke gerichte wijziging;
-5. controleert de relevante code opnieuw;
-6. past tests aan of voegt tests toe wanneer nodig;
-7. rapporteert welke findings zijn verwerkt en welke zijn afgewezen.
+Voer opnieuw een review uit wanneer fixes betrekking hebben op kritieke of hoge findings, meerdere componenten raken, publieke contracten wijzigen of data-, status- of synchronisatiegedrag veranderen.
 
-Een finding is advies en geen automatische opdracht tot wijziging.
-
-Leg findings die een brede architectuur-, schema- of extern-contractwijziging vereisen eerst aan de gebruiker voor.
-
-## Herreview
-
-Voer waar praktisch opnieuw een onafhankelijke review uit wanneer:
-
-* een finding met ernst **Kritiek** of **Hoog** is opgelost;
-* de oplossing meerdere applicatieonderdelen raakt;
-* een publiek contract verandert;
-* status-, synchronisatie- of datagedrag verandert.
-
-Voorkom eindeloze reviewcycli voor kleine wijzigingen.
-
-Een afgeronde review geeft geen toestemming voor commit, push of deployment.
+Voorkom eindeloze reviewcycli voor kleine of duidelijk afgebakende wijzigingen.

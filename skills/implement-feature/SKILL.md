@@ -22,6 +22,8 @@ Inspecteer waar nodig:
 * externe MQT-librarycontracten;
 * relevante side effects.
 
+Gebruik de daadwerkelijke implementatie als primaire bron voor bestaand gedrag; vertrouw niet uitsluitend op comments of JSDoc.
+
 Onderzoek alleen repositoryonderdelen die nodig zijn voor de wijziging.
 
 ## Implementatie
