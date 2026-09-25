@@ -2,14 +2,18 @@
 
 ## Lokaal zonder externe side-effects
 
-Installeer Node.js met npm en voer vanuit de repository uit:
+Installeer Node.js met npm. Zorg dat het gedeelde package `mqt-test-runner`
+naast deze repository staat (zie [de runnerhandleiding](../../mqt-test-runner/README.md)).
+Voer vanuit de repository uit:
 
 ```sh
+npm ci
 npm run test:unit
 ```
 
-Gewone unit-tests hebben geen dependencies nodig. Rechtstreeks uitvoeren kan
-ook met `node scripts/run-unit-tests.cjs`.
+Het npm-script gebruikt de gedeelde runner via een lokale development dependency.
+Suites, mocks en assertions blijven in deze repository.
+Wijzigingen aan de gedeelde runner gelden direct voor alle lokaal gekoppelde projecten.
 
 ## Coverage
 

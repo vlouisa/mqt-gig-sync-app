@@ -88,8 +88,9 @@ Het Apps Script-manifest configureert momenteel:
 
 `.clasp.json` neemt submappen mee en bevat geen expliciete `filePushOrder`.
 
-Er is een `package.json` met `npm run test:unit`. De lokale Node.js-runner staat in
-`scripts/run-unit-tests.cjs`, met expliciete suites in `scripts/unit-test-suites.cjs`.
+Er is een `package.json` met `npm run test:unit`. De gedeelde Node.js-runner staat in
+`../mqt-test-runner` en wordt als lokale npm-development dependency gebruikt.
+De expliciete suites blijven in `scripts/unit-test-suites.cjs`.
 Er is geen lokale buildstap, CI-pipeline of extern testframework.
 
 ---

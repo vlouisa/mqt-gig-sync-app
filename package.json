@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "test:unit": "node scripts/run-unit-tests.cjs",
-    "test:coverage": "c8 node scripts/run-unit-tests.cjs"
+    "test:unit": "mqt-test --config scripts/unit-test-suites.cjs",
+    "test:coverage": "c8 mqt-test --config scripts/unit-test-suites.cjs"
   },
   "c8": {
     "all": true,
@@ -29,6 +29,7 @@
     "reports-dir": "coverage"
   },
   "devDependencies": {
-    "c8": "^12.0.0"
+    "c8": "^12.0.0",
+    "mqt-test-runner": "file:../mqt-test-runner"
   }
 }
