@@ -1,6 +1,7 @@
 **/.git/**
 **/node_modules/**
 scripts/**
+docs/**
 package.json
 package-lock.json
 npm-shrinkwrap.json
