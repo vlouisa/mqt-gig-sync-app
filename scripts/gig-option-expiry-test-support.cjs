@@ -1,7 +1,7 @@
 /** Uitsluitend in-memory mocks voor de optiecontrole. */
 module.exports = `
   const unit = { rows: [], queued: [], errors: [], acquired: true, releases: 0,
-    checks: 0, fail: false, headers: ['Option Expiry Date'], triggers: [], updates: 0 };
+    checks: 0, fail: false, reads: 0, headers: ['Option Expiry Date', 'Gig ID', 'Gig Status', 'SyncStatus', 'Date'], triggers: [], updates: 0 };
   const appPropertiesService = { getCalendarId: () => 'test', getAdminEmail: () => 'test@example.invalid' };
   const Session = { getScriptTimeZone: () => 'Europe/Brussels' };
   const Utilities = { formatDate(date, zone, pattern) {
@@ -16,7 +16,7 @@ module.exports = `
   const logService = { forModule: () => ({ warn() {}, info() {},
     error(...args) { unit.errors.push(args); } }) };
   const sheetService = { getSheet: () => ({}), getHeaders: () => unit.headers,
-    getRowsAsObjects: () => unit.rows };
+    getRowsAsObjects: () => { unit.reads++; return unit.rows; } };
   function initNotifications() {}
   const Notify = {
     notificationFingerprintService: { create: values => JSON.stringify(values) },
@@ -32,7 +32,7 @@ module.exports = `
     getProjectTriggers: () => unit.triggers.map(name => ({ getHandlerFunction: () => name })),
     deleteTrigger(trigger) { unit.triggers.splice(unit.triggers.indexOf(trigger.getHandlerFunction()), 1); },
     newTrigger(name) { return { timeBased() { return this; },
-      everyMinutes(minutes) { unit.minutes = minutes; return this; },
+      everyHours(hours) { unit.hours = hours; return this; },
       create() { unit.triggers.push(name); } }; }
   };
 `;

@@ -31,8 +31,8 @@ function onOpen() {
         .addItem('Installeer hotel-mail-import trigger', 'installHotelMailImportTrigger')
         .addItem('Verwijder hotel-mail-import trigger', 'removeHotelMailImportTriggers')
         .addSeparator()
-        .addItem('Installeer gigoptie-controle', 'installGigOptionExpiryTrigger')
-        .addItem('Verwijder gigoptie-controle', 'removeGigOptionExpiryTriggers')
+        .addItem('Installeer notificatiecontrole', 'installScheduledNotificationTrigger')
+        .addItem('Verwijder notificatiecontrole', 'removeScheduledNotificationTriggers')
         .addSeparator()
         .addItem('Installeer notificatie-worker trigger', 'installNotificationWorkerTrigger')
         .addItem('Verwijder notificatie-worker trigger', 'removeNotificationWorkerTriggers')
@@ -43,6 +43,7 @@ function onOpen() {
 
     .addSubMenu(
       ui.createMenu('Notificaties')
+        .addItem('Controleer tijdgestuurde notificaties', 'checkScheduledNotifications')
         .addItem('Verwerk notificatie queue', 'processEventQueueNotifications')
     )
 
@@ -56,4 +57,3 @@ function onOpen() {
 
   log.info('menu', 'on-open', 'MQT Gig Sync menu opgebouwd.');
 }
-

@@ -119,8 +119,8 @@ const systemStatusService = (() => {
         expectedTriggerCount: 1
       },
       {
-        name: 'Gig Option Expiry',
-        handlerFunction: TRIGGER_HANDLERS.gigOptionExpiry,
+        name: 'Scheduled Notifications',
+        handlerFunction: TRIGGER_HANDLERS.scheduledNotifications,
         expectedTriggerCount: 1
       }
     ];

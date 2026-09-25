@@ -10,7 +10,9 @@ uitgesloten. Ook `DRAFT` telt mee, mits een Gig ID aanwezig is.
 In `CONFIG.entities.gig.optionExpiry` staan:
 
 - `notificationTime`: standaard `09:00`, formaat `HH:mm`.
-- `everyMinutes`: standaard `5`; ondersteund: 1, 5, 10, 15 of 30.
+
+De generieke notificatiecontrole draait elk uur via
+`CONFIG.notifications.schedule.everyHours`. Zie [tijdgestuurde notificaties](scheduled-notifications.md).
 
 Een wijziging van het meldtijdstip werkt bij de volgende controle. Na wijziging
 van het interval moet de trigger opnieuw worden geïnstalleerd. De controle haalt
@@ -32,8 +34,9 @@ notificatie-worker; het ingestelde tijdstip is geen exacte aflevergarantie.
    verschoven beschermingen. De nieuwe vervaldatumkolom moet bewerkbaar zijn.
 5. Vul zelf `event-list` en `event-subscriptions` in met bovenstaande eventcode.
    De bestaande notificatie-worker en ontvangerconfiguratie blijven nodig.
-6. Gebruik `Triggers > Installeer gigoptie-controle`. Controleer in `system-status`
-   dat `Gig Option Expiry` en `Notification Worker` op `OK` staan.
+6. Gebruik `Triggers > Installeer notificatiecontrole`. Dit vervangt ook de oude
+   optietrigger. Controleer in `system-status` dat `Scheduled Notifications` en
+   `Notification Worker` op `OK` staan.
 7. Verifieer met een afgesproken testoptie de queue en aflevering. Deze controle
    wijzigt echte gegevens en verstuurt mogelijk een notificatie.
 

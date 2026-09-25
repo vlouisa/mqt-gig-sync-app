@@ -20,10 +20,10 @@ function testCommonMenuAdmin() {
     'installAutoSyncTrigger', 'removeAutoSyncTriggers',
     'installFlightMailImportTrigger', 'removeFlightMailImportTriggers',
     'installHotelMailImportTrigger', 'removeHotelMailImportTriggers',
-    'installGigOptionExpiryTrigger', 'removeGigOptionExpiryTriggers',
+    'installScheduledNotificationTrigger', 'removeScheduledNotificationTriggers',
     'installNotificationWorkerTrigger', 'removeNotificationWorkerTriggers',
     'installSystemStatusTrigger', 'removeSystemStatusTriggers',
-    'processEventQueueNotifications', 'protectTechnicalColumns', 'refreshSystemStatus'
+    'checkScheduledNotifications', 'processEventQueueNotifications', 'protectTechnicalColumns', 'refreshSystemStatus'
   ], unit.all('item').map(args => args[2]));
   assertEquals(1, unit.all('info').length);
 }

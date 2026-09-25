@@ -1,5 +1,6 @@
 const TRIGGER_HANDLERS = {
   gigOptionExpiry: 'checkGigOptionExpiry',
+  scheduledNotifications: 'checkScheduledNotifications',
   autoSync: 'syncEventsToCalendar',
   notificationWorker: 'processEventQueueNotifications',
   flightMailImport: 'scanFlightEmailsAndImport',
@@ -22,15 +23,48 @@ function checkGigOptionExpiry() {
   }
 }
 
-/** Installeert de periodieke optiecontrole; valideert voordat triggers worden verwijderd. */
+/** Legacy entrypoint: migreert de optiecontrole naar de generieke notificatiecontrole. */
 function installGigOptionExpiryTrigger() {
-  const minutes = CONFIG.entities.gig.optionExpiry.everyMinutes;
-  if (![1, 5, 10, 15, 30].includes(minutes)) {
-    throw new Error('Ongeldig controle-interval voor gigopties.');
+  installScheduledNotificationTrigger();
+}
+
+/** Evalueert alle tijdgestuurde regels onder een scriptlock. */
+function checkScheduledNotifications() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) {
+    logService.forModule('trigger-service').warn('scheduled-notifications-skipped-lock',
+      'Notificatiecontrole overgeslagen: scriptlock bezet.', '');
+    return;
   }
-  removeGigOptionExpiryTriggers();
-  ScriptApp.newTrigger(TRIGGER_HANDLERS.gigOptionExpiry)
-    .timeBased().everyMinutes(minutes).create();
+  try {
+    scheduledNotificationService.check();
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Installeert de generieke controle en vervangt ook legacy optietriggers. */
+function installScheduledNotificationTrigger() {
+  const hours = CONFIG.notifications.schedule.everyHours;
+  if (![1, 2, 4, 6, 8, 12].includes(hours)) {
+    throw new Error('Ongeldig controle-interval voor notificaties.');
+  }
+  // Bij een create-fout blijft de bestaande controle actief.
+  const previous = ScriptApp.getProjectTriggers().filter(trigger =>
+    [TRIGGER_HANDLERS.scheduledNotifications, TRIGGER_HANDLERS.gigOptionExpiry]
+      .includes(trigger.getHandlerFunction()));
+  ScriptApp.newTrigger(TRIGGER_HANDLERS.scheduledNotifications)
+    .timeBased().everyHours(hours).create();
+  previous.forEach(trigger => ScriptApp.deleteTrigger(trigger));
+  systemStatusService.update();
+}
+
+/** Verwijdert generieke en legacy tijdgestuurde notificatiecontroles. */
+function removeScheduledNotificationTriggers() {
+  ScriptApp.getProjectTriggers().forEach(trigger => {
+    if ([TRIGGER_HANDLERS.scheduledNotifications, TRIGGER_HANDLERS.gigOptionExpiry]
+      .includes(trigger.getHandlerFunction())) ScriptApp.deleteTrigger(trigger);
+  });
   systemStatusService.update();
 }
 

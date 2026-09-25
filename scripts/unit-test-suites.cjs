@@ -121,7 +121,10 @@ suites.push(
   },
   {
     name: 'notification-message', setup: infrastructureSetup,
-    sources: ['infrastructure/notification/notification-events.js', 'infrastructure/notification/notification-message-factory.js',
+    sources: ['common/config.js', 'infrastructure/notification/notification-events.js', 'infrastructure/notification/rules/gig-notification-rule-helpers.js',
+    'infrastructure/notification/rules/gig-option-expires-today-rule.js',
+    'infrastructure/notification/rules/gig-invoice-needs-to-be-sent-rule.js',
+    'infrastructure/notification/scheduled-notification-rules.js', 'infrastructure/notification/notification-message-factory.js',
       'test/helpers/assert-util.js', 'test/unit/notification-message-factory-tests.js'],
     tests: ['testNotificationMessageGig', 'testNotificationMessageDates', 'testNotificationMessageGigFallbacks',
       'testNotificationMessageSyncFailures', 'testNotificationMessageUnknownEvent']
@@ -189,11 +192,14 @@ suites.push({
   name: 'gig-option-expiry', setup: require('./gig-option-expiry-test-support.cjs'),
   sources: ['common/config.js', 'trigger-service.js',
     'infrastructure/notification/notification-events.js',
-    'infrastructure/notification/notification-message-factory.js',
-    'domain/gig/gig-notification-service.js', 'domain/gig/gig-option-expiry-service.js',
+    'infrastructure/notification/rules/gig-notification-rule-helpers.js',
+    'infrastructure/notification/rules/gig-option-expires-today-rule.js',
+    'infrastructure/notification/rules/gig-invoice-needs-to-be-sent-rule.js',
+    'infrastructure/notification/scheduled-notification-rules.js', 'infrastructure/notification/notification-message-factory.js',
+    'infrastructure/notification/scheduled-notification-service.js', 'domain/gig/gig-notification-service.js', 'domain/gig/gig-option-expiry-service.js',
     'test/helpers/assert-util.js', 'test/unit/gig-option-expiry-tests.js'],
   tests: ['testOptionExpirySelection', 'testOptionExpiryErrors', 'testOptionExpiryTimeAndExtension',
-    'testOptionExpiryMessage', 'testOptionExpiryTrigger']
+    'testOptionExpiryMessage', 'testOptionExpiryTrigger', 'testInvoiceSelection', 'testInvoiceCalendarBoundaries', 'testScheduledIsolation', 'testScheduledExtension']
 });
 
 module.exports = suites;

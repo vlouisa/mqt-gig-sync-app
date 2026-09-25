@@ -2,9 +2,9 @@
 function assertSystemStatusUpdate_(counts) {
   if (typeof unit === 'undefined') throw new Error('Alleen uitvoeren via de lokale unit-runner.');
   const handlers = [TRIGGER_HANDLERS.autoSync, TRIGGER_HANDLERS.flightMailImport,
-    TRIGGER_HANDLERS.hotelMailImport, TRIGGER_HANDLERS.notificationWorker, TRIGGER_HANDLERS.systemStatus, TRIGGER_HANDLERS.gigOptionExpiry];
+    TRIGGER_HANDLERS.hotelMailImport, TRIGGER_HANDLERS.notificationWorker, TRIGGER_HANDLERS.systemStatus, TRIGGER_HANDLERS.scheduledNotifications];
   const names = ['Automatic Calendar Sync', 'Flight Mail Import', 'Hotel Mail Import',
-    'Notification Worker', 'System Status Refresh', 'Gig Option Expiry'];
+    'Notification Worker', 'System Status Refresh', 'Scheduled Notifications'];
   unit.triggers = ['unrelatedHandler'];
   counts.forEach((count, index) => {
     for (let i = 0; i < count; i++) unit.triggers.push(handlers[index]);

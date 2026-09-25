@@ -58,8 +58,7 @@ const CONFIG = {
     },
     gig: {
       optionExpiry: {
-        notificationTime: '09:00',
-        everyMinutes: 5
+        notificationTime: '09:00'
       },
       columns: {
         gigId: 'Gig ID',
@@ -223,6 +222,8 @@ const CONFIG = {
 
   /** Instellingen voor event-based notificaties. */
   notifications: {
+    /** Interval voor alle tijdgestuurde notificatieregels. */
+    schedule: { everyHours: 1 },
     /** Actieve notificatieprovider. */
     provider: 'PUSHOVER',
     // provider: 'MOCK', // Voor Test doeleinden.
