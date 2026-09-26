@@ -129,3 +129,12 @@ Belangrijke conventies:
 * JSDoc voor relevante publieke contracten en foutvoorwaarden.
 
 Voer geen formatting-only wijzigingen uit in bestanden die niet bij de taak betrokken zijn.
+
+## Reporting
+
+Wanneer je een taak uitvoert:
+
+- vermeld aan het einde welke lokale skills je hebt gebruikt;
+- vermeld alleen skills die je daadwerkelijk hebt ingelezen/toegepast;
+- als geen skill is gebruikt, vermeld dat expliciet;
+- noem kort relevante bijzonderheden, zoals mislukte commando's, retries, ontbrekende tooling of een independent review.
