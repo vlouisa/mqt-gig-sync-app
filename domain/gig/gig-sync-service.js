@@ -237,7 +237,7 @@ const gigSyncService = (() => {
       columns.syncStatus
     );
 
-    syncFailedNotificationService.publish(NOTIFICATION_EVENTS.gigSyncFailed, {
+    syncFailedNotificationService.tryPublish(NOTIFICATION_EVENTS.gigSyncFailed, {
       sourceId: row[columns.gigId],
       entity: 'Gig',
       recordTitle: row[columns.gigId],
@@ -300,12 +300,15 @@ const gigSyncService = (() => {
     const columns = CONFIG.entities.gig.columns;
 
     if (!row[columns.gigId]) {
+      const gigId = Utilities.getUuid();
       sheetService.updateCell(
         row.rowNumber,
         columns.gigId,
-        Utilities.getUuid(),
+        gigId,
         CONFIG.entities.gig.sheetName
       );
+      // Sheet-writes wijzigen het oorspronkelijke rijobject niet.
+      row[columns.gigId] = gigId;
     }
 
     if (!row[columns.createdAt]) {

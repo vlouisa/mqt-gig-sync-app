@@ -68,10 +68,12 @@ for (const [domain, folder] of [['gig', 'gig'], ['flight', 'flight'], ['hotel', 
   suites.push({
     name: `${folder}-sync`,
     setup: domainSetup(domain, 'sync', `${domain}SyncService`),
-    sources: [...domainSources, ...dates, `domain/${folder}/${folder}-sync-service.js`, 'test/unit/domain-sync-tests.js'],
+    sources: [...domainSources, ...dates, 'common/sync-failed-notification-service.js',
+      `domain/${folder}/${folder}-sync-service.js`, 'test/unit/domain-sync-tests.js'],
     tests: ['testDomainSyncPublish', 'testDomainSyncSkipsInactiveRows', 'testDomainSyncDelete',
       'testDomainSyncErrorIsolation', 'testDomainSyncRequiredField',
-      ...(domain === 'gig' ? ['testGigSyncNotificationFailureIsolation'] : []),
+      ...(domain === 'gig' ? ['testGigSyncNotificationFailureIsolation', 'testGigSyncAssignedIdOnError'] : []),
+      ...(domain !== 'blockedDate' ? ['testDomainSyncFailureNotificationIsolation', 'testDomainSyncMissingIdNotification'] : []),
       ...(['gig', 'blockedDate'].includes(domain) ? ['testDomainSyncInvalidDateRange', 'testDomainSyncTechnicalFields'] : [])]
   });
 }
@@ -155,8 +157,10 @@ const commonSuites = [
     ['testCommonCalendarDateObjects', 'testCommonCalendarStrings', 'testCommonCalendarInvalid']],
   ['log', '_log-service.js', 'common-core-tests.js',
     ['testCommonLogLevels', 'testCommonLogDefaults']],
-  ['notification', 'sync-failed-notification-message.js', 'common-core-tests.js',
-    ['testCommonFailureNotification', 'testCommonFailureNotificationErrors']],
+  ['notification', 'sync-failed-notification-service.js', 'common-core-tests.js',
+    ['testCommonFailureNotification', 'testCommonFailureNotificationErrors',
+      'testCommonTryFailureNotification', 'testCommonTryFailureNotificationMissingId',
+      'testCommonTryFailureNotificationErrors']],
   ['sheet', 'sheet-service.js', 'common-sheet-tests.js',
     ['testCommonSheetReadRows', 'testCommonSheetEmptyAndMissing', 'testCommonSheetAppendMapping',
       'testCommonSheetColumnMap', 'testCommonSheetCacheLifecycle', 'testCommonSheetUpdateCell']],

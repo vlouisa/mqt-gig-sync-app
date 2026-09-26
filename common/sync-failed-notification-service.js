@@ -3,6 +3,31 @@
  */
 const syncFailedNotificationService = (() => {
   /**
+   * Probeert een foutnotificatie te publiceren zonder de sync-foutafhandeling te onderbreken.
+   * Ontbrekende bron-IDs worden overgeslagen; Notify-fouten worden technisch gelogd.
+   * Geen retry: Notify kan al een deel van de ontvangers hebben verwerkt.
+   * @param {string} eventCode Notificatie-eventcode.
+   * @param {Object} payload Dezelfde payload als publish().
+   * @returns {void}
+   */
+  function tryPublish(eventCode, payload) {
+    const log = logService.forModule('sync-failed-notification-service');
+    const context = `Event: ${eventCode}, Entity: ${payload.entity}, SourceId: ${payload.sourceId || ''}, Row: ${payload.rowNumber}`;
+
+    if (!payload.sourceId) {
+      log.warn('sync-failed-notification-skipped',
+        'Foutnotificatie overgeslagen: bron-ID ontbreekt.', context);
+      return;
+    }
+
+    try {
+      publish(eventCode, payload);
+    } catch (error) {
+      log.error('sync-failed-notification-error', error.message, context);
+    }
+  }
+
+  /**
    * Publiceert een sync-failed notificatie.
    *
    * @param {string} eventCode Notificatie-eventcode.
@@ -75,6 +100,7 @@ const syncFailedNotificationService = (() => {
   }
 
   return {
-    publish
+    publish,
+    tryPublish
   };
 })();

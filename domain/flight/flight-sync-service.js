@@ -208,7 +208,7 @@ const flightSyncService = (() => {
       columns.syncStatus
     );
 
-    syncFailedNotificationService.publish(NOTIFICATION_EVENTS.flightSyncFailed, {
+    syncFailedNotificationService.tryPublish(NOTIFICATION_EVENTS.flightSyncFailed, {
       sourceId: row[columns.flightId],
       entity: 'Flight',
       recordTitle: row[columns.flightId],

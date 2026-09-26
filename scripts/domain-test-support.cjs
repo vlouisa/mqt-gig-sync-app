@@ -40,6 +40,8 @@ function bootstrap(domain, kind, serviceName) {
       const pad = n => String(n).padStart(2, '0');
       if (pattern === 'yyyy-MM-dd') return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
       if (pattern === 'HH:mm') return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+      if (pattern === 'dd-MM-yyyy hh') return '26-09-2026 08';
+      if (pattern === 'dd-MM-yyyy hh:mm:ss') return '26-09-2026 08:15:30';
       throw new Error('Unsupported test format: ' + pattern);
     }
   };
@@ -86,12 +88,11 @@ function bootstrap(domain, kind, serviceName) {
     for (const key of ['gig', 'flight', 'hotel', 'blockedDate']) entry[key] = params => params;
     globalThis.auditService = { log: params => unit.call('audit', params) };
     globalThis.gigNotificationService = { publishGigPublished: row => unit.call('successNotification', row) };
-    globalThis.syncFailedNotificationService = { publish: (...args) => unit.call('failureNotification', ...args) };
   }
   globalThis.initNotifications = () => unit.call('initNotifications');
   globalThis.Notify = {
     notificationFingerprintService: { create(values) { unit.call('fingerprint', values); return 'fingerprint-1'; } },
-    notificationPublisher: { publish(...args) { unit.call('notify', ...args); } }
+    notificationPublisher: { publish(...args) { unit.call(kind === 'sync' ? 'failureNotification' : 'notify', ...args); } }
   };
   if (kind === 'import') {
     globalThis.flightApi = {

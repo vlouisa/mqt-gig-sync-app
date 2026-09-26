@@ -8,11 +8,16 @@ Er is ook een onafhankelijke review van de syncaanroepen uitgevoerd.
 | ID | Ernst | Status | Bevinding | Details |
 | --- | --- | --- | --- | --- |
 | NOTIFY-001 | Hoog | Opgelost in code; tests nog niet uitgevoerd | Fout bij gigmelding na succesvolle sync breekt de synchronisatierun af | [Details](NOTIFY-001-gig-publication-failure.md) |
-| NOTIFY-002 | Hoog | Open | Foutnotificaties doorbreken foutisolatie per record | [Details](NOTIFY-002-error-notification-isolation.md) |
+| NOTIFY-002 | Hoog | Opgelost; lokale unit-tests geslaagd | Foutnotificaties doorbreken foutisolatie per record | [Details](NOTIFY-002-error-notification-isolation.md) |
 | NOTIFY-003 | Hoog | Open | Onderbroken queue-items op PROCESSING worden niet hersteld | [Details](NOTIFY-003-stuck-processing.md) |
 | NOTIFY-004 | Middel | Open | Uurfingerprint verwart ochtend en avond | [Details](NOTIFY-004-hour-fingerprint.md) |
 
 ## Verificatie en beperkingen
+
+- Na de oplossing van NOTIFY-002 is `npm.cmd run test:unit` uitgevoerd:
+  **158 geslaagd, 0 mislukt**, inclusief de refactor naar `tryPublish`.
+  De onderstaande toolingbeperking betreft de
+  oorspronkelijke review. Zie het detailbestand voor de nieuwe regressiegevallen.
 
 - Bevindingen zijn gebaseerd op de daadwerkelijke control flow en contracten;
   ze zijn niet in productie gereproduceerd.

@@ -95,6 +95,89 @@ function testDomainSyncErrorIsolation() {
   assertEquals(unit.domain === 'blockedDate' ? 0 : 1, unit.count('failureNotification'));
 }
 
+/** Een falende foutnotificatie bij publicatie en verwijdering behoudt fout-audit en voortgang. */
+function testDomainSyncFailureNotificationIsolation() {
+  if (typeof unit === 'undefined') throw new Error('Alleen uitvoeren via de lokale unit-runner.');
+  unit.record.fail = true;
+  const deleting = { ...unit.record, rowNumber: 3, SyncStatus: 'DELETE_REQUESTED' };
+  const next = { ...unit.record, rowNumber: 4, fail: false };
+  unit.rows.push(unit.record, deleting, next);
+  Notify.notificationPublisher.publish = (...args) => {
+    unit.call('failureNotification', ...args);
+    throw new Error('Notify unavailable');
+  };
+
+  unit.getService().sync();
+
+  for (const row of [unit.record, deleting]) {
+    assertEquals('ERROR', row.SyncStatus);
+    assertEquals('Calendar unavailable', row.LastError);
+  }
+  assertEquals('SYNCED', next.SyncStatus);
+  assertEquals(2, unit.count('failureNotification'));
+  const audits = unit.calls.filter(call => call.name === 'audit').map(call => call.args[0]);
+  assertEquals(3, audits.length);
+  for (const audit of audits.slice(0, 2)) {
+    assertEquals('Calendar unavailable', audit.details);
+    assertEquals('ERROR', audit.newStatus);
+    assertEquals(unit.domain.toUpperCase() + '_PUBLICATION_ERROR', audit.action);
+  }
+  assertEquals('DELETE_REQUESTED', audits[1].oldStatus);
+  assertEquals(2, unit.calls.filter(call => call.name === 'error' &&
+    call.args[0] === 'sync-failed-notification-error' &&
+    call.args[1] === 'Notify unavailable').length);
+}
+
+/** Ontbrekende IDs veroorzaken geen ongeldige Notify-aanroep; de volgende rij gaat door. */
+function testDomainSyncMissingIdNotification() {
+  if (typeof unit === 'undefined') throw new Error('Alleen uitvoeren via de lokale unit-runner.');
+  const id = { gig: 'Gig ID', flight: 'Flight ID', hotel: 'Hotel ID' }[unit.domain];
+  const next = { ...unit.record, rowNumber: 3 };
+  delete unit.record[id];
+  // Een deletepad kent ook bij gigs geen nieuwe identiteit toe.
+  if (unit.domain === 'gig') {
+    unit.record.SyncStatus = 'DELETE_REQUESTED';
+    unit.record.fail = true;
+  }
+  unit.rows.push(unit.record, next);
+  unit.getService().sync();
+  assertEquals('ERROR', unit.record.SyncStatus);
+  assertEquals(unit.domain === 'gig' ? 'Calendar unavailable' : 'Verplicht veld ontbreekt: ' + id,
+    unit.record.LastError);
+  assertEquals('SYNCED', next.SyncStatus);
+  assertEquals(0, unit.count('failureNotification'));
+  assertEquals(2, unit.count('audit'));
+  assertEquals('sync-failed-notification-skipped', unit.last('warn')[0]);
+}
+
+/** Echte Sheet-reads leveren snapshots; een nieuw gig-ID blijft bij een validatiefout beschikbaar. */
+function testGigSyncAssignedIdOnError() {
+  if (typeof unit === 'undefined') throw new Error('Alleen uitvoeren via de lokale unit-runner.');
+  const next = { ...unit.record, rowNumber: 3, 'Gig ID': 'G-2' };
+  delete unit.record['Gig ID'];
+  delete unit.record.Title;
+  unit.rows.push(unit.record, next);
+  sheetService.getRowsAsObjects = () => unit.rows.map(row => ({ ...row }));
+  sheetService.getRowAsObject = number => ({ ...unit.rows.find(row => row.rowNumber === number) });
+  Notify.notificationPublisher.publish = (eventCode, payload) => {
+    if (!payload.sourceId) throw new Error('sourceId ontbreekt');
+    unit.call('failureNotification', eventCode, payload);
+  };
+
+  unit.getService().sync();
+
+  assertEquals('ERROR', unit.record.SyncStatus);
+  assertEquals('Verplicht veld ontbreekt: Title', unit.record.LastError);
+  assertEquals('unit-uuid', unit.record['Gig ID']);
+  assertEquals(1, unit.count('failureNotification'));
+  assertEquals(unit.record['Gig ID'], unit.last('failureNotification')[1].sourceId);
+  const audit = unit.calls.find(call => call.name === 'audit').args[0];
+  assertEquals('GIG_PUBLICATION_ERROR', audit.action);
+  assertEquals('unit-uuid', audit.record['Gig ID']);
+  assertEquals('SYNCED', next.SyncStatus);
+  assertEquals(2, unit.count('audit'));
+}
+
 /** Een ontbrekend verplicht veld wordt afgewezen vóór Calendar-publicatie. */
 function testDomainSyncRequiredField() {
   if (typeof unit === 'undefined') throw new Error('Alleen uitvoeren via de lokale unit-runner.');

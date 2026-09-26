@@ -120,3 +120,45 @@ function testCommonFailureNotificationErrors() {
     assertEquals(1, unit.all(stage).length);
   });
 }
+
+/** De veilige variant gebruikt dezelfde payload en publiceert precies eenmaal. */
+function testCommonTryFailureNotification() {
+  requireCommonUnit_();
+  const payload = { sourceId: 'gig-1', entity: 'Gig', rowNumber: 4, errorMessage: 'Calendar failed' };
+  syncFailedNotificationService.publish('GIG_SYNC_FAILED', payload);
+  const expected = unit.all('publish')[0];
+  unit.calls = [];
+  syncFailedNotificationService.tryPublish('GIG_SYNC_FAILED', payload);
+  assertCommonData_([expected], unit.all('publish'));
+  assertEquals(1, unit.all('init').length);
+  assertEquals(0, unit.all('warn').length + unit.all('error').length);
+}
+
+/** Zonder identiteit wordt Notify niet geïnitialiseerd of aangeroepen. */
+function testCommonTryFailureNotificationMissingId() {
+  requireCommonUnit_();
+  syncFailedNotificationService.tryPublish('HOTEL_SYNC_FAILED', { entity: 'Hotel', rowNumber: 3 });
+  assertEquals(0, unit.all('init').length + unit.all('publish').length);
+  assertEquals(1, unit.all('warn').length);
+  assertCommonData_(['sync-failed-notification-service', 'sync-failed-notification-skipped',
+    'Foutnotificatie overgeslagen: bron-ID ontbreekt.',
+    'Event: HOTEL_SYNC_FAILED, Entity: Hotel, SourceId: , Row: 3'], unit.all('warn')[0]);
+}
+
+/** Elke publicatiestap mag falen; de fout blijft gelogd zonder exception of retry. */
+function testCommonTryFailureNotificationErrors() {
+  requireCommonUnit_();
+  for (const stage of ['init', 'fingerprint', 'format', 'publish']) {
+    unit.calls = [];
+    unit.failAt = stage;
+    syncFailedNotificationService.tryPublish('FLIGHT_SYNC_FAILED', {
+      sourceId: 'F-1', entity: 'Flight', rowNumber: 2, errorMessage: 'Calendar failed'
+    });
+    assertEquals(1, unit.all(stage).length);
+    assertEquals(stage === 'publish' ? 1 : 0, unit.all('publish').length);
+    assertEquals(1, unit.all('error').length);
+    assertCommonData_(['sync-failed-notification-service', 'sync-failed-notification-error',
+      stage + ' failed', 'Event: FLIGHT_SYNC_FAILED, Entity: Flight, SourceId: F-1, Row: 2'],
+      unit.all('error')[0]);
+  }
+}

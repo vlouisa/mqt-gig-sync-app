@@ -1,7 +1,7 @@
 # NOTIFY-002 — Foutnotificaties doorbreken isolatie per record
 
 - Ernst: **Hoog**
-- Status: **Open**
+- Status: **Opgelost; lokale unit-tests geslaagd**
 - Zekerheid: **Bewezen uit control flow en lokaal Notify-contract**.
 - Locaties: `domain/gig/gig-sync-service.js:230`,
   `domain/flight/flight-sync-service.js:211`,
@@ -42,4 +42,35 @@ De lokale syncmocks laten notificaties altijd slagen en muteren rijobjecten bij
 Sheet-writes; daardoor missen ze zowel het Notify-contract als de verouderde
 gigrij. Benodigde regressies: falende foutpublicatie met een volgende geldige
 rij, ontbrekende vlucht-/hotel-ID en nieuw toegewezen gig-ID gevolgd door een
-validatiefout. Tests zijn tijdens deze review niet uitgevoerd.
+validatiefout. Tests zijn tijdens de oorspronkelijke review niet uitgevoerd.
+
+## Oplossing en verificatie
+
+De gig-, flight- en hotel-syncservices gebruiken
+`syncFailedNotificationService.tryPublish`. Deze gedeelde methode controleert
+het bron-ID en vangt fouten uit `publish` af. Het bestaande `publish`-contract
+blijft behouden: directe callers ontvangen nog steeds exceptions.
+De oorspronkelijke `LastError`, status ERROR en fout-audit blijven behouden;
+volgende records worden verwerkt. Zonder bron-ID wordt de notificatie overgeslagen
+met een technische waarschuwing. Na een geslaagde ID-write bewaart de gigservice
+de nieuwe UUID ook in het oorspronkelijke rijobject voor de foutafhandeling.
+Er zijn geen retries, nieuwe IDs voor foutmeldingen of librarywijzigingen toegevoegd.
+
+Zeven nieuwe regressiegevallen controleren falende foutmeldingen bij publicatie
+en verwijdering voor alle drie domeinen, ontbrekende IDs en een nieuw gig-ID
+gevolgd door een validatiefout. Die laatste test gebruikt afzonderlijke
+Sheet-snapshots zodat writes het ingelezen object niet impliciet bijwerken.
+
+De technische notificatielogs staan nu onder module
+`sync-failed-notification-service`, met codes `sync-failed-notification-error`
+en `sync-failed-notification-skipped`. Eventcode, entity, bron-ID en rijnummer
+staan in de logcontext; deze vervangen de domeinspecifieke notificatielogcodes.
+
+Drie extra tests controleren succesvolle `tryPublish`, ontbrekende identiteit
+en fouten bij initialisatie, fingerprint, datumformattering en publicatie.
+De sync-tests laden de echte lokale notificatieservice met Notify-mocks.
+
+`npm.cmd run test:unit`: **158 geslaagd, 0 mislukt**. De tests gebruiken lokale
+mocks; er zijn geen integratietests met echte Sheets, Calendar of Notify uitgevoerd.
+Het contract van de lokale Notify-publisher is geïnspecteerd; de gepubliceerde
+libraryversie is niet gecontroleerd. De wijziging is niet gedeployd.

@@ -208,7 +208,7 @@ const hotelSyncService = (() => {
       columns.syncStatus
     );
 
-    syncFailedNotificationService.publish(NOTIFICATION_EVENTS.hotelSyncFailed, {
+    syncFailedNotificationService.tryPublish(NOTIFICATION_EVENTS.hotelSyncFailed, {
       sourceId: row[columns.hotelId],
       entity: 'Hotel',
       recordTitle: row[columns.hotelId],

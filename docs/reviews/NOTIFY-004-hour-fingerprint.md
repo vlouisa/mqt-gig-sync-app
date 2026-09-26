@@ -3,8 +3,8 @@
 - Ernst: **Middel**
 - Status: **Open**
 - Zekerheid: **Bewezen uit formaatcontract en deduplicatiesleutel**.
-- Locatie: `common/sync-failed-notification-message.js:73`,
-  `formatFingerprintDate_`; ook regel 51, `formatDate_`.
+- Locatie: `common/sync-failed-notification-service.js`, functies
+  `formatFingerprintDate_` en `formatDate_`.
 
 ## Probleem en gevolg
 
