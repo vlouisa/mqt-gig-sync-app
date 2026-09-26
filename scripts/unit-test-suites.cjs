@@ -71,6 +71,7 @@ for (const [domain, folder] of [['gig', 'gig'], ['flight', 'flight'], ['hotel', 
     sources: [...domainSources, ...dates, `domain/${folder}/${folder}-sync-service.js`, 'test/unit/domain-sync-tests.js'],
     tests: ['testDomainSyncPublish', 'testDomainSyncSkipsInactiveRows', 'testDomainSyncDelete',
       'testDomainSyncErrorIsolation', 'testDomainSyncRequiredField',
+      ...(domain === 'gig' ? ['testGigSyncNotificationFailureIsolation'] : []),
       ...(['gig', 'blockedDate'].includes(domain) ? ['testDomainSyncInvalidDateRange', 'testDomainSyncTechnicalFields'] : [])]
   });
 }

@@ -16,6 +16,45 @@ function testDomainSyncPublish() {
   assertEquals(unit.domain === 'gig' ? 1 : 0, unit.count('successNotification'));
 }
 
+/** Een falende gigmelding behoudt de Calendar-status en audit; volgende gigs gaan door. */
+function testGigSyncNotificationFailureIsolation() {
+  if (typeof unit === 'undefined') throw new Error('Alleen uitvoeren via de lokale unit-runner.');
+  const next = { ...unit.record, rowNumber: 3, 'Gig ID': 'G-2' };
+  unit.rows.push(unit.record, next);
+  gigNotificationService.publishGigPublished = row => {
+    unit.call('successNotification', row);
+    if (row.rowNumber === 2) throw new Error('Notification queue unavailable');
+  };
+
+  unit.getService().sync();
+
+  for (const row of unit.rows) {
+    assertEquals('SYNCED', row.SyncStatus);
+    assertEquals('event-1', row.CalendarEventId);
+    assertEquals('', row.LastError);
+    assertTrue(row.LastSyncedAt instanceof Date);
+  }
+  assertEquals(2, unit.count('publish'));
+  assertEquals(2, unit.count('successNotification'));
+  assertEquals(0, unit.count('failureNotification'));
+  const audits = unit.calls.filter(call => call.name === 'audit');
+  assertEquals(2, audits.length);
+  audits.forEach(call => {
+    assertEquals('GIG_PUBLISHED_TO_CALENDAR', call.args[0].action);
+    assertEquals('NEEDS_SYNC', call.args[0].oldStatus);
+    assertEquals('SYNCED', call.args[0].newStatus);
+  });
+  assertEquals(1, unit.count('error'));
+  assertEquals('gig-published-notification-error', unit.last('error')[0]);
+  assertEquals('Notification queue unavailable', unit.last('error')[1]);
+  assertEquals('Row: 2, GigId: G-1', unit.last('error')[2]);
+
+  // Een volgende sync herpubliceert de al gesynchroniseerde gigs niet.
+  unit.getService().sync();
+  assertEquals(2, unit.count('publish'));
+  assertEquals(2, unit.count('successNotification'));
+}
+
 /** Niet-verwerkbare statussen veroorzaken geen publicatie of terugschrijven. */
 function testDomainSyncSkipsInactiveRows() {
   if (typeof unit === 'undefined') throw new Error('Alleen uitvoeren via de lokale unit-runner.');

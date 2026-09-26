@@ -131,7 +131,17 @@ const gigSyncService = (() => {
       columns.syncStatus
     );
 
-    gigNotificationService.publishGigPublished(refreshedRow);
+    // Een notificatiefout verandert de geslaagde Calendar-publicatie niet.
+    // Geen automatische retry: Notify kan al een deel van de ontvangers hebben verwerkt.
+    try {
+      gigNotificationService.publishGigPublished(refreshedRow);
+    } catch (error) {
+      log.error(
+        'gig-published-notification-error',
+        error.message,
+        `Row: ${refreshedRow.rowNumber}, GigId: ${refreshedRow[columns.gigId] || ''}`
+      );
+    }
 
     auditService.log(entry.gig({
       action: 'GIG_PUBLISHED_TO_CALENDAR',

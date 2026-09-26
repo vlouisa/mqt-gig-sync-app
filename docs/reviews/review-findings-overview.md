@@ -7,7 +7,7 @@ Er is ook een onafhankelijke review van de syncaanroepen uitgevoerd.
 
 | ID | Ernst | Status | Bevinding | Details |
 | --- | --- | --- | --- | --- |
-| NOTIFY-001 | Hoog | Open | Fout bij gigmelding na succesvolle sync breekt de synchronisatierun af | [Details](NOTIFY-001-gig-publication-failure.md) |
+| NOTIFY-001 | Hoog | Opgelost in code; tests nog niet uitgevoerd | Fout bij gigmelding na succesvolle sync breekt de synchronisatierun af | [Details](NOTIFY-001-gig-publication-failure.md) |
 | NOTIFY-002 | Hoog | Open | Foutnotificaties doorbreken foutisolatie per record | [Details](NOTIFY-002-error-notification-isolation.md) |
 | NOTIFY-003 | Hoog | Open | Onderbroken queue-items op PROCESSING worden niet hersteld | [Details](NOTIFY-003-stuck-processing.md) |
 | NOTIFY-004 | Middel | Open | Uurfingerprint verwart ochtend en avond | [Details](NOTIFY-004-hour-fingerprint.md) |
@@ -20,4 +20,5 @@ Er is ook een onafhankelijke review van de syncaanroepen uitgevoerd.
   `npm run test:unit` kon niet starten: npm en node zijn niet op PATH gevonden;
   ook `C:/Program Files/nodejs/node.exe` ontbreekt. Er is dus geen testuitslag.
 - Geen integratietests, externe mutaties of deployments uitgevoerd.
-- Alleen deze reviewdocumentatie is toegevoegd; implementaties zijn niet gewijzigd.
+- Tijdens de oorspronkelijke review is alleen documentatie toegevoegd. NOTIFY-001
+  is daarna gericht opgelost; de details vermelden de wijziging en verificatie.
