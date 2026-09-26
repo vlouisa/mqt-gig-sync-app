@@ -10,11 +10,15 @@ Commit uitsluitend de wijzigingen die bij de huidige taak horen.
 
 ## Werkwijze
 
-1. Inspecteer de huidige Git-status en relevante diff.
-2. Controleer dat alleen bedoelde wijzigingen worden meegenomen.
-3. Commit geen niet-gerelateerde wijzigingen.
-4. Maak de commit.
-5. Rapporteer de gebruikte commit message en het resultaat.
+1. Bekijk `git status --short`.
+2. Inspecteer alleen de diff van gewijzigde bestanden die bij de huidige taak horen.
+3. Controleer met `git diff --check` op whitespace- of patchproblemen.
+4. Stage uitsluitend de bestanden die bij de huidige taak horen.
+5. Controleer kort de staged diff.
+6. Maak de commit.
+7. Controleer dat de commit succesvol is gemaakt en rapporteer de gebruikte commit message.
+
+Voer geen tests, code review of aanvullende repository-analyse uit, tenzij de gebruiker dit expliciet vraagt.
 
 ## Commit message
 
@@ -24,18 +28,17 @@ Gebruik:
 <onderwerp>: <message>
 ```
 
-De commit message is in het Nederlands.
+Gebruik voor <onderwerp> een passend Conventional Commit-type, bijvoorbeeld:
+- feat
+- fix
+- test
+- docs
+- refactor
+- chore
 
+De <message> moet in het Nederlands zijn.
+Gebruik alleen Engelse woorden wanneer dit inhoudelijk logisch is, bijvoorbeeld voor technische termen, productnamen, code-identifiers of andere gangbare vaktermen.
 Schrijf onderwerp en message in kleine letters, behalve waar hoofdletters inhoudelijk noodzakelijk zijn.
-
-Gebruik een passend onderwerp, bijvoorbeeld:
-
-* `feat`
-* `fix`
-* `test`
-* `docs`
-* `refactor`
-* `chore`
 
 Voorbeelden:
 
@@ -45,4 +48,3 @@ fix: voorkom dubbele notificaties
 test: voeg tests voor verlopen opties toe
 docs: actualiseer projectinstructies
 ```
-
