@@ -2,6 +2,7 @@
  * Centrale eventcodes voor app-specifieke notificaties.
  */
 const NOTIFICATION_EVENTS = {
+  gigTravelBookingsMissing: 'GIG_TRAVEL_BOOKINGS_MISSING',
   gigOptionExpiresToday: 'GIG_OPTION_EXPIRES_TODAY',
   gigInvoiceNeedsToBeSent: 'GIG_INVOICE_NEEDS_TO_BE_SENT',
   gigPublished: 'GIG_PUBLISHED',

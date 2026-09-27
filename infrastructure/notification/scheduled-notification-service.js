@@ -57,7 +57,12 @@ const scheduledNotificationService = (() => {
 
       const source = getSource_(entity.sheetName, run.sources);
       validateRequiredColumns_(rule, entity, source.headers);
-      source.rows.forEach(record => processRecord_(rule, record, entity.sheetName, run));
+      const context = rule.prepare ? { ...run.context, prepared: rule.prepare(name => {
+        const dependency = CONFIG.entities[name];
+        if (!dependency) throw new Error('Onbekende regelbron.');
+        return getSource_(dependency.sheetName, run.sources);
+      }, run.context) } : run.context;
+      source.rows.forEach(record => processRecord_(rule, record, entity.sheetName, run, context));
     } catch (error) {
       run.log.error('scheduled-notification-rule-error', error.message, `Rule: ${rule.id}`);
     }
@@ -107,10 +112,10 @@ const scheduledNotificationService = (() => {
   }
 
   /** Evalueert één record; selectie- en publicatiefouten blokkeren andere records niet. */
-  function processRecord_(rule, record, sheetName, run) {
+  function processRecord_(rule, record, sheetName, run, context) {
     let sourceId = '';
     try {
-      const result = rule.evaluate(record, run.context);
+      const result = rule.evaluate(record, context);
       if (!result) return;
 
       const { fingerprintValues, ...payload } = result;

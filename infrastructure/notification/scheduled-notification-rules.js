@@ -5,7 +5,7 @@ const scheduledNotificationRules = (() => {
    * @returns {Object[]} Nieuwe definities zodat callers de rule-objecten niet wijzigen.
    */
   function getAll() {
-    return [gigOptionExpiresTodayRule, gigInvoiceNeedsToBeSentRule].map(rule => ({
+    return [gigOptionExpiresTodayRule, gigInvoiceNeedsToBeSentRule, gigTravelBookingsMissingRule].map(rule => ({
       ...rule,
       requiredColumns: [...rule.requiredColumns]
     }));

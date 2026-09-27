@@ -72,6 +72,11 @@ const CONFIG = {
       syncStatusColumnIndex: 5
     },
     gig: {
+      travelBookings: {
+        daysBefore: 14, notificationTime: '09:00',
+        outboundArrival: { from: -1, to: 0 },
+        returnDeparture: { from: 1, to: 1 }
+      },
       optionExpiry: {
         notificationTime: '09:00'
       },

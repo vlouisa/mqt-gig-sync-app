@@ -11,6 +11,8 @@ gigvelden, syncstatussen of Calendar-events.
 
 ## Regels
 
+- `GIG_TRAVEL_BOOKINGS_MISSING`: gezamenlijke controle van reisboekingen vanaf veertien dagen vóór een CONFIRMED gig. Zie [reisboekingsreminder](FEAT-006-gig-travel-bookings-reminder.md) voor vensters, bronvalidatie en deduplicatie.
+
 - `GIG_OPTION_EXPIRES_TODAY`: `OPTION`, vervaldatum vandaag, vanaf 09:00.
   De bestaande datumfingerprint blijft behouden. Het meldtijdstip blijft
   instelbaar via `CONFIG.entities.gig.optionExpiry.notificationTime`.
@@ -18,10 +20,10 @@ gigvelden, syncstatussen of Calendar-events.
   Start/eindtijd en factuurstatus spelen geen rol. Een vaste fingerprint betekent
   eenmaal per Gig ID en abonnee, ook na een latere wijziging van de gigdatum.
 
-Beide regels sluiten `DELETE_REQUESTED` en `DELETED` uit; overige syncstatussen
+Alle regels sluiten `DELETE_REQUESTED` en `DELETED` uit; overige syncstatussen
 zijn toegestaan. Een Gig ID is verplicht. Datumvelden moeten echte Sheet-datums
 zijn. Alle kalendervergelijkingen gebruiken de scripttijdzone Europe/Brussels.
-Er worden geen controles van eerdere dagen ingehaald. Een al klaargezette
+Optie- en factuurreminders halen geen controles van eerdere dagen in. De reisregel blijft controleren binnen het ingestelde venster vóór de gig. Een al klaargezette
 notificatie kan wel later via de bestaande worker worden afgeleverd.
 
 Notify verzorgt eventactivatie, abonnementen, deduplicatie en afleverretries.

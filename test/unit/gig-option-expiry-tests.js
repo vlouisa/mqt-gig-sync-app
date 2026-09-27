@@ -139,7 +139,7 @@ function testScheduledIsolation() {
   unit.rows = [{ ...gig, Date: '2026-09-24' }, { ...gig, Date: new Date(NaN) },
     { ...gig, Date: '' }, { ...gig, 'Gig ID': '' }, { ...gig, 'Gig ID': 'fail' }, gig];
   scheduledNotificationService.check(new Date('2026-09-25T07:00:00Z'));
-  assertEquals(5, unit.errors.length);
+  assertEquals(7, unit.errors.length); // Ook de reisregel wijst beide ongeldige gigdatums af.
   assertEquals(1, unit.queued.length);
   const rules = scheduledNotificationRules.getAll();
   rules[0].notificationTime = '25:00';
@@ -147,7 +147,7 @@ function testScheduledIsolation() {
   assertEquals(2, unit.queued.length);
 }
 
-/** Een derde regel vereist geen aanpassingen aan runner, trigger of berichtfactory. */
+/** Een extra regel vereist geen aanpassingen aan runner, trigger of berichtfactory. */
 function testScheduledExtension() {
   unit.rows = [optionGig_()];
   const rules = scheduledNotificationRules.getAll();
@@ -162,7 +162,7 @@ function testScheduledExtension() {
     assertEquals(2, unit.queued.length);
     assertEquals(1, unit.reads);
     assertEquals('Example', notificationMessageFactory.create('EXAMPLE', {}).title);
-    rules[2].enabled = false;
+    rules.find(rule => rule.id === 'example').enabled = false;
     scheduledNotificationService.check(new Date('2026-09-25T07:00:00Z'));
     assertEquals(3, unit.queued.length);
   } finally {

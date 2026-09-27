@@ -15,8 +15,17 @@ module.exports = `
   } };
   const logService = { forModule: () => ({ warn() {}, info() {},
     error(...args) { unit.errors.push(args); } }) };
-  const sheetService = { getSheet: () => ({}), getHeaders: () => unit.headers,
-    getRowsAsObjects: () => { unit.reads++; return unit.rows; } };
+  unit.travel = { 'flight-input': [], 'hotel-input': [] };
+  unit.sourceReads = {};
+  const sheetService = { getSheet: name => ({ name }), getHeaders: sheet => {
+    if (sheet.name === 'flight-input') return unit.flightHeaders || Object.values(CONFIG.entities.flight.columns);
+    if (sheet.name === 'hotel-input') return Object.values(CONFIG.entities.hotel.columns);
+    return unit.headers;
+  }, getRowsAsObjects: name => {
+    unit.sourceReads[name] = (unit.sourceReads[name] || 0) + 1;
+    if (name !== 'gig-input') return unit.travel[name];
+    unit.reads++; return unit.rows;
+  } };
   function initNotifications() {}
   const Notify = {
     notificationFingerprintService: { create: values => JSON.stringify(values) },
