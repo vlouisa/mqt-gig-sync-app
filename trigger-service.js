@@ -1,4 +1,5 @@
 const TRIGGER_HANDLERS = {
+  websitePublications: 'syncWebsitePublications',
   gigOptionExpiry: 'checkGigOptionExpiry',
   scheduledNotifications: 'checkScheduledNotifications',
   autoSync: 'syncEventsToCalendar',
@@ -449,14 +450,13 @@ function removeSystemStatusTriggers() {
  *
  * @param {string} action Naam van de beheeractie voor logging en foutmelding.
  * @returns {void}
- * @throws {Error} Bij een afwijkend adres. De huidige logService.warn-aanroep
- * bestaat niet op de service en kan vóór de bedoelde autorisatiefout falen.
+ * @throws {Error} Bij een afwijkend adres.
  */
 function assertAdminUser(action) {
   const userEmail = Session.getActiveUser().getEmail();
 
   if (userEmail !== CONFIG.adminEmail) {
-    logService.warn('trigger-service', 'unauthorized-action', 'Niet-admin probeerde beheeractie uit te voeren.', `Action: ${action}, User: ${userEmail}`);
+    logService.forModule('trigger-service').warn('unauthorized-action', 'Niet-admin probeerde beheeractie uit te voeren.', `Action: ${action}, User: ${userEmail}`);
     throw new Error(`Alleen ${CONFIG.adminEmail} mag '${action}'.`);
   }
 }

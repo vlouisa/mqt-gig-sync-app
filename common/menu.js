@@ -21,7 +21,18 @@ function onOpen() {
     )
 
     .addSubMenu(
+      ui.createMenu('Website')
+        .addItem('Synchroniseer publicaties', 'syncWebsitePublications')
+        .addItem('Maak WordPress-concept', 'createWordPressDraft')
+        .addItem('Sla geselecteerde publicatie over', 'skipWebsitePublication')
+        .addItem('Richt publicatietabblad in', 'setupWebsitePublications')
+    )
+
+    .addSubMenu(
       ui.createMenu('Triggers')
+        .addItem('Installeer website-publicatietrigger', 'installWebsitePublicationTrigger')
+        .addItem('Verwijder website-publicatietrigger', 'removeWebsitePublicationTriggers')
+        .addSeparator()
         .addItem('Installeer auto-sync trigger', 'installAutoSyncTrigger')
         .addItem('Verwijder auto-sync trigger', 'removeAutoSyncTriggers')
         .addSeparator()

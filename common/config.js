@@ -27,6 +27,21 @@ const CONFIG = {
     everyMinutes: 5
   },
 
+  /** Eigen werkvoorraad; staat los van Calendar Sync en de Notify-queue. */
+  websitePublications: {
+    sheetName: 'website-publications',
+    everyHours: 1,
+    columns: {
+      status: 'Status', title: 'Title', date: 'Date', venue: 'Venue',
+      city: 'City', country: 'Country', start: 'Start', address: 'Address',
+      zip: 'Zip', contactEmail: 'Contact Email', contactWebsite: 'Contact Website',
+      ticketUrl: 'Ticket URL', price: 'Price', wpEventId: 'WP Event ID',
+      wpDraftUrl: 'WP Draft URL', gigId: 'Gig ID', lastError: 'Last Error'
+    },
+    editableColumnKeys: ['title', 'contactEmail', 'contactWebsite', 'ticketUrl', 'price'],
+    statuses: { ready: 'READY', draftCreated: 'DRAFT_CREATED', skipped: 'SKIPPED', error: 'ERROR' }
+  },
+
   /**
    * Domeinconfiguratie per type record.
    */

@@ -43,6 +43,10 @@ const appPropertiesService = (() => {
 
   return {
     getCalendarId,
-    getAdminEmail
+    getAdminEmail,
+    // Pas bij de handmatige WordPress-actie lezen; overige workflows hebben dit niet nodig.
+    getWordPressBaseUrl: () => getRequiredProperty_('WORDPRESS_BASE_URL'),
+    getWordPressUsername: () => getRequiredProperty_('WORDPRESS_USERNAME'),
+    getWordPressApplicationPassword: () => getRequiredProperty_('WORDPRESS_APPLICATION_PASSWORD')
   };
 })();

@@ -7,6 +7,8 @@ Er is ook een onafhankelijke review van de syncaanroepen uitgevoerd.
 
 | ID | Ernst | Status | Bevinding | Details |
 | --- | --- | --- | --- | --- |
+| WEB-001 | Laag | Opgelost; lokale regressietest toegevoegd | HTTP-status uitlezen viel buiten veilige foutafhandeling | [Details](WEB-001-response-read.md) |
+| WEB-002 | Laag | Opgelost; lokale regressietest toegevoegd | Bewerkbare bereiken werden niet expliciet uitgebreid bij een vol tabblad | [Details](WEB-002-sheet-growth.md) |
 | NOTIFY-001 | Hoog | Opgelost in code; tests nog niet uitgevoerd | Fout bij gigmelding na succesvolle sync breekt de synchronisatierun af | [Details](NOTIFY-001-gig-publication-failure.md) |
 | NOTIFY-002 | Hoog | Opgelost; lokale unit-tests geslaagd | Foutnotificaties doorbreken foutisolatie per record | [Details](NOTIFY-002-error-notification-isolation.md) |
 | NOTIFY-003 | Hoog | Open | Onderbroken queue-items op PROCESSING worden niet hersteld | [Details](NOTIFY-003-stuck-processing.md) |

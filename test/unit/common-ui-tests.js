@@ -13,10 +13,12 @@ function testCommonMenuAdmin() {
   requireCommonUnit_();
   onOpen();
   assertCommonData_([['MQT Gig Sync']], unit.all('addToUi'));
-  assertCommonData_(['MQT Gig Sync', 'Import', 'Triggers', 'Notificaties', 'Systeem'], unit.all('menu').map(args => args[0]));
-  assertCommonData_(['Import', 'Triggers', 'Notificaties', 'Systeem'], unit.all('submenu').map(args => args[1]));
+  assertCommonData_(['MQT Gig Sync', 'Import', 'Website', 'Triggers', 'Notificaties', 'Systeem'], unit.all('menu').map(args => args[0]));
+  assertCommonData_(['Import', 'Website', 'Triggers', 'Notificaties', 'Systeem'], unit.all('submenu').map(args => args[1]));
   assertCommonData_([
     'syncEventsToCalendar', 'scanFlightEmailsAndImport', 'scanHotelEmailsAndImport',
+    'syncWebsitePublications', 'createWordPressDraft', 'skipWebsitePublication', 'setupWebsitePublications',
+    'installWebsitePublicationTrigger', 'removeWebsitePublicationTriggers',
     'installAutoSyncTrigger', 'removeAutoSyncTriggers',
     'installFlightMailImportTrigger', 'removeFlightMailImportTriggers',
     'installHotelMailImportTrigger', 'removeHotelMailImportTriggers',

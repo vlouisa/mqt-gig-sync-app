@@ -94,6 +94,11 @@ const systemStatusService = (() => {
   function getTriggerComponents_() {
     return [
       {
+        name: 'Website Publications',
+        handlerFunction: TRIGGER_HANDLERS.websitePublications,
+        expectedTriggerCount: 1
+      },
+      {
         name: 'Automatic Calendar Sync',
         handlerFunction: TRIGGER_HANDLERS.autoSync,
         expectedTriggerCount: 1
