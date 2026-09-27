@@ -2,7 +2,7 @@
 
 ## Scope en goedgekeurde afwijking van de brief
 
-De [volledige oorspronkelijke brief](website-publications-implementation-brief.md) is ongewijzigd bewaard. Bij goedkeuring is expliciet afgesproken dat **historische en technisch verwijderde gigs uitgesloten zijn**, ook met `CONFIRMED`.
+De [volledige oorspronkelijke brief](../implementation-briefs/BRIEF-001-website-publications-implementation-brief.md) is ongewijzigd bewaard. Bij goedkeuring is expliciet afgesproken dat **historische en technisch verwijderde gigs uitgesloten zijn**, ook met `CONFIRMED`.
 
 Een gig komt alleen in aanmerking met `Gig Status = CONFIRMED`, een geldige datum van vandaag of later en een `SyncStatus` anders dan `DELETE_REQUESTED` of `DELETED`. Vandaag wordt bepaald in de Apps Script-tijdzone. Bij handmatig aanmaken worden de actuele bron-gig en de snapshotdatum opnieuw gecontroleerd. Een inmiddels ongeschikte gig levert geen WordPress-aanroep op.
 
@@ -12,7 +12,7 @@ Gig ID is een door de applicatie gegenereerde UUID, geen Google Calendar-event-I
 
 ## Inrichting en gebruik
 
-1. Laat de bestaande WordPress-supportplugin uitbreiden zoals hieronder beschreven.
+1. Gebruik de WordPress-supportplugin v0.2.5 zoals hieronder gedocumenteerd.
 2. Configureer in Apps Script de Script Properties `WORDPRESS_BASE_URL`, `WORDPRESS_USERNAME` en `WORDPRESS_APPLICATION_PASSWORD`. Gebruik de HTTPS-basis-URL van de WordPress-installatie en een Application Password van een gebruiker die event-concepten mag maken. Zet credentials nooit in Sheets, broncode of logs.
 3. Voer als de geconfigureerde MQT-admin de website-inrichtingsactie in het spreadsheetmenu uit. Deze maakt `website-publications` aan met de 17 headers uit de brief. Een bestaand tabblad met afwijkende headers wordt afgewezen; bestaande gegevens worden niet herbouwd.
 4. Synchroniseer de werkvoorraad via het menu. Optioneel installeert dezelfde admin de website-trigger vanuit het Triggers-menu. Deze draait ieder uur en maakt uitsluitend snapshots, nooit WordPress-concepten.
@@ -28,9 +28,11 @@ De enige create-aanroep is een expliciete menuactie: `POST /wp-json/wp/v2/event`
 
 Title wordt `title`; Date wordt `_wolf_event_start_date` (`dd-MM-yyyy`). Venue, City, Country, Start, Address en Zip worden respectievelijk `_wolf_event_venue`, `_wolf_event_city`, `_wolf_event_country_short`, `_wolf_event_time`, `_wolf_event_address` en `_wolf_event_zip`. Country wordt niet vertaald; `_wolf_event_country` blijft leeg. Contact Email, Contact Website, Ticket URL en Price worden `_wolf_event_email`, `_wolf_event_website`, `_wolf_event_ticket` en `_wolf_event_price`. `_wolf_event_currency` is altijd `EUR`. Contact Name en Contact Phone worden niet verstuurd. Lege waarden blijven leeg; prijs nul blijft behouden.
 
-De externe plugin **Miracle Gig Sync API Support v0.2.4** staat niet in deze repository. Voeg daar `_wolf_event_email` en `_wolf_event_website` toe aan de bestaande string-meta-registratie voor posttype `event`: `type: string`, `single: true`, `show_in_rest: true`, met dezelfde bestaande autorisatie- en sanitization-conventies. Behoud ondersteuning van custom fields op het posttype. Wijzig geen theme, Wolf-plugin of WordPress-core. Zie de officiële documentatie voor [REST-meta](https://developer.wordpress.org/rest-api/extending-the-rest-api/modifying-responses/) en [register_meta](https://developer.wordpress.org/reference/functions/register_meta/).
+De aangeleverde broncode van **Miracle Gig Sync API Support v0.2.5** is opgeslagen als [referentiedocument](../wordpress/miracle-gig-sync-api-support-v0.2.5.md). Deze versie registreert onder meer `_wolf_event_email` en `_wolf_event_website` als string-meta voor REST. De plugin wordt buiten deze repository beheerd en geïnstalleerd.
 
-Deze externe pluginwijziging en het daadwerkelijk opslaan/uitlezen van beide velden moeten nog in de WordPress-omgeving worden geverifieerd. De lokale tests gebruiken uitsluitend mocks.
+**Start wordt bewust nog niet overgenomen door de plugin.** Het veld blijft opgeslagen in `website-publications`. De huidige Apps Script-mapper stuurt het nog als `_wolf_event_time` mee in de payload, maar v0.2.5 registreert dit veld niet voor REST. Of de starttijd daadwerkelijk naar WordPress moet worden doorgegeven, wordt later besloten. Dit is een bewuste afwijking van de oorspronkelijke brief.
+
+De aangeleverde broncode bevestigt de registratie; installatie en daadwerkelijk opslaan/uitlezen in de WordPress-omgeving zijn hier niet geverifieerd. De lokale tests gebruiken uitsluitend mocks.
 
 ## Statussen en herstel
 

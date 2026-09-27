@@ -5,14 +5,16 @@ lokale repository `../mqt-sync-notification-library` zijn gelezen. De daadwerkel
 gepubliceerde libraryversie en productieconfiguratie zijn niet gecontroleerd.
 Er is ook een onafhankelijke review van de syncaanroepen uitgevoerd.
 
-| ID | Ernst | Status | Bevinding | Details |
-| --- | --- | --- | --- | --- |
-| WEB-001 | Laag | Opgelost; lokale regressietest toegevoegd | HTTP-status uitlezen viel buiten veilige foutafhandeling | [Details](WEB-001-response-read.md) |
-| WEB-002 | Laag | Opgelost; lokale regressietest toegevoegd | Bewerkbare bereiken werden niet expliciet uitgebreid bij een vol tabblad | [Details](WEB-002-sheet-growth.md) |
-| NOTIFY-001 | Hoog | Opgelost in code; tests nog niet uitgevoerd | Fout bij gigmelding na succesvolle sync breekt de synchronisatierun af | [Details](NOTIFY-001-gig-publication-failure.md) |
-| NOTIFY-002 | Hoog | Opgelost; lokale unit-tests geslaagd | Foutnotificaties doorbreken foutisolatie per record | [Details](NOTIFY-002-error-notification-isolation.md) |
-| NOTIFY-003 | Hoog | Open | Onderbroken queue-items op PROCESSING worden niet hersteld | [Details](NOTIFY-003-stuck-processing.md) |
-| NOTIFY-004 | Middel | Open | Uurfingerprint verwart ochtend en avond | [Details](NOTIFY-004-hour-fingerprint.md) |
+Timestamp vermeldt het oorspronkelijke taakbericht van de gebruiker, gereconstrueerd uit de lokale gespreksregistratie en weergegeven in Europe/Amsterdam met UTC-offset (seconden, zonder milliseconden). Dit is geen uitvoerings-, afrondings- of opvraagmoment. Latere raadpleging verandert deze datum niet.
+
+| ID | Timestamp | Ernst | Status | Bevinding | Details |
+| --- | --- | --- | --- | --- | --- |
+| NOTIFY-001 | 2026-09-26 08:19:41 +02:00 | Hoog | Opgelost in code; tests nog niet uitgevoerd | Fout bij gigmelding na succesvolle sync breekt de synchronisatierun af | [Details](NOTIFY-001-gig-publication-failure.md) |
+| NOTIFY-002 | 2026-09-26 08:19:41 +02:00 | Hoog | Opgelost; lokale unit-tests geslaagd | Foutnotificaties doorbreken foutisolatie per record | [Details](NOTIFY-002-error-notification-isolation.md) |
+| NOTIFY-003 | 2026-09-26 08:19:41 +02:00 | Hoog | Open | Onderbroken queue-items op PROCESSING worden niet hersteld | [Details](NOTIFY-003-stuck-processing.md) |
+| NOTIFY-004 | 2026-09-26 08:19:41 +02:00 | Middel | Open | Uurfingerprint verwart ochtend en avond | [Details](NOTIFY-004-hour-fingerprint.md) |
+| WEB-001 | 2026-09-27 11:18:01 +02:00 | Laag | Opgelost; lokale regressietest toegevoegd | HTTP-status uitlezen viel buiten veilige foutafhandeling | [Details](WEB-001-response-read.md) |
+| WEB-002 | 2026-09-27 11:18:01 +02:00 | Laag | Opgelost; lokale regressietest toegevoegd | Bewerkbare bereiken werden niet expliciet uitgebreid bij een vol tabblad | [Details](WEB-002-sheet-growth.md) |
 
 ## Verificatie en beperkingen
 

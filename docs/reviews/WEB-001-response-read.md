@@ -8,4 +8,4 @@ De onafhankelijke implementatiereview constateerde dat `getResponseCode()` buite
 
 Oplossing: lees de status binnen dezelfde catchgrens als fetch. De regressietest `testWebsiteResponseReadFailure` simuleert een exception met dummycredentials, controleert afscherming en blokkeert een tweede create. Geen live HTTP uitgevoerd.
 
-De review noemde tevens het ontbreken van de externe WordPress-pluginwijziging. Dit is een bekende uitrolvoorwaarde uit het goedgekeurde plan, geen aanvullende lokale codefinding: inrichting vereist registratie van de twee contactvelden vóór gebruik en handmatige verificatie in WordPress. Zie `docs/website-publications.md`.
+De review noemde tevens het ontbreken van de externe WordPress-pluginwijziging. Dit is een bekende uitrolvoorwaarde uit het goedgekeurde plan, geen aanvullende lokale codefinding: inrichting vereist registratie van de twee contactvelden vóór gebruik en handmatige verificatie in WordPress. Zie `docs/features/FEAT-004-website-publications.md`.

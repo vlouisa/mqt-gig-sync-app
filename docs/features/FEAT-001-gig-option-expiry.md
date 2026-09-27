@@ -12,7 +12,7 @@ In `CONFIG.entities.gig.optionExpiry` staan:
 - `notificationTime`: standaard `09:00`, formaat `HH:mm`.
 
 De generieke notificatiecontrole draait elk uur via
-`CONFIG.notifications.schedule.everyHours`. Zie [tijdgestuurde notificaties](scheduled-notifications.md).
+`CONFIG.notifications.schedule.everyHours`. Zie [tijdgestuurde notificaties](FEAT-002-scheduled-notifications.md).
 
 Een wijziging van het meldtijdstip werkt bij de volgende controle. Na wijziging
 van het interval moet de trigger opnieuw worden geïnstalleerd. De controle haalt
