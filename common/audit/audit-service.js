@@ -15,9 +15,9 @@ const auditService = (() => {
 
     const row = auditEntry.toRow();
 
-    sheetService
-      .getSheet(CONFIG.auditLog.sheetName)
-      .appendRow(row);
+    withAuditDocumentLock_(() => {
+      sheetService.getSheet(CONFIG.auditLog.sheetName).appendRow(row);
+    });
 
     logService
       .forModule(MODULE_NAME)
@@ -49,3 +49,12 @@ const auditService = (() => {
     log
   };
 })();
+
+/** Kort documentlock voor auditwrites; onafhankelijk van het bestaande workflow-scriptlock. */
+function withAuditDocumentLock_(action) {
+  const lock = LockService.getDocumentLock();
+  if (!lock || !lock.tryLock(5000)) throw new Error('Auditlog is tijdelijk bezet; schrijven niet uitgevoerd.');
+  try { return action(); } finally {
+    try { SpreadsheetApp.flush(); } finally { lock.releaseLock(); }
+  }
+}

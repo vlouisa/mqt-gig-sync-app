@@ -60,6 +60,7 @@ function onOpen() {
 
     .addSubMenu(
       ui.createMenu('Systeem')
+        .addItem('Archiveer en schoon auditlog op', 'archiveAuditLog')
         .addItem('Bescherm technische kolommen', 'protectTechnicalColumns')
         .addItem('Ververs systeemstatus', 'refreshSystemStatus')
     )

@@ -236,4 +236,16 @@ suites.push({
     'testWebsiteTriggerBoundaryAndLock', 'testWebsiteTriggerInstallation', 'testWebsiteConfigurationAndDraftOnly']
 });
 
+suites.push({
+  name: 'audit-maintenance', setup: require('./audit-maintenance-test-support.cjs'),
+  sources: ['common/config/app-properties-service.js', 'common/admin-authorization.js',
+    'common/audit/audit-service.js', 'common/audit/audit-maintenance-service.js',
+    'common/audit/audit-entrypoints.js', 'test/helpers/assert-util.js', 'test/unit/audit-maintenance-tests.js'],
+  tests: ['testAuditArchiveConfiguration', 'testAuditArchiveSelectionAndJsonLines',
+    'testAuditArchiveConcurrentAppendAndDuplicates', 'testAuditArchiveNoDataAndInvalidDates',
+    'testAuditArchiveDriveFailureBlocksRetry', 'testAuditArchiveVerificationFailure',
+    'testAuditArchiveChangedSheetPreserved', 'testAuditArchiveAmbiguousDelete', 'testAuditArchiveLimitsAndPermissions',
+    'testAuditArchiveDefaultBatchAndNextRun', 'testAuditArchiveFolderAndMetadataFailure', 'testAuditArchiveEntrypointAndSchema']
+});
+
 module.exports = suites;

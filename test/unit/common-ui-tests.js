@@ -25,7 +25,7 @@ function testCommonMenuAdmin() {
     'installScheduledNotificationTrigger', 'removeScheduledNotificationTriggers',
     'installNotificationWorkerTrigger', 'removeNotificationWorkerTriggers',
     'installSystemStatusTrigger', 'removeSystemStatusTriggers',
-    'checkScheduledNotifications', 'processEventQueueNotifications', 'protectTechnicalColumns', 'refreshSystemStatus'
+    'checkScheduledNotifications', 'processEventQueueNotifications', 'archiveAuditLog', 'protectTechnicalColumns', 'refreshSystemStatus'
   ], unit.all('item').map(args => args[2]));
   assertEquals(1, unit.all('info').length);
 }

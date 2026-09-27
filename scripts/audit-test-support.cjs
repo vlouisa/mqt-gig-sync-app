@@ -1,5 +1,7 @@
 /** In-memory afhankelijkheden voor audit-tests; geen echte Google-services. */
 module.exports = `
+  const LockService = { getDocumentLock: () => ({ tryLock: () => true, releaseLock() {} }) };
+  const SpreadsheetApp = { flush() {} };
   const unit = {
     activeEmail: 'active@example.invalid', effectiveEmail: 'effective@example.invalid',
     effectiveCalls: 0, rows: [], sheets: [], logs: [], appendError: null
