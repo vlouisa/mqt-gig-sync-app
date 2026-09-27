@@ -13,7 +13,7 @@
 // Dezelfde globale functies als voorheen, nu verdeeld over hun eigen componenten.
 const entrypointSources = [
   'common/trigger-handlers.js', 'common/admin-authorization.js',
-  'domain/gig/gig-technical-fields.js', 'calendar-entrypoints.js',
+  'domain/gig/gig-technical-fields.js', 'application/calendar-sync/calendar-sync-entrypoints.js',
   'common/spreadsheet/spreadsheet-entrypoints.js',
   'domain/flight/flight-import-entrypoints.js', 'domain/hotel/hotel-import-entrypoints.js',
   'infrastructure/notification/notification-entrypoints.js',
@@ -166,7 +166,7 @@ const commonSuites = [
     ['testCommonPropertiesValues', 'testCommonPropertiesMissing', 'testCommonPropertiesFreshRead']],
   ['calendar', 'infrastructure/calendar/calendar-service.js', 'common-core-tests.js',
     ['testCommonCalendarDateObjects', 'testCommonCalendarStrings', 'testCommonCalendarInvalid']],
-  ['log', 'common/_log-service.js', 'common-core-tests.js',
+  ['log', 'common/log-service.js', 'common-core-tests.js',
     ['testCommonLogLevels', 'testCommonLogDefaults']],
   ['notification', 'infrastructure/notification/sync-failed-notification-service.js', 'common-core-tests.js',
     ['testCommonFailureNotification', 'testCommonFailureNotificationErrors',

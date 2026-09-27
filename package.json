@@ -8,7 +8,7 @@
     "all": true,
     "include": [
       "appInit.js",
-      "calendar-entrypoints.js",
+      "application/**/*.js",
       "common/**/*.js",
       "domain/**/*.js",
       "infrastructure/**/*.js",

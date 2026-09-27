@@ -29,7 +29,7 @@ De belangrijkste syncstatussen zijn `DRAFT`, `NEEDS_SYNC`, `SYNCED`,
 | --- | --- |
 | [appsscript.json](appsscript.json) | Runtime, tijdzone en externe libraries |
 | [appInit.js](appInit.js) | Initialisatie van de notificatielibrary |
-| [calendar-entrypoints.js](calendar-entrypoints.js) | Domeinoverstijgende Calendar-sync en bijbehorend triggerbeheer |
+| [application/calendar-sync/calendar-sync-entrypoints.js](application/calendar-sync/calendar-sync-entrypoints.js) | Domeinoverstijgende Calendar-sync en bijbehorend triggerbeheer |
 | [common/](common/) | Configuratie, Sheets, editafhandeling, statussen, logging en audit |
 | [domain/](domain/) | Domeinservices voor gigs, flights, hotels, blocked dates en users |
 | [infrastructure/](infrastructure/) | Notificatieberichten en systeemstatus |
@@ -115,14 +115,14 @@ over commits, uploads, externe libraries en veilig testen.
 
 ## Entrypoints
 
-Globale menu- en triggerfuncties staan in `*-entrypoints.js` bij het domein of component dat de workflow beheert:
+Globale menu- en triggerfuncties staan in `*-entrypoints.js` bij het domein of component dat de workflow beheert. Domeinoverstijgende workflows staan in `application/`:
 
 - `domain/flight/` en `domain/hotel/`: mailimport en bijbehorend triggerbeheer.
 - `domain/website-publication/`: websitewerkvoorraad en handmatige WordPress-acties.
 - `infrastructure/notification/`: tijdgestuurde controles, legacy optiehandlers en queue-worker.
 - `infrastructure/system/`: systeemstatus en triggerdiagnostiek.
 - `common/spreadsheet/spreadsheet-entrypoints.js`: Sheet-edits en kolombescherming. `onOpen()` blijft bij het menu in `common/spreadsheet/menu.js`.
-- `calendar-entrypoints.js`: gezamenlijke Calendar-sync voor de vier domeinen, op applicatieniveau.
+- `application/calendar-sync/calendar-sync-entrypoints.js`: gezamenlijke Calendar-sync voor de vier domeinen, in de applicatielaag. Deze coördineert domeinservices; technische Calendar-toegang blijft in `infrastructure/calendar/`.
 
 De entrypoints verzorgen aansturing; inhoudelijke verwerking blijft in services. Functienamen blijven globaal beschikbaar voor bestaande menuverwijzingen en geïnstalleerde triggers. `common/trigger-handlers.js` bevat de gedeelde handlernamen, `common/admin-authorization.js` de admincontrole en `domain/gig/gig-technical-fields.js` de helpers voor Gig ID en CreatedAt. Bestaande logmodulelabels zijn bij deze structurele verplaatsing behouden.
 
