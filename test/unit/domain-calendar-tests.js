@@ -1,5 +1,18 @@
 /** Calendar-contracttests voor vier domeinen; vereisen de lokale unit-fixture. */
 
+/** Informatieve gigvelden veranderen de Calendar-payload niet. */
+function testGigCalendarIgnoresInformationalFields() {
+  if (typeof unit === 'undefined') throw new Error('Alleen uitvoeren via de lokale unit-runner.');
+  gigCalendarService.createOrUpdateEvent(unit.record);
+  const before = JSON.stringify(unit.last('createEvent'));
+  for (const header of ['Venue', 'Address', 'Zip', 'City', 'Country',
+    'Contact Name', 'Contact Phone', 'Contact Email', 'Contact Website']) {
+    unit.record[header] = 'informatief: ' + header;
+  }
+  gigCalendarService.createOrUpdateEvent(unit.record);
+  assertEquals(before, JSON.stringify(unit.last('createEvent')));
+}
+
 /** Aanmaken gebruikt de juiste kalender, inhoud en domeinspecifieke datumgrenzen. */
 function testDomainCalendarCreate() {
   if (typeof unit === 'undefined') throw new Error('Alleen uitvoeren via de lokale unit-runner.');

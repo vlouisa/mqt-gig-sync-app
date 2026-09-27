@@ -68,6 +68,15 @@ const CONFIG = {
         start: 'Start',
         end: 'End',
         location: 'Location',
+        venue: 'Venue',
+        address: 'Address',
+        zip: 'Zip',
+        city: 'City',
+        country: 'Country',
+        contactName: 'Contact Name',
+        contactPhone: 'Contact Phone',
+        contactEmail: 'Contact Email',
+        contactWebsite: 'Contact Website',
         description: 'Description',
         soundEngineer: 'Sound Engineer',
         syncStatus: 'SyncStatus',
@@ -87,7 +96,7 @@ const CONFIG = {
         'updatedAt'
       ],
       sheetName: 'gig-input',
-      syncStatusColumnIndex: 9
+      syncStatusColumnIndex: 18
     },
 
     flight: {

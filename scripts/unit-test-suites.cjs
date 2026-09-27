@@ -63,7 +63,8 @@ for (const [domain, folder] of [['gig', 'gig'], ['flight', 'flight'], ['hotel', 
     name: `${folder}-calendar`,
     setup: domainSetup(domain, 'calendar', `${domain}CalendarService`),
     sources: [...domainSources, ...dates, `domain/${folder}/${folder}-calendar-service.js`, 'test/unit/domain-calendar-tests.js'],
-    tests: ['testDomainCalendarCreate', 'testDomainCalendarUpdate', 'testDomainCalendarMissingEventRecreated', 'testDomainCalendarDelete']
+    tests: ['testDomainCalendarCreate', 'testDomainCalendarUpdate', 'testDomainCalendarMissingEventRecreated', 'testDomainCalendarDelete',
+      ...(domain === 'gig' ? ['testGigCalendarIgnoresInformationalFields'] : [])]
   });
   suites.push({
     name: `${folder}-sync`,
@@ -171,7 +172,7 @@ const commonSuites = [
     ['testCommonContextIgnored', 'testCommonContextDomains']],
   ['record', 'on-edit-record-service.js', 'common-edit-tests.js',
     ['testCommonRecordIgnored', 'testCommonRecordCreated', 'testCommonRecordChanged',
-      'testCommonRecordUnchangedStatuses', 'testCommonRecordTransitionFailure']],
+      'testCommonRecordUnchangedStatuses', 'testCommonRecordTransitionFailure', 'testGigInformationalEdits']],
   ['manual', 'on-edit-sync-status-service.js', 'common-edit-tests.js',
     ['testCommonManualIgnored', 'testCommonManualAllowed', 'testCommonManualCleared',
       'testCommonManualRejected', 'testCommonManualRestoreFailure']],
@@ -188,6 +189,7 @@ for (const [kind, source, testFile, tests] of commonSuites) {
   suites.push({
     name: `common-${kind}`, setup: commonSetup(kind),
     sources: [...(kind === 'properties' ? [] : ['common/config.js']), `common/${source}`,
+      ...(kind === 'record' ? ['common/on-edit-context-provider.js'] : []),
       'test/helpers/assert-util.js', 'test/helpers/common-unit-util.js', `test/unit/${testFile}`],
     tests
   });

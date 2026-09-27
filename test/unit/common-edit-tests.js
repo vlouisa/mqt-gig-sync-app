@@ -26,11 +26,41 @@ function testCommonContextDomains() {
     assertEquals(config.columns.syncStatus, context.provider.syncStatusColumn);
     assertEquals(entry[domain], context.provider.auditEntryFactory);
     assertCommonData_({ created: `${prefix}_CREATED`, changedAfterPublication: `${prefix}_CHANGED_AFTER_PUBLICATION` }, context.provider.auditActions);
-    assertCommonData_([idKey, ...(domain === 'gig' ? ['optionExpiryDate'] : []),
+    assertCommonData_([idKey, ...(domain === 'gig' ? ['optionExpiryDate',
+      'venue', 'address', 'zip', 'city', 'country', 'contactName', 'contactPhone', 'contactEmail', 'contactWebsite'] : []),
       'syncStatus', 'calendarEventId', 'lastSyncedAt', 'lastError', 'createdAt', 'updatedAt']
       .map(key => config.columns[key]), context.provider.ignoredColumns);
   });
   assertEquals(4, unit.all('headers').length);
+}
+
+/** Informatieve gigvelden wijzigen geen syncstatus; verschoven publicatievelden blijven actief. */
+function testGigInformationalEdits() {
+  requireCommonUnit_();
+  const columns = ['Venue', 'Address', 'Zip', 'City', 'Country',
+    'Contact Name', 'Contact Phone', 'Contact Email', 'Contact Website'];
+  unit.headers = ['Location', ...columns, 'Description', 'SyncStatus'];
+  const sheet = { getName: () => CONFIG.entities.gig.sheetName };
+  for (const status of ['', 'DRAFT', 'SYNCED', 'ERROR']) {
+    unit.row = { SyncStatus: status };
+    for (const column of columns) {
+      const context = onEditContextProvider.getContext({ range: {
+        getSheet: () => sheet, getRow: () => 2,
+        getColumn: () => unit.headers.indexOf(column) + 1
+      } });
+      onEditRecordService.handleRecordEdit(context);
+    }
+  }
+  assertEquals(0, unit.all('row').length);
+  assertEquals(0, unit.all('transition').length);
+  assertEquals(0, unit.all('audit').length);
+  // De verschoven Description-kolom blijft wel een synchronisatiewijziging.
+  unit.row = { SyncStatus: 'SYNCED' };
+  onEditRecordService.handleRecordEdit(onEditContextProvider.getContext({ range: {
+    getSheet: () => sheet, getRow: () => 2,
+    getColumn: () => unit.headers.indexOf('Description') + 1
+  } }));
+  assertEquals('NEEDS_SYNC', unit.all('transition')[0][1]);
 }
 
 /** Ongeldige context en technische edits lezen geen record. */
