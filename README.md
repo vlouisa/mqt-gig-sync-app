@@ -21,7 +21,7 @@ aan het bijbehorende Calendar-event.
 
 De belangrijkste syncstatussen zijn `DRAFT`, `NEEDS_SYNC`, `SYNCED`,
 `DELETE_REQUESTED`, `DELETED` en `ERROR`. Toegestane overgangen staan in
-[common/config.js](common/config.js).
+[common/config/config.js](common/config/config.js).
 
 ## Projectstructuur
 
@@ -29,7 +29,7 @@ De belangrijkste syncstatussen zijn `DRAFT`, `NEEDS_SYNC`, `SYNCED`,
 | --- | --- |
 | [appsscript.json](appsscript.json) | Runtime, tijdzone en externe libraries |
 | [appInit.js](appInit.js) | Initialisatie van de notificatielibrary |
-| [trigger-service.js](trigger-service.js) | Globale entrypoints en triggerbeheer |
+| [calendar-entrypoints.js](calendar-entrypoints.js) | Domeinoverstijgende Calendar-sync en bijbehorend triggerbeheer |
 | [common/](common/) | Configuratie, Sheets, editafhandeling, statussen, logging en audit |
 | [domain/](domain/) | Domeinservices voor gigs, flights, hotels, blocked dates en users |
 | [infrastructure/](infrastructure/) | Notificatieberichten en systeemstatus |
@@ -59,7 +59,7 @@ Bewaar credentials in Script Properties, nooit in broncode of testfixtures.
 Aanvullende provider- en ontvangerinstellingen voor notificaties worden bepaald
 door de externe `Notify`-library; raadpleeg daarvoor de betreffende library.
 
-[common/config.js](common/config.js) bevat de tabbladnamen, exacte kolomheaders,
+[common/config/config.js](common/config/config.js) bevat de tabbladnamen, exacte kolomheaders,
 Gmail-labels, statusovergangen en notificatieconfiguratie. Gebruik deze definities
 voor de inrichting van de spreadsheet, met kolomheaders op rij 1. De invoerbladen
 zijn `gig-input`, `flight-input`, `hotel-input`, `blocked-date-input` en
@@ -112,3 +112,26 @@ de Google OAuth-flow. Bewaar de lokale OAuth-credentials buiten de repository.
 
 Zie [AGENTS.md](AGENTS.md) voor de volledige repositoryregels, waaronder afspraken
 over commits, uploads, externe libraries en veilig testen.
+
+## Entrypoints
+
+Globale menu- en triggerfuncties staan in `*-entrypoints.js` bij het domein of component dat de workflow beheert:
+
+- `domain/flight/` en `domain/hotel/`: mailimport en bijbehorend triggerbeheer.
+- `domain/website-publication/`: websitewerkvoorraad en handmatige WordPress-acties.
+- `infrastructure/notification/`: tijdgestuurde controles, legacy optiehandlers en queue-worker.
+- `infrastructure/system/`: systeemstatus en triggerdiagnostiek.
+- `common/spreadsheet/spreadsheet-entrypoints.js`: Sheet-edits en kolombescherming. `onOpen()` blijft bij het menu in `common/spreadsheet/menu.js`.
+- `calendar-entrypoints.js`: gezamenlijke Calendar-sync voor de vier domeinen, op applicatieniveau.
+
+De entrypoints verzorgen aansturing; inhoudelijke verwerking blijft in services. Functienamen blijven globaal beschikbaar voor bestaande menuverwijzingen en geïnstalleerde triggers. `common/trigger-handlers.js` bevat de gedeelde handlernamen, `common/admin-authorization.js` de admincontrole en `domain/gig/gig-technical-fields.js` de helpers voor Gig ID en CreatedAt. Bestaande logmodulelabels zijn bij deze structurele verplaatsing behouden.
+
+## Gedeelde componenten
+
+- `common/config/`: centrale configuratie en Script Properties.
+- `common/spreadsheet/`: Sheet-toegang, bescherming, menu en spreadsheet-entrypoints.
+- `common/spreadsheet/editing/`: verwerking en context van Sheet-edits.
+- `common/sync/`: gedeelde synchronisatiestatusovergangen.
+- `common/audit/`: auditlogging en audit-entrytypen, gescheiden van technische logging.
+
+Autorisatie, handlernamen en technische logging staan rechtstreeks in `common/`. Google Calendar-helpers staan in `infrastructure/calendar/`; de gedeelde foutnotificatieservice staat bij `infrastructure/notification/`. Deze mappen groeperen bestanden; ze vormen geen JavaScript-namespaces.

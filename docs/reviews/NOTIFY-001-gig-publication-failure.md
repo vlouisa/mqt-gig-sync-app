@@ -5,7 +5,7 @@
 - Zekerheid: **Bewezen uit control flow**, niet uitgevoerd in Apps Script.
 - Locatie: `domain/gig/gig-sync-service.js:127-135`, `processRow_`,
   `publishRowToCalendar_` en `handlePublicationError_` (regels 223-228).
-- Afhankelijkheden: `common/config.js`, `common/sync-status-service.js:setStatus`.
+- Afhankelijkheden: `common/config/config.js`, `common/sync/sync-status-service.js:setStatus`.
 
 ## Probleem en gevolg
 

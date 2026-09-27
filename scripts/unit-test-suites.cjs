@@ -10,11 +10,21 @@
  * Expliciete selectie zonder integratietests en appInit.
  * @type {TestSuite[]}
  */
+// Dezelfde globale functies als voorheen, nu verdeeld over hun eigen componenten.
+const entrypointSources = [
+  'common/trigger-handlers.js', 'common/admin-authorization.js',
+  'domain/gig/gig-technical-fields.js', 'calendar-entrypoints.js',
+  'common/spreadsheet/spreadsheet-entrypoints.js',
+  'domain/flight/flight-import-entrypoints.js', 'domain/hotel/hotel-import-entrypoints.js',
+  'infrastructure/notification/notification-entrypoints.js',
+  'infrastructure/system/system-entrypoints.js'
+];
+
 const suites = [
   {
     name: 'gig-date-time',
     sources: [
-      'common/calendar-service.js',
+      'infrastructure/calendar/calendar-service.js',
       'domain/gig/gig-date-time-service.js',
       'test/helpers/assert-util.js',
       'test/unit/gig-date-time-service-tests.js'
@@ -31,7 +41,7 @@ const suites = [
   {
     name: 'flight-to-record-mapper',
     sources: [
-      'common/config.js',
+      'common/config/config.js',
       'domain/flight/flight-to-record-mapper.js',
       'test/helpers/assert-util.js',
       'test/unit/flight-to-record-mapper-tests.js'
@@ -54,11 +64,11 @@ const suites = [
 ];
 
 const domainSetup = require('./domain-test-support.cjs');
-const domainSources = ['common/config.js', 'infrastructure/notification/notification-events.js', 'test/helpers/assert-util.js'];
+const domainSources = ['common/config/config.js', 'infrastructure/notification/notification-events.js', 'test/helpers/assert-util.js'];
 
 // Elke suite laadt één te testen service; overige externe afhankelijkheden zijn mocks.
 for (const [domain, folder] of [['gig', 'gig'], ['flight', 'flight'], ['hotel', 'hotel'], ['blockedDate', 'blocked-date']]) {
-  const dates = ['common/calendar-service.js', 'domain/gig/gig-date-time-service.js'];
+  const dates = ['infrastructure/calendar/calendar-service.js', 'domain/gig/gig-date-time-service.js'];
   suites.push({
     name: `${folder}-calendar`,
     setup: domainSetup(domain, 'calendar', `${domain}CalendarService`),
@@ -69,7 +79,7 @@ for (const [domain, folder] of [['gig', 'gig'], ['flight', 'flight'], ['hotel', 
   suites.push({
     name: `${folder}-sync`,
     setup: domainSetup(domain, 'sync', `${domain}SyncService`),
-    sources: [...domainSources, ...dates, 'common/sync-failed-notification-service.js',
+    sources: [...domainSources, ...dates, 'infrastructure/notification/sync-failed-notification-service.js',
       `domain/${folder}/${folder}-sync-service.js`, 'test/unit/domain-sync-tests.js'],
     tests: ['testDomainSyncPublish', 'testDomainSyncSkipsInactiveRows', 'testDomainSyncDelete',
       'testDomainSyncErrorIsolation', 'testDomainSyncRequiredField',
@@ -119,13 +129,13 @@ const infrastructureSetup = require('./infrastructure-test-support.cjs');
 suites.push(
   {
     name: 'system-status', setup: infrastructureSetup,
-    sources: ['common/config.js', 'trigger-service.js', 'infrastructure/system/system-status-service.js',
+    sources: ['common/config/config.js', ...entrypointSources, 'infrastructure/system/system-status-service.js',
       'test/helpers/assert-util.js', 'test/unit/system-status-service-tests.js'],
     tests: ['testSystemStatusAllOk', 'testSystemStatusMissingCreatesSheet', 'testSystemStatusMixedTriggers']
   },
   {
     name: 'notification-message', setup: infrastructureSetup,
-    sources: ['common/config.js', 'infrastructure/notification/notification-events.js', 'infrastructure/notification/rules/gig-notification-rule-helpers.js',
+    sources: ['common/config/config.js', 'infrastructure/notification/notification-events.js', 'infrastructure/notification/rules/gig-notification-rule-helpers.js',
     'infrastructure/notification/rules/gig-option-expires-today-rule.js',
     'infrastructure/notification/rules/gig-invoice-needs-to-be-sent-rule.js',
     'infrastructure/notification/scheduled-notification-rules.js', 'infrastructure/notification/notification-message-factory.js',
@@ -138,7 +148,7 @@ suites.push(
 const auditSetup = require('./audit-test-support.cjs');
 suites.push({
   name: 'audit', setup: auditSetup,
-  sources: ['common/config.js', 'common/audit/_base-audit-entry.js',
+  sources: ['common/config/config.js', 'common/audit/_base-audit-entry.js',
     'common/audit/gig-audit-entry.js', 'common/audit/flight-audit-entry.js',
     'common/audit/hotel-audit-entry.js', 'common/audit/blocked-date-audit-entry-service.js',
     'common/audit/entry.js', 'common/audit/audit-service.js',
@@ -152,44 +162,44 @@ suites.push({
 
 const commonSetup = require('./common-test-support.cjs');
 const commonSuites = [
-  ['properties', 'app-properties-service.js', 'common-core-tests.js',
+  ['properties', 'common/config/app-properties-service.js', 'common-core-tests.js',
     ['testCommonPropertiesValues', 'testCommonPropertiesMissing', 'testCommonPropertiesFreshRead']],
-  ['calendar', 'calendar-service.js', 'common-core-tests.js',
+  ['calendar', 'infrastructure/calendar/calendar-service.js', 'common-core-tests.js',
     ['testCommonCalendarDateObjects', 'testCommonCalendarStrings', 'testCommonCalendarInvalid']],
-  ['log', '_log-service.js', 'common-core-tests.js',
+  ['log', 'common/_log-service.js', 'common-core-tests.js',
     ['testCommonLogLevels', 'testCommonLogDefaults']],
-  ['notification', 'sync-failed-notification-service.js', 'common-core-tests.js',
+  ['notification', 'infrastructure/notification/sync-failed-notification-service.js', 'common-core-tests.js',
     ['testCommonFailureNotification', 'testCommonFailureNotificationErrors',
       'testCommonTryFailureNotification', 'testCommonTryFailureNotificationMissingId',
       'testCommonTryFailureNotificationErrors']],
-  ['sheet', 'sheet-service.js', 'common-sheet-tests.js',
+  ['sheet', 'common/spreadsheet/sheet-service.js', 'common-sheet-tests.js',
     ['testCommonSheetReadRows', 'testCommonSheetEmptyAndMissing', 'testCommonSheetAppendMapping',
       'testCommonSheetColumnMap', 'testCommonSheetCacheLifecycle', 'testCommonSheetUpdateCell']],
-  ['status', 'sync-status-service.js', 'common-sheet-tests.js',
+  ['status', 'common/sync/sync-status-service.js', 'common-sheet-tests.js',
     ['testCommonStatusNormalization', 'testCommonStatusTransitions', 'testCommonStatusWrite',
       'testCommonStatusNoChange', 'testCommonStatusInvalid']],
-  ['context', 'on-edit-context-provider.js', 'common-edit-tests.js',
+  ['context', 'common/spreadsheet/editing/on-edit-context-provider.js', 'common-edit-tests.js',
     ['testCommonContextIgnored', 'testCommonContextDomains']],
-  ['record', 'on-edit-record-service.js', 'common-edit-tests.js',
+  ['record', 'common/spreadsheet/editing/on-edit-record-service.js', 'common-edit-tests.js',
     ['testCommonRecordIgnored', 'testCommonRecordCreated', 'testCommonRecordChanged',
       'testCommonRecordUnchangedStatuses', 'testCommonRecordTransitionFailure', 'testGigInformationalEdits']],
-  ['manual', 'on-edit-sync-status-service.js', 'common-edit-tests.js',
+  ['manual', 'common/spreadsheet/editing/on-edit-sync-status-service.js', 'common-edit-tests.js',
     ['testCommonManualIgnored', 'testCommonManualAllowed', 'testCommonManualCleared',
       'testCommonManualRejected', 'testCommonManualRestoreFailure']],
-  ['dispatch', 'on-edit-service.js', 'common-edit-tests.js',
+  ['dispatch', 'common/spreadsheet/editing/on-edit-service.js', 'common-edit-tests.js',
     ['testCommonDispatchUser', 'testCommonDispatchNoContext', 'testCommonDispatchStatus',
       'testCommonDispatchRecord', 'testCommonDispatchErrors', 'testCommonDispatchUserError']],
-  ['menu', 'menu.js', 'common-ui-tests.js',
+  ['menu', 'common/spreadsheet/menu.js', 'common-ui-tests.js',
     ['testCommonMenuNonAdmin', 'testCommonMenuAdmin']],
-  ['protection', 'sheet-protection-service.js', 'common-ui-tests.js',
+  ['protection', 'common/spreadsheet/sheet-protection-service.js', 'common-ui-tests.js',
     ['testCommonProtectionAllEntities', 'testCommonProtectionReplacement',
       'testCommonProtectionMissingColumn', 'testCommonProtectionFailure']]
 ];
 for (const [kind, source, testFile, tests] of commonSuites) {
   suites.push({
     name: `common-${kind}`, setup: commonSetup(kind),
-    sources: [...(kind === 'properties' ? [] : ['common/config.js']), `common/${source}`,
-      ...(kind === 'record' ? ['common/on-edit-context-provider.js'] : []),
+    sources: [...(kind === 'properties' ? [] : ['common/config/config.js']), source,
+      ...(kind === 'record' ? ['common/spreadsheet/editing/on-edit-context-provider.js'] : []),
       'test/helpers/assert-util.js', 'test/helpers/common-unit-util.js', `test/unit/${testFile}`],
     tests
   });
@@ -197,7 +207,7 @@ for (const [kind, source, testFile, tests] of commonSuites) {
 
 suites.push({
   name: 'gig-option-expiry', setup: require('./gig-option-expiry-test-support.cjs'),
-  sources: ['common/config.js', 'trigger-service.js',
+  sources: ['common/config/config.js', ...entrypointSources,
     'infrastructure/notification/notification-events.js',
     'infrastructure/notification/rules/gig-notification-rule-helpers.js',
     'infrastructure/notification/rules/gig-option-expires-today-rule.js',
@@ -211,8 +221,8 @@ suites.push({
 
 suites.push({
   name: 'website-publication', setup: require('./website-publication-test-support.cjs'),
-  sources: ['common/app-properties-service.js', 'common/config.js', 'common/sheet-service.js',
-    'trigger-service.js', 'domain/website-publication/website-publication-sheet-service.js',
+  sources: ['common/config/app-properties-service.js', 'common/config/config.js', 'common/spreadsheet/sheet-service.js',
+    ...entrypointSources, 'domain/website-publication/website-publication-sheet-service.js',
     'domain/website-publication/website-publication-sync-service.js',
     'infrastructure/wordpress/wordpress-event-mapper.js', 'infrastructure/wordpress/wordpress-event-client.js',
     'domain/website-publication/website-publication-service.js',

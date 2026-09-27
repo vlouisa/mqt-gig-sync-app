@@ -3,7 +3,7 @@
 - Ernst: **Middel**
 - Status: **Open**
 - Zekerheid: **Bewezen uit formaatcontract en deduplicatiesleutel**.
-- Locatie: `common/sync-failed-notification-service.js`, functies
+- Locatie: `infrastructure/notification/sync-failed-notification-service.js`, functies
   `formatFingerprintDate_` en `formatDate_`.
 
 ## Probleem en gevolg
