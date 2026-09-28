@@ -7,7 +7,7 @@ const scheduledNotificationService = (() => {
    * Controleert regels met één datumcontext en een gedeelde broncache per uitvoering.
    * Fouten worden per regel en per record afgehandeld, zodat verwerking doorgaat.
    * @param {Date} [now] Exact controletijdstip.
-   * @param {Object[]} [rules] Optionele selectie, onder andere voor legacy callers.
+   * @param {Object[]} [rules] Optionele selectie van te evalueren regels.
    * @returns {void}
    */
   function check(now = new Date(), rules = scheduledNotificationRules.getAll()) {

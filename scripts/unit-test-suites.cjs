@@ -213,7 +213,7 @@ suites.push({
     'infrastructure/notification/rules/gig-option-expires-today-rule.js',
     'infrastructure/notification/rules/gig-invoice-needs-to-be-sent-rule.js',
     'infrastructure/notification/rules/gig-travel-bookings-missing-rule.js', 'infrastructure/notification/scheduled-notification-rules.js', 'infrastructure/notification/notification-message-factory.js',
-    'infrastructure/notification/scheduled-notification-service.js', 'domain/gig/gig-notification-service.js', 'domain/gig/gig-option-expiry-service.js',
+    'infrastructure/notification/scheduled-notification-service.js', 'domain/gig/gig-notification-service.js',
     'test/helpers/assert-util.js', 'test/unit/gig-option-expiry-tests.js', 'test/unit/gig-travel-bookings-tests.js'],
   tests: ['testOptionExpirySelection', 'testOptionExpiryErrors', 'testOptionExpiryTimeAndExtension',
     'testOptionExpiryMessage', 'testOptionExpiryTrigger', 'testInvoiceSelection', 'testInvoiceCalendarBoundaries', 'testScheduledIsolation', 'testScheduledExtension', 'testTravelMissingListAndFingerprint', 'testTravelCompleteAndDeletedBookings', 'testTravelDateWindowAndEligibility', 'testTravelInvalidSourcesAndConfiguration', 'testTravelConfigurableWindowsAndDst']

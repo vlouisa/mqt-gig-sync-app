@@ -38,7 +38,7 @@ van de gig. Exact eenmalige aflevering wordt niet gegarandeerd.
 2. Voeg de gewenste ontvangers toe aan `event-subscriptions`. De bestaande
    ontvangerproperties en notificatie-worker blijven nodig.
 3. Kies `Triggers > Installeer notificatiecontrole`. De installer maakt de nieuwe
-   uurtrigger aan en verwijdert bestaande generieke en legacy optietriggers van
+   uurtrigger aan en verwijdert bestaande notificatiecontroletriggers van
    het uitvoerende account. Bij een aanmaakfout blijven oude triggers intact.
 4. Controleer `Scheduled Notifications` en `Notification Worker` in `system-status`.
    Deze status bewijst triggeraanwezigheid, niet geslaagde uitvoering.
@@ -46,10 +46,9 @@ van de gig. Exact eenmalige aflevering wordt niet gegarandeerd.
    aflevering; dit kan echte notificaties versturen.
 
 Geen nieuwe kolommen of librarywijzigingen zijn nodig. Bestaande opties en
-queue-items blijven behouden. Tot migratie werkt `checkGigOptionExpiry` nog als
-compatibiliteitshandler voor uitsluitend de optieregel. De legacy installer
-`installGigOptionExpiryTrigger` installeert voortaan de generieke controle.
-Gebruik het nieuwe menu om beide soorten controletriggers te verwijderen.
+queue-items blijven behouden. Gebruik
+`installScheduledNotificationTrigger` om de generieke controle te installeren.
+Gebruik het menu om de notificatiecontroletriggers te verwijderen.
 
 ## Handmatig controleren
 
@@ -87,6 +86,6 @@ Voeg het nieuwe rule-bestand ook toe aan de relevante lokale testsuites.
 
 De lokale tests gebruiken mocks en controleren onder meer kalendergrenzen,
 zomer-/wintertijd, 09:00, statussen, stabiele fingerprints, foutisolatie, één
-bronlezing per run, uitbreidbaarheid, lockvrijgave en triggermigratie. Echte
+bronlezing per run, uitbreidbaarheid, lockvrijgave en triggervervanging. Echte
 Notify-aflevering is geen onderdeel van deze unit-tests. Bewaking van gemiste
 uitvoeringen valt buiten deze wijziging.

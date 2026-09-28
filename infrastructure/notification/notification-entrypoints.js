@@ -1,23 +1,3 @@
-/** Controleert vervallende gigopties onder hetzelfde scriptlock als de queue-worker. */
-function checkGigOptionExpiry() {
-  const lock = LockService.getScriptLock();
-  if (!lock.tryLock(30000)) {
-    logService.forModule('trigger-service').warn('gig-option-expiry-skipped-lock',
-      'Optiecontrole overgeslagen: scriptlock bezet.', '');
-    return;
-  }
-  try {
-    gigOptionExpiryService.check();
-  } finally {
-    lock.releaseLock();
-  }
-}
-
-/** Legacy entrypoint: migreert de optiecontrole naar de generieke notificatiecontrole. */
-function installGigOptionExpiryTrigger() {
-  installScheduledNotificationTrigger();
-}
-
 /** Evalueert alle tijdgestuurde regels onder een scriptlock. */
 function checkScheduledNotifications() {
   const lock = LockService.getScriptLock();
@@ -33,7 +13,7 @@ function checkScheduledNotifications() {
   }
 }
 
-/** Installeert de generieke controle en vervangt ook legacy optietriggers. */
+/** Installeert de notificatiecontrole en vervangt bestaande controletriggers. */
 function installScheduledNotificationTrigger() {
   const hours = CONFIG.notifications.schedule.everyHours;
   if (![1, 2, 4, 6, 8, 12].includes(hours)) {
@@ -41,27 +21,17 @@ function installScheduledNotificationTrigger() {
   }
   // Bij een create-fout blijft de bestaande controle actief.
   const previous = ScriptApp.getProjectTriggers().filter(trigger =>
-    [TRIGGER_HANDLERS.scheduledNotifications, TRIGGER_HANDLERS.gigOptionExpiry]
-      .includes(trigger.getHandlerFunction()));
+    trigger.getHandlerFunction() === TRIGGER_HANDLERS.scheduledNotifications);
   ScriptApp.newTrigger(TRIGGER_HANDLERS.scheduledNotifications)
     .timeBased().everyHours(hours).create();
   previous.forEach(trigger => ScriptApp.deleteTrigger(trigger));
   systemStatusService.update();
 }
 
-/** Verwijdert generieke en legacy tijdgestuurde notificatiecontroles. */
+/** Verwijdert tijdgestuurde notificatiecontroles. */
 function removeScheduledNotificationTriggers() {
   ScriptApp.getProjectTriggers().forEach(trigger => {
-    if ([TRIGGER_HANDLERS.scheduledNotifications, TRIGGER_HANDLERS.gigOptionExpiry]
-      .includes(trigger.getHandlerFunction())) ScriptApp.deleteTrigger(trigger);
-  });
-  systemStatusService.update();
-}
-
-/** Verwijdert uitsluitend triggers voor de optiecontrole. */
-function removeGigOptionExpiryTriggers() {
-  ScriptApp.getProjectTriggers().forEach(trigger => {
-    if (trigger.getHandlerFunction() === TRIGGER_HANDLERS.gigOptionExpiry) {
+    if (trigger.getHandlerFunction() === TRIGGER_HANDLERS.scheduledNotifications) {
       ScriptApp.deleteTrigger(trigger);
     }
   });
