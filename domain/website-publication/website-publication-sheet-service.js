@@ -19,6 +19,26 @@ const websitePublicationSheetService = (() => {
 
   /** Inrichting expliciet vanuit het menu; nooit bestaande publicatiewaarden wissen. */
   function setup() {
+    const config = CONFIG.websitePublications;
+    const existing = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(config.sheetName);
+    if (existing) {
+      const expected = Object.values(config.columns);
+      const legacy = expected.filter(header => header !== config.columns.googleMapsEmbed);
+      const actual = sheetService.getHeaders(existing);
+      const index = expected.indexOf(config.columns.googleMapsEmbed);
+      if (actual.length === legacy.length && actual.every((value, i) => value === legacy[i])) {
+        // Alleen het bekende oude schema migreren; geen bestaande cellen herschrijven.
+        existing.insertColumnAfter(index);
+        existing.getRange(1, index + 1).setValue(config.columns.googleMapsEmbed);
+        sheetService.clearColumnIndexMapCache(config.sheetName);
+      } else if (actual.length === expected.length && actual[index] === '' &&
+          actual.every((value, i) => i === index || value === expected[i]) &&
+          existing.getRange(2, index + 1, existing.getMaxRows() - 1, 1).getValues().every(row => row[0] === '')) {
+        // Herstel een onderbroken migratie na insertColumnAfter, vóór de headerwrite.
+        existing.getRange(1, index + 1).setValue(config.columns.googleMapsEmbed);
+        sheetService.clearColumnIndexMapCache(config.sheetName);
+      }
+    }
     const sheet = ensureSheet();
     configureSheet_(sheet);
   }
@@ -46,7 +66,7 @@ const websitePublicationSheetService = (() => {
     const expected = Object.values(CONFIG.websitePublications.columns);
     const actual = sheetService.getHeaders(sheet);
     if (actual.length !== expected.length || actual.some((value, i) => value !== expected[i])) {
-      throw new Error('website-publications heeft niet de verwachte 17 headers in de juiste volgorde.');
+      throw new Error('website-publications heeft niet de verwachte 18 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
     }
   }
 

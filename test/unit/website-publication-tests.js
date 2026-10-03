@@ -91,7 +91,7 @@ function testWebsiteSheetSetupAndSchema() {
   websiteFixture_();
   setupWebsitePublications();
   const sheet = unit.sheets['website-publications'];
-  assertEquals('Status,Title,Date,Venue,City,Country,Start,Address,Zip,Contact Email,Contact Website,Ticket URL,Price,WP Event ID,WP Draft URL,Gig ID,Last Error', sheet.values[0].join(','));
+  assertEquals('Status,Title,Date,Venue,City,Country,Start,Address,Zip,Contact Email,Contact Website,Ticket URL,Price,Google Maps Embed,WP Event ID,WP Draft URL,Gig ID,Last Error', sheet.values[0].join(','));
   setupWebsitePublications();
   assertEquals(1, sheet.protections.length);
   assertEquals(false, sheet.protections[0].domain);
@@ -105,8 +105,57 @@ function testWebsiteSheetSetupAndSchema() {
   assertEquals('2,10,11,12,13', sheet.protections[0].ranges.map(r => r.getColumn()).join(','));
   assertTrue(sheet.formats.some(f => f.column === 9 && f.format === '@'));
   sheet.values[0][0] = 'Wrong';
-  assertThrows(() => syncWebsitePublications(), 'website-publications heeft niet de verwachte 17 headers in de juiste volgorde.');
+  assertThrows(() => syncWebsitePublications(), 'website-publications heeft niet de verwachte 18 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
   assertEquals('Wrong', sheet.values[0][0]);
+}
+
+function testWebsiteMapsSnapshot() {
+  const { sheet, c } = websiteFixture_();
+  sheet.values[1][sheet.values[0].indexOf('Location')] = 'Stadsbroek 17, 9405 BK Assen';
+  unit.addGig({ 'Gig ID': 'G-2', Location: '  ' });
+  unit.addGig({ 'Gig ID': 'G-3', Location: 'Café "A&B" <zaal> \'s-Hertogenbosch' });
+  syncWebsitePublications();
+  const rows = websitePublicationSheetService.getRows();
+  const widget = rows[0][c.googleMapsEmbed];
+  assertTrue(widget.includes('q=Stadsbroek%2017%2C%209405%20BK%20Assen&amp;z=12'));
+  assertTrue(widget.endsWith('</iframe></div>'));
+  assertFalse(widget.includes('<script'));
+  assertFalse(widget.includes('acadoo'));
+  assertFalse(widget.includes('id="gmap_canvas"'));
+  assertEquals('', rows[1][c.googleMapsEmbed]);
+  assertTrue(rows[2][c.googleMapsEmbed].includes('Caf%C3%A9%20%22A%26B%22%20%3Czaal%3E%20%27s-Hertogenbosch'));
+  sheet.values[1][sheet.values[0].indexOf('Location')] = 'Ander adres';
+  syncWebsitePublications();
+  assertEquals(widget, websitePublicationSheetService.getRows()[0][c.googleMapsEmbed]);
+  assertEquals(widget, wordpressEventMapper.map(rows[0]).meta._wolf_event_map);
+  assertEquals('', wordpressEventMapper.map(rows[1]).meta._wolf_event_map);
+  assertEquals(rows[2][c.googleMapsEmbed], wordpressEventMapper.map(rows[2]).meta._wolf_event_map);
+  assertEquals(0, unit.requests.length);
+}
+
+function testWebsiteMapsMigration() {
+  websiteFixture_();
+  const c = CONFIG.websitePublications.columns;
+  const headers = Object.values(c).filter(header => header !== c.googleMapsEmbed);
+  const original = headers.map((header, index) => 'bestaand-' + index);
+  const sheet = unit.makeSheet(CONFIG.websitePublications.sheetName, [headers.slice(), original.slice()]);
+  assertThrows(() => websitePublicationSheetService.getRows(), 'website-publications heeft niet de verwachte 18 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
+  assertEquals(17, sheet.values[0].length);
+  setupWebsitePublications();
+  assertEquals(c.googleMapsEmbed, sheet.values[0][13]);
+  assertEquals('', sheet.values[1][13]);
+  assertEquals(JSON.stringify(original), JSON.stringify(sheet.values[1].filter((value, index) => index !== 13)));
+  const before = JSON.stringify(sheet.values);
+  setupWebsitePublications();
+  assertEquals(before, JSON.stringify(sheet.values));
+  assertFalse(sheet.protections[0].ranges.some(range => range.getColumn() === 14));
+  sheet.values[0][13] = ''; // Onderbroken headerwrite is herstelbaar zonder tweede kolom.
+  setupWebsitePublications();
+  assertEquals(before, JSON.stringify(sheet.values));
+  sheet.values[0][0] = 'Onbekend';
+  const invalid = JSON.stringify(sheet.values);
+  assertThrows(setupWebsitePublications, 'website-publications heeft niet de verwachte 18 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
+  assertEquals(invalid, JSON.stringify(sheet.values));
 }
 
 function testWebsiteMapper() {
@@ -119,10 +168,10 @@ function testWebsiteMapper() {
   row['Contact Phone'] = '001234';
   const payload = wordpressEventMapper.map(row);
   assertEquals(JSON.stringify({ title: 'Concert', status: 'draft', we_artist: [13], meta: {
-    _wolf_event_start_date: '31-12-2099', _wolf_event_venue: 'Zaal', _wolf_event_city: 'Stad',
+    _wolf_event_start_date: '31-12-2099', _wolf_event_venue: 'Zaal', _wolf_event_location: 'Concert', _wolf_event_city: 'Stad',
     _wolf_event_country_short: 'Custom landcode', _wolf_event_country: '', _wolf_event_time: '20:30',
     _wolf_event_address: 'Straat 1', _wolf_event_zip: '0012 AB', _wolf_event_email: 'public@example.invalid',
-    _wolf_event_website: 'https://example.invalid', _wolf_event_ticket: '', _wolf_event_price: '0', _wolf_event_currency: 'EUR'
+    _wolf_event_website: 'https://example.invalid', _wolf_event_ticket: '', _wolf_event_price: '0', _wolf_event_map: '', _wolf_event_currency: 'EUR'
   } }), JSON.stringify(payload));
   row[c.start] = '0:05';
   assertEquals('00:05', wordpressEventMapper.map(row).meta._wolf_event_time);
@@ -193,7 +242,8 @@ function testWebsiteAmbiguousFailuresAndWriteFailure() {
   }
   unit.rawBody = undefined;
   websitePublicationSheetService.update('G-1', { status: 'READY' });
-  unit.failWrite = (sheet, row, column) => sheet === 'website-publications' && column === 14;
+  unit.failWrite = (sheet, row, column) => sheet === 'website-publications' &&
+    column === Object.values(CONFIG.websitePublications.columns).indexOf(c.wpEventId) + 1;
   createWordPressDraft();
   assertTrue(unit.alerts.at(-1).includes('2049'));
   assertEquals('ERROR', websitePublicationSheetService.getByGigId('G-1')[c.status]);

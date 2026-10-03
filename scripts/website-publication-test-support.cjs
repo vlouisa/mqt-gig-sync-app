@@ -60,6 +60,7 @@ function setup() {
       getLastColumn: () => Math.max(0, ...sheet.values.map(row => row.length)),
       getMaxRows: () => sheet.maxRows,
       insertRowsAfter: (after, count) => { sheet.maxRows += count; },
+      insertColumnAfter: after => { sheet.values.forEach(row => row.splice(after, 0, '')); },
       getRange: (...args) => range(sheet, ...args),
       getDataRange: () => range(sheet, 1, 1, sheet.values.length, sheet.getLastColumn()),
       appendRow: row => { sheet.values.push([...row]); },

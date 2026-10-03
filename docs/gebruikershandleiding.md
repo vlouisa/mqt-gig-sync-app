@@ -244,6 +244,13 @@ Dit onderdeel is voor de beheerder. De websitewerkvoorraad staat los van de agen
 2. Open `website-publications`. Controleer de gegevens van de gewenste rij.
    Je kunt `Title`, `Contact Email`, `Contact Website`, `Ticket URL` en `Price`
    aanpassen.
+   Nieuwe publicaties bevatten ook `Google Maps Embed`, direct na `Price`, met
+   kaartcode op basis van `gig-input.Location`. Gebruik daar bij voorkeur een
+   volledig adres. Bij een lege locatie blijft de widget leeg. Bij **Maak WordPress-concept**
+   wordt de code meegestuurd naar het kaartveld in WordPress. Hiervoor moet de
+   WordPress-supportplugin met ondersteuning voor `_wolf_event_map` geïnstalleerd zijn.
+   Bestaande publicaties worden niet
+   achteraf aangevuld en locatieaanpassingen wijzigen bestaande widgets niet.
 3. Selecteer één gegevensrij met `Status = READY`.
 4. Kies in het beheerpaneel **Website > Laad geselecteerde publicatie**.
    Controleer titel en Gig ID en kies **Maak WordPress-concept**. Bevestig de actie.

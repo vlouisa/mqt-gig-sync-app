@@ -24,6 +24,7 @@ const wordpressEventMapper = (() => {
       meta: {
         _wolf_event_start_date: Utilities.formatDate(date, zone, 'dd-MM-yyyy'),
         _wolf_event_venue: text_(row[c.venue]),
+        _wolf_event_location: text_(row[c.title]),
         _wolf_event_city: text_(row[c.city]),
         _wolf_event_country_short: text_(row[c.country]),
         _wolf_event_country: '',
@@ -34,6 +35,7 @@ const wordpressEventMapper = (() => {
         _wolf_event_website: text_(row[c.contactWebsite]),
         _wolf_event_ticket: text_(row[c.ticketUrl]),
         _wolf_event_price: text_(row[c.price]),
+        _wolf_event_map: text_(row[c.googleMapsEmbed]),
         _wolf_event_currency: 'EUR'
       }
     };

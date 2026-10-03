@@ -229,7 +229,7 @@ suites.push({
     'domain/website-publication/website-publication-entrypoints.js',
     'test/helpers/assert-util.js', 'test/unit/website-publication-tests.js'],
   tests: ['testWebsiteSnapshotSelectionAndIdentity', 'testWebsiteSnapshotPreservedAndNewId',
-    'testWebsiteDuplicateSourceRejected', 'testWebsiteResponseReadFailure', 'testWebsiteSheetSetupAndSchema', 'testWebsiteMapper',
+    'testWebsiteDuplicateSourceRejected', 'testWebsiteResponseReadFailure', 'testWebsiteSheetSetupAndSchema', 'testWebsiteMapsSnapshot', 'testWebsiteMapsMigration', 'testWebsiteMapper',
     'testWebsiteDraftSuccessAndDuplicateBlock', 'testWebsiteHttpErrorsAndNoSecrets',
     'testWebsiteAmbiguousFailuresAndWriteFailure', 'testWebsiteReservationFailureNoPost',
     'testWebsiteInvalidSelectionAndStatus', 'testWebsiteEligibilityRecheckedAtCreate',

@@ -12,9 +12,9 @@ Gig ID is een door de applicatie gegenereerde UUID, geen Google Calendar-event-I
 
 ## Inrichting en gebruik
 
-1. Gebruik de WordPress-supportplugin v0.2.5 zoals hieronder gedocumenteerd.
+1. Gebruik de WordPress-supportplugin v0.2.7 zoals hieronder gedocumenteerd, inclusief REST-ondersteuning voor `_wolf_event_map`.
 2. Configureer in Apps Script de Script Properties `WORDPRESS_BASE_URL`, `WORDPRESS_USERNAME` en `WORDPRESS_APPLICATION_PASSWORD`. Gebruik de HTTPS-basis-URL van de WordPress-installatie en een Application Password van een gebruiker die event-concepten mag maken. Zet credentials nooit in Sheets, broncode of logs.
-3. Voer als de geconfigureerde MQT-admin de website-inrichtingsactie in het spreadsheetmenu uit. Deze maakt `website-publications` aan met de 17 headers uit de brief. Een bestaand tabblad met afwijkende headers wordt afgewezen; bestaande gegevens worden niet herbouwd.
+3. Voer als de geconfigureerde MQT-admin de website-inrichtingsactie uit via **Beheerpaneel > Onderhoud > Richt websitewerkvoorraad in**. Deze maakt `website-publications` aan met 18 headers, inclusief `Google Maps Embed` na `Price`. Het bekende oude schema met 17 headers wordt met behoud van gegevens uitgebreid; overige afwijkingen worden afgewezen. Zie [Google Maps-widget](FEAT-008-google-maps-embed.md).
 4. Synchroniseer de werkvoorraad via het menu. Optioneel installeert dezelfde admin de website-trigger vanuit het Triggers-menu. Deze draait ieder uur en maakt uitsluitend snapshots, nooit WordPress-concepten.
 5. Bewerk zo nodig Title, Contact Email, Contact Website, Ticket URL en Price. Selecteer precies één dataregel met `READY` en kies de actie om een WordPress-concept aan te maken, of de afzonderlijke overslaanactie.
 
@@ -28,9 +28,11 @@ De enige create-aanroep is een expliciete menuactie: `POST /wp-json/wp/v2/event`
 
 Title wordt `title`; Date wordt `_wolf_event_start_date` (`dd-MM-yyyy`). Venue, City, Country, Start, Address en Zip worden respectievelijk `_wolf_event_venue`, `_wolf_event_city`, `_wolf_event_country_short`, `_wolf_event_time`, `_wolf_event_address` en `_wolf_event_zip`. Country wordt niet vertaald; `_wolf_event_country` blijft leeg. Contact Email, Contact Website, Ticket URL en Price worden `_wolf_event_email`, `_wolf_event_website`, `_wolf_event_ticket` en `_wolf_event_price`. `_wolf_event_currency` is altijd `EUR`. Contact Name en Contact Phone worden niet verstuurd. Lege waarden blijven leeg; prijs nul blijft behouden.
 
-De aangeleverde broncode van **Miracle Gig Sync API Support v0.2.5** is opgeslagen als [referentiedocument](../wordpress/miracle-gig-sync-api-support-v0.2.5.md). Deze versie registreert onder meer `_wolf_event_email` en `_wolf_event_website` als string-meta voor REST. De plugin wordt buiten deze repository beheerd en geïnstalleerd.
+De mapper stuurt daarnaast Title als `_wolf_event_location` en Google Maps Embed als `_wolf_event_map`. Een lege embed wordt als lege string verstuurd. Bestaande WordPress-concepten worden niet bijgewerkt.
 
-**Start wordt bewust nog niet overgenomen door de plugin.** Het veld blijft opgeslagen in `website-publications`. De huidige Apps Script-mapper stuurt het nog als `_wolf_event_time` mee in de payload, maar v0.2.5 registreert dit veld niet voor REST. Of de starttijd daadwerkelijk naar WordPress moet worden doorgegeven, wordt later besloten. Dit is een bewuste afwijking van de oorspronkelijke brief.
+De aangeleverde broncode van **Miracle Gig Sync API Support v0.2.7** is opgeslagen als [referentiedocument](../wordpress/miracle-gig-sync-api-support-latest.md). Deze versie registreert onder meer `_wolf_event_email` en `_wolf_event_website` als string-meta voor REST en `_wolf_event_map` met een aparte HTML-sanitizer voor de iframe. De plugin wordt buiten deze repository beheerd en geïnstalleerd.
+
+**Start wordt bewust nog niet overgenomen door de plugin.** Het veld blijft opgeslagen in `website-publications`. De huidige Apps Script-mapper stuurt het nog als `_wolf_event_time` mee in de payload, maar v0.2.7 registreert dit veld niet voor REST. Of de starttijd daadwerkelijk naar WordPress moet worden doorgegeven, wordt later besloten. Dit is een bewuste afwijking van de oorspronkelijke brief.
 
 De aangeleverde broncode bevestigt de registratie; installatie en daadwerkelijk opslaan/uitlezen in de WordPress-omgeving zijn hier niet geverifieerd. De lokale tests gebruiken uitsluitend mocks.
 
