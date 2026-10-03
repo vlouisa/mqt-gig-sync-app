@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <base target="_blank">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { color-scheme:light; --ink:#25312f; --muted:#606a68; --line:#e3e7e5; --surface:#f7f8f7; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:16px; background:#fff; color:var(--ink); font:13px/1.5 Arial,sans-serif; }
+    h1 { margin:0; font-size:19px; font-weight:600; } h2 { font-size:15px; margin:20px 0 8px; } h3 { font-size:13px; margin:0 0 6px; }
+    p { margin:6px 0 10px; } .muted, small { color:var(--muted); } small { display:block; font-size:11px; overflow-wrap:anywhere; }
+    label { display:block; margin:16px 0 4px; font-weight:600; }
+    select, button { font:inherit; border:1px solid #ccd4d0; border-radius:6px; background:#fff; color:var(--ink); padding:7px 10px; }
+    select { width:100%; } button { cursor:pointer; text-align:left; } button:hover { background:#f0f3f1; }
+    button:focus-visible, select:focus-visible, a:focus-visible { outline:2px solid #46695d; outline-offset:2px; }
+    button:disabled { opacity:.5; cursor:wait; } .wide { display:block; width:100%; margin:8px 0; }
+    a { color:#365f50; text-underline-offset:2px; overflow-wrap:anywhere; }
+    .card { border-bottom:1px solid var(--line); padding:13px 0; } .card:last-child { border-bottom:0; }
+    .badge { display:inline-flex; align-items:center; gap:4px; border-radius:4px; padding:2px 7px; font-size:11px; font-weight:600; }
+    .neutral { background:#eef1f0; color:#4a5551; } .success { background:#e8f2eb; color:#28573c; }
+    .warning { background:#fff1da; color:#805312; } .error { background:#f9e9e7; color:#923b36; }
+    .summary { padding:12px; background:var(--surface); border:1px solid var(--line); border-radius:8px; margin:12px 0; }
+    .summary strong { display:block; font-size:15px; } .toolbar { display:flex; gap:6px; flex-wrap:wrap; margin:9px 0; }
+    #feedback { margin-top:12px; border-left:3px solid #cbd4cf; padding:9px; background:var(--surface); overflow-wrap:anywhere; }
+    #feedback:empty { display:none; } #feedback[data-tone="error"] { border-color:#b35f57; } #feedback[data-tone="success"] { border-color:#659574; }
+    #feedback[data-tone="warning"] { border-color:#bf914a; } [hidden] { display:none !important; }
+    #confirmation { border:1px solid #ccd4d0; border-radius:8px; padding:12px; margin-top:12px; background:var(--surface); }
+    ul { padding-left:18px; } li { margin:6px 0; } .error-item { margin:8px 0; overflow-wrap:anywhere; }
+  </style>
+</head>
+<body>
+  <header><h1>Beheer</h1><p class="muted">Miracle Queen Tribute Gig Sync</p></header>
+  <label for="section">Onderdeel</label>
+  <select id="section">
+    <option value="overview">Overzicht</option><option value="processing">Verwerking</option>
+    <option value="website">Website</option><option value="automation">Automatisering</option>
+    <option value="maintenance">Onderhoud</option><option value="help">Help</option>
+  </select>
+  <button id="refresh" class="wide" type="button">Ververs overzicht</button>
+  <small id="checked">Nog niet gecontroleerd</small>
+  <div id="feedback" role="status" aria-live="polite"></div>
+  <div id="confirmation" hidden role="group" aria-labelledby="confirm-title">
+    <h2 id="confirm-title">Actie bevestigen</h2><p id="confirm-text"></p>
+    <div class="toolbar"><button id="confirm" type="button">Uitvoeren</button><button id="cancel" type="button">Annuleren</button></div>
+  </div>
+  <main id="content" aria-busy="false"></main>
+  <script>
+    let data = null, busy = false, selection = null, pending = null;
+    const section = document.getElementById('section');
+    section.value = '<?= initialSection ?>';
+    const content = document.getElementById('content');
+    const symbols = { success:'✓', warning:'!', error:'×', neutral:'•' };
+    function element(tag, text, className) {
+      const node = document.createElement(tag);
+      if (text !== undefined) node.textContent = text;
+      if (className) node.className = className;
+      return node;
+    }
+    function badge(text, tone) { return element('span', symbols[tone] + ' ' + text, 'badge ' + tone); }
+    function button(text, action, parent, className) {
+      const node = element('button', text, className); node.type = 'button'; node.disabled = busy;
+      node.addEventListener('click', action); parent.append(node); return node;
+    }
+    function link(text, url, parent) {
+      const node = element('a', text); node.href = url; node.target = '_blank'; node.rel = 'noopener noreferrer'; parent.append(node);
+    }
+    function feedback(message, tone = 'neutral') {
+      const node = document.getElementById('feedback'); node.textContent = message; node.dataset.tone = tone;
+    }
+    function setBusy(value) {
+      busy = value; content.setAttribute('aria-busy', String(value));
+      document.querySelectorAll('button').forEach(node => { node.disabled = value; }); section.disabled = value;
+      if (!value && selection && selection.status !== 'READY') document.querySelectorAll('[data-publication]').forEach(node => { node.disabled = true; });
+    }
+    function call(method, args, done, mutation = false, failed) {
+      if (busy) return;
+      setBusy(true); feedback(mutation ? 'Bezig met uitvoeren…' : 'Bezig met laden…');
+      const runner = google.script.run.withSuccessHandler(result => { setBusy(false); done(result); })
+        .withFailureHandler(error => {
+          setBusy(false);
+          if (failed) { failed(); return; }
+          const safeMessages = ['De publicatie is gewijzigd. Laad de selectie opnieuw en controleer de gegevens.',
+            'Een andere verwerking is actief. Probeer later opnieuw.', 'Selecteer één dataregel in website-publications.',
+            'Gig ID ontbreekt of komt meerdere keren voor.', 'Gig ID ontbreekt of komt meerdere keren voor in website-publications.'];
+          const known = safeMessages.find(message => error && (error.message === message || error.message === 'Error: ' + message));
+          if (known) { feedback(known, 'warning'); return; }
+          // Ruwe libraryfouten kunnen gevoelige gegevens bevatten.
+          feedback(mutation ? 'De actie is niet bevestigd. Controleer de rijstatussen, externe uitkomst en technische logging vóór een nieuwe poging.' :
+            'Laden is niet gelukt. Controleer het beheeraccount, de selectie en de inrichting en probeer opnieuw.', 'error');
+        });
+      runner[method](...args);
+    }
+    function refresh(preserveFeedback = false) {
+      if (busy) return;
+      const previous = document.getElementById('feedback').textContent;
+      const tone = document.getElementById('feedback').dataset.tone;
+      call('getAdminPanelSnapshot', [], result => {
+        data = result; document.getElementById('checked').textContent = 'Gecontroleerd: ' + new Date(result.checkedAt).toLocaleString('nl-NL');
+        render(); feedback(preserveFeedback ? previous : '', tone);
+      }, false, () => {
+        document.getElementById('checked').textContent = 'Verversen mislukt — getoonde gegevens kunnen verouderd zijn';
+        feedback((preserveFeedback ? previous + ' ' : '') + 'Het overzicht kon niet worden ververst.', preserveFeedback ? tone : 'warning');
+      });
+    }
+    function confirmAction(text, action) {
+      pending = action; document.getElementById('confirm-text').textContent = text;
+      document.getElementById('confirmation').hidden = false; document.getElementById('confirm').focus();
+    }
+    function cancel() { pending = null; document.getElementById('confirmation').hidden = true; }
+    function run(method, args) {
+      cancel(); call(method, args, result => { selection = null; render(); feedback(result.message, result.tone); refresh(true); }, true);
+    }
+    function showActions(group) {
+      (data ? data.actions : []).filter(action => action.group === group).forEach(action => {
+        const card = element('div', undefined, 'card');
+        button(action.label, () => {
+          const execute = () => run('runAdminPanelAction', [action.id]);
+          if (action.confirm) confirmAction(action.description, execute); else execute();
+        }, card, 'wide');
+        card.append(element('small', action.description)); content.append(card);
+      });
+    }
+    function overview() {
+      const failed = data.sources.reduce((sum, source) => sum + (source.errorCount || 0), 0);
+      const missing = data.sources.filter(source => source.issue).length;
+      const triggers = data.triggers.filter(trigger => trigger.count !== 1).length;
+      const summary = element('div', undefined, 'summary');
+      summary.append(element('strong', 'Aandachtspunten'), element('p', `${failed} ${failed === 1 ? 'rij' : 'rijen'} met fouten · ${triggers} afwijkende triggers · ${missing} onleesbare overzichten`));
+      summary.append(element('small', 'Controle van werkvoorraad en triggeraanwezigheid. Uitvoeringshistorie en aflevering zijn niet gecontroleerd.'));
+      content.append(summary);
+      const ordered = [...data.sources].sort((a, b) => Number(Boolean(b.issue || b.errorCount)) - Number(Boolean(a.issue || a.errorCount)));
+      ordered.forEach(source => {
+        const card = element('div', undefined, 'card'); card.append(element('h3', source.name));
+        if (source.issue) card.append(badge('Controle nodig', 'warning'), element('p', source.issue));
+        else {
+          card.append(badge(source.errorCount ? `${source.errorCount} ${source.errorCount === 1 ? 'fout' : 'fouten'}` : 'Geen ERROR-rijen', source.errorCount ? 'error' : 'success'), element('p', `${source.waiting} ${source.waiting === 1 ? 'rij' : 'rijen'} in de werkvoorraad`, 'muted'));
+          link('Open overzicht', source.url, card);
+          source.errors.forEach(error => {
+            const item = element('div', undefined, 'error-item'); link(`Rij ${error.row}`, error.url, item);
+            item.append(element('small', error.message)); card.append(item);
+          });
+          if (source.errorCount > source.errors.length) card.append(element('small', 'De eerste tien fouten worden getoond. Open het tabblad voor alle fouten.'));
+        }
+        content.append(card);
+      });
+    }
+    function automation() {
+      content.append(element('p', 'Triggerstatus voor ' + data.account, 'muted'), element('small', 'Alleen triggers van dit account zijn zichtbaar. Een aanwezige trigger bewijst geen geslaagde verwerking. Het interval is de instelling voor een nieuwe installatie.'));
+      data.triggers.forEach(trigger => {
+        const card = element('div', undefined, 'card'); card.append(element('h3', trigger.label));
+        card.append(badge(trigger.count === 1 ? 'Trigger aanwezig' : trigger.count === 0 ? 'Trigger ontbreekt' : `${trigger.count} triggers: controle nodig`, trigger.count === 1 ? 'success' : trigger.count === 0 ? 'error' : 'warning'));
+        card.append(element('p', 'Ingesteld: iedere ' + trigger.interval, 'muted'));
+        const toolbar = element('div', undefined, 'toolbar');
+        button(trigger.count ? 'Opnieuw instellen' : 'Installeren', () => confirmAction(`${trigger.label}: installeer de trigger met interval ${trigger.interval}. Bestaande eigen triggers voor dit proces worden vervangen.`, () => run('manageAdminPanelTrigger', [trigger.id, 'install'])), toolbar);
+        if (trigger.count) button('Verwijderen', () => confirmAction(`${trigger.label}: verwijder de triggers van dit account. De automatische taak stopt voor dit account.`, () => run('manageAdminPanelTrigger', [trigger.id, 'remove'])), toolbar);
+        card.append(toolbar); content.append(card);
+      });
+    }
+    function website() {
+      const source = data.sources.find(item => item.id === 'website');
+      if (source.url) link('Open websitewerkvoorraad', source.url, content);
+      content.append(element('p', 'Selecteer één publicatieregel in Sheets en laad deze hieronder.', 'muted'));
+      button('Laad geselecteerde publicatie', () => {
+        cancel(); selection = null; render();
+        call('getAdminPanelSelection', [], result => { selection = result; render(); feedback('Controleer het getoonde optreden vóór uitvoering.'); });
+      }, content, 'wide');
+      if (selection) {
+        const card = element('div', undefined, 'summary');
+        card.append(element('h3', selection.title), element('small', 'Gig ID: ' + selection.gigId), badge(selection.status, selection.status === 'ERROR' ? 'error' : 'neutral'));
+        [['create', 'Maak WordPress-concept'], ['skip', 'Sla publicatie over']].forEach(([operation, label]) => {
+          const expected = selection;
+          const node = button(label, () => confirmAction(`${label} voor “${expected.title}” (${expected.gigId})?`, () => run('runAdminPanelPublication', [operation, expected])), card, 'wide');
+          node.dataset.publication = 'true'; node.disabled = busy || selection.status !== 'READY';
+        });
+        if (selection.status !== 'READY') card.append(element('p', 'Alleen READY-publicaties kunnen worden verwerkt. Controleer bij ERROR eerst WordPress om dubbele concepten te voorkomen.'));
+        content.append(card);
+      }
+      showActions('website');
+    }
+    function help() {
+      content.append(element('h2', 'Werken met het beheerpaneel'));
+      const list = element('ul');
+      ['Overzicht toont wachtende rijen en fouten. Open de rij om de oorzaak te herstellen.', 'Verwerking start taken handmatig; Calendar verwerkt alle vier invoerbladen, ook verwijderverzoeken.', 'Website gebruikt het geladen optreden. Laad de selectie opnieuw als je een ander optreden wilt verwerken.', 'Automatisering beheert triggers van het huidige beheeraccount.', 'Onderhoud bevat archivering, inrichting en beveiliging.', 'Verversen leest de actuele toestand. Het start geen imports, publicaties of notificaties.'].forEach(text => list.append(element('li', text)));
+      content.append(list, element('h2', 'Statuskleuren'));
+      [['success', 'Gecontroleerd en in orde'], ['warning', 'Controle nodig'], ['error', 'Fout of ontbrekende trigger'], ['neutral', 'Normale werkvoorraad of onbekend']].forEach(([tone, text]) => {
+        const row = element('p'); row.append(badge(text, tone)); content.append(row);
+      });
+      content.append(element('p', 'Groen geldt alleen voor de genoemde controle. Het bevestigt geen aflevering of volledige werking.', 'muted'));
+    }
+    function render() {
+      content.replaceChildren();
+      if (section.value === 'help') { help(); return; }
+      if (!data) { content.append(element('p', 'Laad het overzicht om beheeracties te bekijken.')); return; }
+      if (section.value === 'overview') overview(); else if (section.value === 'automation') automation();
+      else if (section.value === 'website') website(); else showActions(section.value);
+    }
+    section.addEventListener('change', () => { cancel(); render(); });
+    document.getElementById('refresh').addEventListener('click', () => { cancel(); selection = null; render(); refresh(); });
+    document.getElementById('cancel').addEventListener('click', cancel);
+    document.getElementById('confirm').addEventListener('click', () => { const action = pending; cancel(); if (action) action(); });
+    render(); refresh();
+  </script>
+</body>
+</html>

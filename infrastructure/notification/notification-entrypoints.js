@@ -4,7 +4,7 @@ function checkScheduledNotifications() {
   if (!lock.tryLock(30000)) {
     logService.forModule('trigger-service').warn('scheduled-notifications-skipped-lock',
       'Notificatiecontrole overgeslagen: scriptlock bezet.', '');
-    return;
+    return { tone: 'warning', message: 'Notificatiecontrole overgeslagen: er draait al een verwerking.' };
   }
   try {
     scheduledNotificationService.check();
@@ -49,20 +49,20 @@ function processEventQueueNotifications() {
 /**
  * Installeert de 1-minuut time-based trigger voor de notificatie-worker.
  *
- * Verwijdert eerst bestaande notificatie-worker triggers om dubbele
- * queue-verwerking te voorkomen.
+ * Vervangt bestaande triggers pas nadat aanmaken slaagt.
  *
  * @returns {void}
  */
 function installNotificationWorkerTrigger() {
   const log = logService.forModule('trigger-service');
 
-  removeNotificationWorkerTriggers();
+  const previous = ScriptApp.getProjectTriggers().filter(trigger => trigger.getHandlerFunction() === TRIGGER_HANDLERS.notificationWorker);
 
   ScriptApp.newTrigger(TRIGGER_HANDLERS.notificationWorker)
     .timeBased()
     .everyMinutes(1)
     .create();
+  previous.forEach(trigger => ScriptApp.deleteTrigger(trigger));
 
   systemStatusService.update();
   log.info(

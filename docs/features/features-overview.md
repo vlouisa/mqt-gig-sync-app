@@ -14,5 +14,6 @@ Timestamp vermeldt het oorspronkelijke taakbericht van de gebruiker, gereconstru
 | FEAT-004 | 2026-09-27 11:05:39 +02:00 | Websitepublicaties | Snapshotwerkvoorraad, handmatige WordPress-concepten, inrichting en foutherstel | [Details](FEAT-004-website-publications.md) |
 | FEAT-005 | 2026-09-27 17:04:06 +02:00 | Auditlog archiveren | Handmatige JSON Lines-archivering van oude auditregels naar Drive, met configurabele bewaartermijn en batchgrootte | [Details](FEAT-005-audit-log-archiving.md) |
 | FEAT-006 | 2026-09-27 21:40:18 +02:00 | Reisboekingsreminder | Eén boodschappenlijstje voor ontbrekende heen-/terugvlucht en hotel vanaf veertien dagen vóór een bevestigde gig | [Details](FEAT-006-gig-travel-bookings-reminder.md) |
+| FEAT-007 | Niet vastgelegd | Beheerpaneel | Compact menu, rustige statuskleuren, werkvoorraad en veilig beheer vanuit een sidebar | [Details](FEAT-007-admin-panel.md) |
 
 Oorspronkelijke opdrachten staan in het [overzicht van implementatiebriefs](../implementation-briefs/implementation-briefs-overview.md). Bevindingen staan in het [reviewoverzicht](../reviews/review-findings-overview.md).

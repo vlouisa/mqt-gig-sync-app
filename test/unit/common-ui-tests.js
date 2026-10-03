@@ -8,24 +8,15 @@ function testCommonMenuNonAdmin() {
   assertEquals(0, unit.calls.length);
 }
 
-/** Het adminmenu bevat alle bestaande stringgebaseerde entrypoints. */
+/** Het adminmenu biedt het paneel, de Calendar-snelkoppeling en hulp. */
 function testCommonMenuAdmin() {
   requireCommonUnit_();
   onOpen();
   assertCommonData_([['MQT Gig Sync']], unit.all('addToUi'));
-  assertCommonData_(['MQT Gig Sync', 'Import', 'Website', 'Triggers', 'Notificaties', 'Systeem'], unit.all('menu').map(args => args[0]));
-  assertCommonData_(['Import', 'Website', 'Triggers', 'Notificaties', 'Systeem'], unit.all('submenu').map(args => args[1]));
+  assertCommonData_(['MQT Gig Sync'], unit.all('menu').map(args => args[0]));
+  assertCommonData_([], unit.all('submenu'));
   assertCommonData_([
-    'syncEventsToCalendar', 'scanFlightEmailsAndImport', 'scanHotelEmailsAndImport',
-    'syncWebsitePublications', 'createWordPressDraft', 'skipWebsitePublication', 'setupWebsitePublications',
-    'installWebsitePublicationTrigger', 'removeWebsitePublicationTriggers',
-    'installAutoSyncTrigger', 'removeAutoSyncTriggers',
-    'installFlightMailImportTrigger', 'removeFlightMailImportTriggers',
-    'installHotelMailImportTrigger', 'removeHotelMailImportTriggers',
-    'installScheduledNotificationTrigger', 'removeScheduledNotificationTriggers',
-    'installNotificationWorkerTrigger', 'removeNotificationWorkerTriggers',
-    'installSystemStatusTrigger', 'removeSystemStatusTriggers',
-    'checkScheduledNotifications', 'processEventQueueNotifications', 'archiveAuditLog', 'protectTechnicalColumns', 'refreshSystemStatus'
+    'showAdminPanel', 'syncEventsToCalendar', 'showAdminHelp'
   ], unit.all('item').map(args => args[2]));
   assertEquals(1, unit.all('info').length);
 }

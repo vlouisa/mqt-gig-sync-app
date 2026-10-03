@@ -28,12 +28,14 @@ const websitePublicationService = (() => {
   /**
    * Maakt maximaal één draftpoging. ERROR wordt vóór de POST duurzaam opgeslagen.
    * Een timeout of afgebroken uitvoering vereist altijd handmatige controle en herstel.
+   * @param {Date} now Controletijdstip.
+   * @param {Object} [selectedRow] Onder het scriptlock opnieuw gelezen publicatie voor het beheerpaneel.
    * @returns {string} Gebruikersmelding; geen credentials of ruwe HTTP-fouten.
    */
-  function createSelectedDraft(now = new Date()) {
+  function createSelectedDraft(now = new Date(), selectedRow) {
     const c = CONFIG.websitePublications.columns;
     const states = CONFIG.websitePublications.statuses;
-    const row = websitePublicationSheetService.getSelected();
+    const row = selectedRow || websitePublicationSheetService.getSelected();
     assertReady_(row);
     const gigId = row[c.gigId];
     const log = logService.forModule('website-publication-service');
@@ -83,8 +85,9 @@ const websitePublicationService = (() => {
     return result.isDraft ? `WordPress-concept ${result.id} aangemaakt.` : 'Onverwachte WordPress-response; zie Last Error.';
   }
 
-  function skipSelected() {
-    const row = websitePublicationSheetService.getSelected();
+  /** @param {Object} [selectedRow] Onder het scriptlock opnieuw gelezen publicatie; anders de huidige selectie. */
+  function skipSelected(selectedRow) {
+    const row = selectedRow || websitePublicationSheetService.getSelected();
     assertReady_(row);
     websitePublicationSheetService.update(row[CONFIG.websitePublications.columns.gigId], {
       status: CONFIG.websitePublications.statuses.skipped, lastError: ''

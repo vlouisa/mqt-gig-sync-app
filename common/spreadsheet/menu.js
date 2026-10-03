@@ -1,71 +1,11 @@
-/**
- * Bouwt het spreadsheetmenu uitsluitend voor het actieve adminaccount.
- * Simple onOpen-trigger; wijzigt de spreadsheet-UI.
- * @returns {void}
- */
+﻿/** Bouwt het compacte spreadsheetmenu uitsluitend voor het actieve beheeraccount. */
 function onOpen() {
-  const log = logService.forModule('menu');
-  const userEmail = Session.getActiveUser().getEmail();
-  if (userEmail !== CONFIG.adminEmail) return;
-
-  const ui = SpreadsheetApp.getUi();
-
-  ui.createMenu('MQT Gig Sync')
+  if (Session.getActiveUser().getEmail() !== CONFIG.adminEmail) return;
+  SpreadsheetApp.getUi().createMenu('MQT Gig Sync')
+    .addItem('Open beheerpaneel', 'showAdminPanel')
     .addItem('Publiceer events naar Calendar', 'syncEventsToCalendar')
-
     .addSeparator()
-    .addSubMenu(
-      ui.createMenu('Import')
-        .addItem('Scan en importeer vluchtgegevens', 'scanFlightEmailsAndImport')
-        .addItem('Scan en importeer hotelgegevens', 'scanHotelEmailsAndImport')
-    )
-
-    .addSubMenu(
-      ui.createMenu('Website')
-        .addItem('Synchroniseer publicaties', 'syncWebsitePublications')
-        .addItem('Maak WordPress-concept', 'createWordPressDraft')
-        .addItem('Sla geselecteerde publicatie over', 'skipWebsitePublication')
-        .addItem('Richt publicatietabblad in', 'setupWebsitePublications')
-    )
-
-    .addSubMenu(
-      ui.createMenu('Triggers')
-        .addItem('Installeer website-publicatietrigger', 'installWebsitePublicationTrigger')
-        .addItem('Verwijder website-publicatietrigger', 'removeWebsitePublicationTriggers')
-        .addSeparator()
-        .addItem('Installeer auto-sync trigger', 'installAutoSyncTrigger')
-        .addItem('Verwijder auto-sync trigger', 'removeAutoSyncTriggers')
-        .addSeparator()
-        .addItem('Installeer flight-mail-import trigger', 'installFlightMailImportTrigger')
-        .addItem('Verwijder flight-mail-import trigger', 'removeFlightMailImportTriggers')
-        .addSeparator()
-        .addItem('Installeer hotel-mail-import trigger', 'installHotelMailImportTrigger')
-        .addItem('Verwijder hotel-mail-import trigger', 'removeHotelMailImportTriggers')
-        .addSeparator()
-        .addItem('Installeer notificatiecontrole', 'installScheduledNotificationTrigger')
-        .addItem('Verwijder notificatiecontrole', 'removeScheduledNotificationTriggers')
-        .addSeparator()
-        .addItem('Installeer notificatie-worker trigger', 'installNotificationWorkerTrigger')
-        .addItem('Verwijder notificatie-worker trigger', 'removeNotificationWorkerTriggers')
-        .addSeparator()
-        .addItem('Installeer systeemstatus trigger', 'installSystemStatusTrigger')
-        .addItem('Verwijder systeemstatus trigger', 'removeSystemStatusTriggers')
-    )
-
-    .addSubMenu(
-      ui.createMenu('Notificaties')
-        .addItem('Controleer tijdgestuurde notificaties', 'checkScheduledNotifications')
-        .addItem('Verwerk notificatie queue', 'processEventQueueNotifications')
-    )
-
-    .addSubMenu(
-      ui.createMenu('Systeem')
-        .addItem('Archiveer en schoon auditlog op', 'archiveAuditLog')
-        .addItem('Bescherm technische kolommen', 'protectTechnicalColumns')
-        .addItem('Ververs systeemstatus', 'refreshSystemStatus')
-    )
-
+    .addItem('Help', 'showAdminHelp')
     .addToUi();
-
-  log.info('menu', 'on-open', 'MQT Gig Sync menu opgebouwd.');
+  logService.forModule('menu').info('menu', 'on-open', 'MQT Gig Sync menu opgebouwd.');
 }

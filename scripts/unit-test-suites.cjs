@@ -248,4 +248,19 @@ suites.push({
     'testAuditArchiveDefaultBatchAndNextRun', 'testAuditArchiveFolderAndMetadataFailure', 'testAuditArchiveEntrypointAndSchema']
 });
 
+suites.push({
+  name: 'admin-panel', setup: require('./admin-panel-test-support.cjs'),
+  sources: [
+    ...suites.find(suite => suite.name === 'website-publication').sources.filter(path => !path.startsWith('test/')),
+    'common/audit/audit-entrypoints.js', 'common/spreadsheet/admin-panel-service.js',
+    'common/spreadsheet/admin-panel-entrypoints.js', 'test/helpers/assert-util.js',
+    'test/unit/website-publication-tests.js', 'test/unit/admin-panel-tests.js'
+  ],
+  tests: ['testAdminPanelAuthorization', 'testAdminPanelOpenAndHelp', 'testAdminPanelReadOnlyOverview',
+    'testAdminPanelInvalidHeadersAndErrorLimit', 'testAdminPanelDispatchAndLockOutcomes',
+    'testAdminPanelTriggerReplacement', 'testAdminPanelInvalidIntervalPreservesTriggers',
+    'testAdminPanelPublicationIdentity', 'testAdminPanelPublicationChangedAndDuplicate',
+    'testAdminPanelDraftResult', 'testAdminPanelDraftErrorResult']
+});
+
 module.exports = suites;

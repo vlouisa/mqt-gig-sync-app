@@ -11,12 +11,10 @@ function scanHotelEmailsAndImport() {
 /**
  * Installeert een time-based trigger voor hotel mail import.
  *
- * Verwijdert eerst bestaande hotel mail import triggers om dubbele triggers
- * te voorkomen.
+ * Valideert eerst en vervangt bestaande triggers pas nadat aanmaken slaagt.
  */
 function installHotelMailImportTrigger() {
   const log = logService.forModule('trigger-service');
-  removeHotelMailImportTriggers();
 
   const minutes = CONFIG.entities.hotel.mailImport.autoSync.everyMinutes;
 
@@ -24,10 +22,12 @@ function installHotelMailImportTrigger() {
     throw new Error('Ongeldige auto-sync periode. Gebruik 1, 5, 10, 15 of 30 minuten.');
   }
 
+  const previous = ScriptApp.getProjectTriggers().filter(trigger => trigger.getHandlerFunction() === TRIGGER_HANDLERS.hotelMailImport);
   ScriptApp.newTrigger('scanHotelEmailsAndImport')
     .timeBased()
     .everyMinutes(minutes)
     .create();
+  previous.forEach(trigger => ScriptApp.deleteTrigger(trigger));
 
   systemStatusService.update();
   log.info('hotel-mail-import-triggers-installed', 'HotelMailImport trigger geïnstalleerd.', `Interval: ${minutes} minuten`);

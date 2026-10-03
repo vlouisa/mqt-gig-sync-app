@@ -5,6 +5,8 @@ hotelboekingen en niet-beschikbaarheid van Miracle Queen Tribute.
 Google Sheets is de administratieve bron; de applicatie publiceert records naar
 Google Calendar, importeert boekingsgegevens uit Gmail en verwerkt notificaties.
 
+Voor de dagelijkse bediening: zie de [Nederlandstalige gebruikershandleiding](docs/gebruikershandleiding.md).
+
 ## Werking
 
 - Optredens en niet-beschikbaarheid worden in Sheets ingevoerd.
@@ -74,8 +76,14 @@ Het manifest verwijst momenteel naar deze libraries in development mode.
 ## Gebruik en automatische verwerking
 
 Het ingestelde adminaccount krijgt in de spreadsheet het menu **MQT Gig Sync**.
-Dit biedt Calendar-publicatie, vlucht- en hotelimport, triggerbeheer,
-notificatieverwerking, bescherming van technische kolommen en systeemstatus.
+Kies **Open beheerpaneel** voor overzichten, verwerking, websiteacties,
+automatisering en onderhoud. Calendar-publicatie blijft ook rechtstreeks in het
+menu beschikbaar; **Help** opent de uitleg in het paneel.
+
+Het paneel gebruikt kleine statuslabels met zachte kleuren en tekst. Openen en
+verversen lezen alleen werkvoorraad en triggers van het huidige account.
+Triggeraanwezigheid bewijst geen geslaagde verwerking. Zie
+[Beheerpaneel](docs/features/FEAT-007-admin-panel.md) voor bediening en grenzen.
 
 Na installatie van de bijbehorende triggers gelden de volgende intervallen:
 

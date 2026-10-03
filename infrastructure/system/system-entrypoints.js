@@ -12,19 +12,20 @@ function refreshSystemStatus() {
 /**
  * Installeert de time-based trigger voor het verversen van de system-status sheet.
  *
- * Verwijdert eerst bestaande system-status triggers om dubbele status-updates te voorkomen.
+ * Vervangt bestaande triggers pas nadat aanmaken slaagt.
  *
  * @returns {void}
  */
 function installSystemStatusTrigger() {
   const log = logService.forModule('trigger-service');
 
-  removeSystemStatusTriggers();
+  const previous = ScriptApp.getProjectTriggers().filter(trigger => trigger.getHandlerFunction() === TRIGGER_HANDLERS.systemStatus);
 
   ScriptApp.newTrigger(TRIGGER_HANDLERS.systemStatus)
     .timeBased()
     .everyMinutes(30)
     .create();
+  previous.forEach(trigger => ScriptApp.deleteTrigger(trigger));
 
   log.info(
     'system-status-trigger-installed',

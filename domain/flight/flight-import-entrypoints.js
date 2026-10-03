@@ -16,12 +16,10 @@ function scanFlightEmailsAndImport() {
 /**
  * Installeert time-based triggers voor flight mail import.
  *
- * Verwijdert eerst bestaande flight mail import triggers om dubbele triggers
- * te voorkomen.
+ * Valideert eerst en vervangt bestaande triggers pas nadat aanmaken slaagt.
  */
 function installFlightMailImportTrigger() {
   const log = logService.forModule('trigger-service');
-  removeFlightMailImportTriggers();
 
   const minutes = CONFIG.entities.flight.mailImport.autoSync.everyMinutes;
 
@@ -29,10 +27,12 @@ function installFlightMailImportTrigger() {
     throw new Error('Ongeldige auto-sync periode. Gebruik 1, 5, 10, 15 of 30 minuten.');
   }
 
+  const previous = ScriptApp.getProjectTriggers().filter(trigger => trigger.getHandlerFunction() === TRIGGER_HANDLERS.flightMailImport);
   ScriptApp.newTrigger('scanFlightEmailsAndImport')
     .timeBased()
     .everyMinutes(minutes)
     .create();
+  previous.forEach(trigger => ScriptApp.deleteTrigger(trigger));
 
   systemStatusService.update();
   log.info('flight-mail-import-triggers-installed', 'FlightMailImport trigger geïnstalleerd.', `Interval: ${minutes} minuten`);

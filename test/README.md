@@ -96,6 +96,28 @@ lokale runner. De notificatietests controleren de aanroepen aan Notify, niet de
 externe fingerprintimplementatie, queue of aflevering. Ook de datumformatter is
 een stub: de tests controleren het meegegeven formaat en de tijdzone.
 
+## Beheerpaneel
+
+De suite `admin-panel` controleert de serverautorisatie, alleen-lezen overzichten,
+triggervervanging en websiteacties met vastgelegde identiteit en inhoudscontrole.
+Alle Google- en libraryaanroepen worden lokaal nagebootst.
+
+Voor een lokale browserpreview op Windows met Edge:
+
+```powershell
+./scripts/preview-admin-panel.ps1
+node scripts/check-admin-panel-browser.cjs
+```
+
+Gebruik de geldende lokale scriptpolicy voor PowerShell. De preview gebruikt
+uitsluitend fictieve gegevens en vervangt `google.script.run` door een testmock.
+De browsercontrole vereist Node.js met een globale `WebSocket` (getest met 24).
+Edge start onzichtbaar met een apart profiel. De controle test bevestigingen,
+uitgeschakelde actieknoppen, tekstweergave zonder HTML-injectie, selecties en
+het behoud van actieresultaten wanneer verversen mislukt. HTML, screenshots,
+diagnostiek en het browserprofiel staan onder het genegeerde
+`coverage/admin-panel-preview/`. Dit vervangt geen integratietest in Google Sheets.
+
 ## Indeling
 
 - `unit/`: tests met lokale invoer en eventueel mocks, zonder externe mutaties.

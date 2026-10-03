@@ -17,7 +17,7 @@ function syncEventsToCalendar() {
 
   if (!lock.tryLock(30000)) {
     log.warn('sync-skipped-lock', 'Sync overgeslagen: er draait al een sync.', '');
-    return;
+    return { tone: 'warning', message: 'Calendar-publicatie overgeslagen: er draait al een verwerking.' };
   }
 
   try {
@@ -38,13 +38,12 @@ function syncEventsToCalendar() {
 /**
  * Installeert de automatische time-based trigger voor Calendar-publicatie.
  *
- * Verwijdert eerst bestaande auto-sync triggers om dubbele triggers te voorkomen.
+ * Valideert eerst en maakt een nieuwe trigger vóór bestaande triggers worden verwijderd.
  * Werkt daarna de system-status sheet bij.
- * @throws {Error} Bij een ongeldig interval; bestaande triggers zijn dan al verwijderd.
+ * @throws {Error} Bij een ongeldig interval; bestaande triggers blijven behouden.
  */
 function installAutoSyncTrigger() {
   const log = logService.forModule('trigger-service');
-  removeAutoSyncTriggers();
 
   const minutes = CONFIG.autoSync.everyMinutes;
 
@@ -52,10 +51,12 @@ function installAutoSyncTrigger() {
     throw new Error('Ongeldige auto-sync periode. Gebruik 1, 5, 10, 15 of 30 minuten.');
   }
 
+  const previous = ScriptApp.getProjectTriggers().filter(trigger => trigger.getHandlerFunction() === TRIGGER_HANDLERS.autoSync);
   ScriptApp.newTrigger('syncEventsToCalendar')
     .timeBased()
     .everyMinutes(minutes)
     .create();
+  previous.forEach(trigger => ScriptApp.deleteTrigger(trigger));
 
   systemStatusService.update();
   log.info('auto-sync-trigger-installed', 'Auto-sync trigger geïnstalleerd.', `Interval: ${minutes} minuten`);
