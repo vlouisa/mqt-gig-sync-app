@@ -242,15 +242,18 @@ Dit onderdeel is voor de beheerder. De websitewerkvoorraad staat los van de agen
    automatische uurcontrole. Bevestigde optredens van vandaag of later worden
    toegevoegd, behalve rijen met `DELETE_REQUESTED` of `DELETED`.
 2. Open `website-publications`. Controleer de gegevens van de gewenste rij.
-   Je kunt `Title`, `Contact Email`, `Contact Website`, `Ticket URL` en `Price`
+   Je kunt `Title`, `Contact Email`, `Contact Website`, `Ticket URL`, `Price` en `Event Description`
    aanpassen.
    Nieuwe publicaties bevatten ook `Google Maps Embed`, direct na `Price`, met
    kaartcode op basis van `gig-input.Location`. Gebruik daar bij voorkeur een
    volledig adres. Bij een lege locatie blijft de widget leeg. Bij **Maak WordPress-concept**
    wordt de code meegestuurd naar het kaartveld in WordPress. Hiervoor moet de
    WordPress-supportplugin met ondersteuning voor `_wolf_event_map` geïnstalleerd zijn.
-   Bestaande publicaties worden niet
+   Bestaande kaartvelden worden niet
    achteraf aangevuld en locatieaanpassingen wijzigen bestaande widgets niet.
+   `Event Description` staat na `Google Maps Embed`. AI genereert beschrijvingen voor nieuw toegevoegde publicaties
+   in het Engels; `gig-input.Description` wordt daarbij nooit gebruikt.
+   Controleer de tekst en pas hem zo nodig aan. Gevulde teksten blijven behouden.
 3. Selecteer één gegevensrij met `Status = READY`.
 4. Kies in het beheerpaneel **Website > Laad geselecteerde publicatie**.
    Controleer titel en Gig ID en kies **Maak WordPress-concept**. Bevestig de actie.
@@ -263,9 +266,35 @@ Dit onderdeel is voor de beheerder. De websitewerkvoorraad staat los van de agen
 Wil je de rij overslaan? Selecteer de rij op `READY`, laad deze in het paneel en
 kies **Sla publicatie over**. De status wordt `SKIPPED`.
 
-Gegevens worden één keer per optreden overgenomen. Later synchroniseren werkt
-een bestaande website-rij of een WordPress-concept niet bij. Controleer na een
-wijziging aan het optreden dus ook deze gegevens.
+Gegevens worden één keer per optreden overgenomen. Later synchroniseren vult
+geen bestaande eventbeschrijvingen aan en werkt WordPress-concepten niet bij.
+Controleer na een wijziging aan het optreden dus ook deze gegevens.
+
+### AI eenmalig instellen
+
+1. Maak een OpenAI-project met API-betaling en een API-key aan.
+2. Open Apps Script > Projectinstellingen > Script Properties. Voeg `OPENAI_API_KEY`
+   toe. `OPENAI_MODEL` is optioneel en gebruikt standaard `gpt-5.4-mini`.
+   Zet de key uitsluitend hier, nooit in de Sheet, repository of chat.
+3. Voer na deployment **Onderhoud > Richt websitewerkvoorraad in** uit om de nieuwe
+   kolom veilig toe te voegen. Doe dit wanneer niemand de Sheet bewerkt.
+4. Kies **Website > Werk websitewerkvoorraad bij**. Standaard worden maximaal vijf
+   AI-aanvragen per run gedaan. Het paneel meldt hoeveel beschrijvingen zijn aangevuld
+   en hoeveel nieuwe publicaties nog geen beschrijving hebben. Bestaande lege velden worden overgeslagen.
+
+Bij een AI-fout of het bereiken van de aanvraaglimiet blijft de beschrijving leeg. Er is geen automatische vervolgpoging; controleer deze publicatie handmatig.
+AI-fouten staan in de technische uitvoeringslogs, zodat `Last Error` beschikbaar blijft
+voor WordPress-fouten. Een lege beschrijving blokkeert het maken van een concept niet.
+Een zwakke tekst kan tijdens de eerste generatie één keer opnieuw worden gegenereerd;
+ook die aanvraag telt mee voor de limiet. Schrijfregels en vier stijlvoorbeelden staan
+centraal in `knowledge/event-copy-guidelines.md`. Wijzigingen daarin moeten door de
+beheerder opnieuw worden gebouwd en gedeployd. Bestaande teksten worden niet vervangen.
+Controleer de feitelijkheid zelf. De AI krijgt geen onduidelijke starttijd of contactwebsite
+mee en mag prijzen, showtimes of artiesten uit voorbeelden niet overnemen.
+WordPress ontvangt de opgeslagen tekst; het maken van een concept genereert geen tekst.
+Meer instellingen en beperkingen: [AI-eventbeschrijving](features/FEAT-009-ai-event-description.md).
+
+### WordPress-fouten
 
 Bij `ERROR` lees je `Last Error` en controleer je eerst in WordPress of het concept
 toch is aangemaakt. Laat herstel door de beheerder uitvoeren om dubbele concepten

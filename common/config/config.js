@@ -35,10 +35,10 @@ const CONFIG = {
       status: 'Status', title: 'Title', date: 'Date', venue: 'Venue',
       city: 'City', country: 'Country', start: 'Start', address: 'Address',
       zip: 'Zip', contactEmail: 'Contact Email', contactWebsite: 'Contact Website',
-      ticketUrl: 'Ticket URL', price: 'Price', googleMapsEmbed: 'Google Maps Embed', wpEventId: 'WP Event ID',
+      ticketUrl: 'Ticket URL', price: 'Price', googleMapsEmbed: 'Google Maps Embed', eventDescription: 'Event Description', wpEventId: 'WP Event ID',
       wpDraftUrl: 'WP Draft URL', gigId: 'Gig ID', lastError: 'Last Error'
     },
-    editableColumnKeys: ['title', 'contactEmail', 'contactWebsite', 'ticketUrl', 'price'],
+    editableColumnKeys: ['title', 'contactEmail', 'contactWebsite', 'ticketUrl', 'price', 'eventDescription'],
     statuses: { ready: 'READY', draftCreated: 'DRAFT_CREATED', skipped: 'SKIPPED', error: 'ERROR' }
   },
 

@@ -1,4 +1,4 @@
-/** Maakt nieuwe snapshots; kent geen WordPress-client en wijzigt bestaande snapshots nooit. */
+/** Maakt nieuwe snapshots en genereert uitsluitend daarvoor AI-beschrijvingen. */
 const websitePublicationSyncService = (() => {
   /** Bouwt kaart-HTML uit Location, zonder netwerkverzoek of externe generatorscripts. */
   function buildGoogleMapsEmbed_(location) {
@@ -25,6 +25,7 @@ const websitePublicationSyncService = (() => {
 
   /** De entrypoint houdt hetzelfde scriptlock vast als Calendar-sync. */
   function sync(now = new Date()) {
+    const startedAt = Date.now();
     const config = CONFIG.entities.gig;
     const c = config.columns;
     const headers = sheetService.getHeaders(sheetService.getSheet(config.sheetName));
@@ -41,6 +42,7 @@ const websitePublicationSyncService = (() => {
     });
     const log = logService.forModule('website-publication-sync-service');
     let added = 0;
+    const addedIds = [];
     rows.forEach(gig => {
       if (!isEligible(gig, now)) return;
       let id = String(gig[c.gigId] || '');
@@ -64,11 +66,13 @@ const websitePublicationSyncService = (() => {
         keys.filter(key => !['gigStatus', 'syncStatus'].includes(key))
           .forEach(key => { snapshot[key] = gig[c[key]]; });
         websitePublicationSheetService.append(snapshot);
+        addedIds.push(id);
         added++;
       } catch (error) {
         log.error('website-snapshot-error', 'Snapshot niet afgerond; controleer headers en Sheet-toegang.', `Row: ${gig.rowNumber}`);
       }
     });
+    eventDescriptionService.fillMissing(addedIds, startedAt);
     return added;
   }
 

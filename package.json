@@ -1,6 +1,8 @@
 {
   "private": true,
   "scripts": {
+    "build:guidelines": "node scripts/build-event-copy-guidelines.cjs",
+    "check:guidelines": "node scripts/build-event-copy-guidelines.cjs --check",
     "test:unit": "mqt-test --config scripts/unit-test-suites.cjs",
     "test:coverage": "c8 mqt-test --config scripts/unit-test-suites.cjs"
   },

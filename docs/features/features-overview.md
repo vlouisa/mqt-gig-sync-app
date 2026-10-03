@@ -16,5 +16,6 @@ Timestamp vermeldt het oorspronkelijke taakbericht van de gebruiker, gereconstru
 | FEAT-006 | 2026-09-27 21:40:18 +02:00 | Reisboekingsreminder | Eén boodschappenlijstje voor ontbrekende heen-/terugvlucht en hotel vanaf veertien dagen vóór een bevestigde gig | [Details](FEAT-006-gig-travel-bookings-reminder.md) |
 | FEAT-007 | 2026-10-03 10:18:25 +02:00 | Beheerpaneel | Compact menu, rustige statuskleuren, werkvoorraad en veilig beheer vanuit een sidebar | [Details](FEAT-007-admin-panel.md) |
 | FEAT-008 | 2026-10-03 11:30:29 +02:00 | Google Maps-widget | Kaartcode uit Location in een nieuwe publicatiekolom na Price | [Details](FEAT-008-google-maps-embed.md) |
+| FEAT-009 | 2026-10-03 19:47:00 +02:00 | AI-eventbeschrijving | Beschrijvingen voor nieuwe publicaties met AI genereren en als WordPress-content doorgeven | [Details](FEAT-009-ai-event-description.md) |
 
 Oorspronkelijke opdrachten staan in het [overzicht van implementatiebriefs](../implementation-briefs/implementation-briefs-overview.md). Bevindingen staan in het [reviewoverzicht](../reviews/review-findings-overview.md).

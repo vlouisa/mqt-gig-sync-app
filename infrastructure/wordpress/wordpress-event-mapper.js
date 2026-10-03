@@ -20,7 +20,7 @@ const wordpressEventMapper = (() => {
       time = match[1].padStart(2, '0') + ':' + match[2];
     }
     return {
-      title: text_(row[c.title]), status: 'draft', we_artist: [13],
+      title: text_(row[c.title]), status: 'draft', we_artist: [13], content: text_(row[c.eventDescription]),
       meta: {
         _wolf_event_start_date: Utilities.formatDate(date, zone, 'dd-MM-yyyy'),
         _wolf_event_venue: text_(row[c.venue]),

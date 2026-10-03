@@ -5,7 +5,7 @@ const adminPanelService = (() => {
       { id: 'calendar', group: 'processing', label: 'Publiceer naar Calendar', description: 'Verwerkt alle klaarstaande rijen, inclusief verwijderverzoeken, in de vier invoerbladen.', run: syncEventsToCalendar },
       { id: 'flights', group: 'processing', label: 'Importeer vluchtmails', description: 'Scant Gmail en kan rijen en maillabels wijzigen.', run: scanFlightEmailsAndImport },
       { id: 'hotels', group: 'processing', label: 'Importeer hotelmails', description: 'Scant Gmail en kan rijen en maillabels wijzigen.', run: scanHotelEmailsAndImport },
-      { id: 'website', group: 'website', label: 'Werk websitewerkvoorraad bij', description: 'Voegt nieuwe publicaties toe. Bestaande snapshots en WordPress-concepten blijven behouden.', run: syncWebsitePublications },
+      { id: 'website', group: 'website', label: 'Werk websitewerkvoorraad bij', description: 'Voegt publicaties toe en genereert daarvoor beschrijvingen met AI. Bestaande teksten blijven behouden.', run: syncWebsitePublications },
       { id: 'notifications', group: 'processing', label: 'Controleer notificaties', description: 'Controleert tijdgestuurde regels en kan meldingen klaarzetten.', run: checkScheduledNotifications },
       { id: 'worker', group: 'processing', label: 'Verwerk notificatiewachtrij', description: 'Kan meldingen afleveren via de ingestelde provider.', run: processEventQueueNotifications },
       { id: 'archive', group: 'maintenance', label: 'Archiveer auditlog', description: 'Schrijft een archief naar Drive en verwijdert daarna de gecontroleerde oude auditregels.', confirm: true, run: archiveAuditLogResult_ },
@@ -83,7 +83,11 @@ const adminPanelService = (() => {
     const result = action.run();
     if (result && typeof result === 'object' && result.message) return result;
     if (id === 'website' && typeof result === 'number') {
-      return { tone: 'success', message: `${result} nieuwe websitepublicaties toegevoegd aan de werkvoorraad.` };
+      const ai = eventDescriptionService.getLastResult();
+      return { tone: ai.failed || ai.configurationMissing ? 'warning' : 'success',
+        message: `${result} nieuwe websitepublicaties toegevoegd aan de werkvoorraad. ` +
+          `${ai.generated} beschrijvingen aangevuld, ${ai.failed} mislukt, ${ai.remaining} nog leeg binnen de nieuw toegevoegde publicaties.` +
+          (ai.configurationMissing ? ' Controleer de AI-configuratie in Script Properties.' : '') };
     }
     return { tone: 'neutral', message: typeof result === 'string' ? result :
       `${action.label}: uitvoering afgerond. Controleer de rijstatussen of het betreffende overzicht; dit bevestigt niet dat ieder record of iedere aflevering is geslaagd.` };

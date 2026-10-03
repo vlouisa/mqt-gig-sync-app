@@ -23,19 +23,26 @@ const websitePublicationSheetService = (() => {
     const existing = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(config.sheetName);
     if (existing) {
       const expected = Object.values(config.columns);
-      const legacy = expected.filter(header => header !== config.columns.googleMapsEmbed);
       const actual = sheetService.getHeaders(existing);
-      const index = expected.indexOf(config.columns.googleMapsEmbed);
-      if (actual.length === legacy.length && actual.every((value, i) => value === legacy[i])) {
-        // Alleen het bekende oude schema migreren; geen bestaande cellen herschrijven.
-        existing.insertColumnAfter(index);
-        existing.getRange(1, index + 1).setValue(config.columns.googleMapsEmbed);
-        sheetService.clearColumnIndexMapCache(config.sheetName);
-      } else if (actual.length === expected.length && actual[index] === '' &&
-          actual.every((value, i) => i === index || value === expected[i]) &&
-          existing.getRange(2, index + 1, existing.getMaxRows() - 1, 1).getValues().every(row => row[0] === '')) {
-        // Herstel een onderbroken migratie na insertColumnAfter, vóór de headerwrite.
-        existing.getRange(1, index + 1).setValue(config.columns.googleMapsEmbed);
+      const additions = [config.columns.googleMapsEmbed, config.columns.eventDescription];
+      const schemas = [expected, expected.filter(header => header !== config.columns.eventDescription),
+        expected.filter(header => !additions.includes(header))];
+      const known = schemas.find(schema => actual.length === schema.length && actual.every((value, i) =>
+        value === schema[i] || (value === '' && additions.includes(schema[i]) &&
+          existing.getRange(2, i + 1, existing.getMaxRows() - 1, 1).getValues().every(row => row[0] === ''))));
+      if (known) {
+        // Herstel eerst lege headers na een onderbroken kolominsertie.
+        known.forEach((header, i) => {
+          if (actual[i] === '') existing.getRange(1, i + 1).setValue(header);
+        });
+        const current = known.slice();
+        expected.forEach((header, i) => {
+          if (current[i] !== header) {
+            existing.insertColumnAfter(i);
+            existing.getRange(1, i + 1).setValue(header);
+            current.splice(i, 0, header);
+          }
+        });
         sheetService.clearColumnIndexMapCache(config.sheetName);
       }
     }
@@ -49,6 +56,7 @@ const websitePublicationSheetService = (() => {
     keys.forEach((key, index) => {
       const format = key === 'date' ? 'dd-MM-yyyy' : key === 'start' ? 'HH:mm' : '@';
       sheet.getRange(2, index + 1, sheet.getMaxRows() - 1, 1).setNumberFormat(format);
+      if (key === 'eventDescription') sheet.getRange(2, index + 1, sheet.getMaxRows() - 1, 1).setWrap(true);
     });
     const description = 'Website publications: bron- en technische velden';
     let protection = sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET)
@@ -66,7 +74,7 @@ const websitePublicationSheetService = (() => {
     const expected = Object.values(CONFIG.websitePublications.columns);
     const actual = sheetService.getHeaders(sheet);
     if (actual.length !== expected.length || actual.some((value, i) => value !== expected[i])) {
-      throw new Error('website-publications heeft niet de verwachte 18 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
+      throw new Error('website-publications heeft niet de verwachte 19 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
     }
   }
 

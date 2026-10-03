@@ -91,7 +91,7 @@ function testWebsiteSheetSetupAndSchema() {
   websiteFixture_();
   setupWebsitePublications();
   const sheet = unit.sheets['website-publications'];
-  assertEquals('Status,Title,Date,Venue,City,Country,Start,Address,Zip,Contact Email,Contact Website,Ticket URL,Price,Google Maps Embed,WP Event ID,WP Draft URL,Gig ID,Last Error', sheet.values[0].join(','));
+  assertEquals('Status,Title,Date,Venue,City,Country,Start,Address,Zip,Contact Email,Contact Website,Ticket URL,Price,Google Maps Embed,Event Description,WP Event ID,WP Draft URL,Gig ID,Last Error', sheet.values[0].join(','));
   setupWebsitePublications();
   assertEquals(1, sheet.protections.length);
   assertEquals(false, sheet.protections[0].domain);
@@ -102,10 +102,10 @@ function testWebsiteSheetSetupAndSchema() {
   syncWebsitePublications();
   assertEquals(3, sheet.maxRows);
   assertTrue(sheet.protections[0].ranges.every(range => range.getNumRows() === 2));
-  assertEquals('2,10,11,12,13', sheet.protections[0].ranges.map(r => r.getColumn()).join(','));
+  assertEquals('2,10,11,12,13,15', sheet.protections[0].ranges.map(r => r.getColumn()).join(','));
   assertTrue(sheet.formats.some(f => f.column === 9 && f.format === '@'));
   sheet.values[0][0] = 'Wrong';
-  assertThrows(() => syncWebsitePublications(), 'website-publications heeft niet de verwachte 18 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
+  assertThrows(() => syncWebsitePublications(), 'website-publications heeft niet de verwachte 19 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
   assertEquals('Wrong', sheet.values[0][0]);
 }
 
@@ -136,15 +136,15 @@ function testWebsiteMapsSnapshot() {
 function testWebsiteMapsMigration() {
   websiteFixture_();
   const c = CONFIG.websitePublications.columns;
-  const headers = Object.values(c).filter(header => header !== c.googleMapsEmbed);
+  const headers = Object.values(c).filter(header => header !== c.googleMapsEmbed && header !== c.eventDescription);
   const original = headers.map((header, index) => 'bestaand-' + index);
   const sheet = unit.makeSheet(CONFIG.websitePublications.sheetName, [headers.slice(), original.slice()]);
-  assertThrows(() => websitePublicationSheetService.getRows(), 'website-publications heeft niet de verwachte 18 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
+  assertThrows(() => websitePublicationSheetService.getRows(), 'website-publications heeft niet de verwachte 19 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
   assertEquals(17, sheet.values[0].length);
   setupWebsitePublications();
   assertEquals(c.googleMapsEmbed, sheet.values[0][13]);
   assertEquals('', sheet.values[1][13]);
-  assertEquals(JSON.stringify(original), JSON.stringify(sheet.values[1].filter((value, index) => index !== 13)));
+  assertEquals(JSON.stringify(original), JSON.stringify(sheet.values[1].filter((value, index) => index !== 13 && index !== 14)));
   const before = JSON.stringify(sheet.values);
   setupWebsitePublications();
   assertEquals(before, JSON.stringify(sheet.values));
@@ -154,7 +154,7 @@ function testWebsiteMapsMigration() {
   assertEquals(before, JSON.stringify(sheet.values));
   sheet.values[0][0] = 'Onbekend';
   const invalid = JSON.stringify(sheet.values);
-  assertThrows(setupWebsitePublications, 'website-publications heeft niet de verwachte 18 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
+  assertThrows(setupWebsitePublications, 'website-publications heeft niet de verwachte 19 headers in de juiste volgorde. Voer de website-inrichtingsactie uit voor het oude schema.');
   assertEquals(invalid, JSON.stringify(sheet.values));
 }
 
@@ -167,7 +167,7 @@ function testWebsiteMapper() {
   row['Contact Name'] = 'Private name';
   row['Contact Phone'] = '001234';
   const payload = wordpressEventMapper.map(row);
-  assertEquals(JSON.stringify({ title: 'Concert', status: 'draft', we_artist: [13], meta: {
+  assertEquals(JSON.stringify({ title: 'Concert', status: 'draft', we_artist: [13], content: '', meta: {
     _wolf_event_start_date: '31-12-2099', _wolf_event_venue: 'Zaal', _wolf_event_location: 'Concert', _wolf_event_city: 'Stad',
     _wolf_event_country_short: 'Custom landcode', _wolf_event_country: '', _wolf_event_time: '20:30',
     _wolf_event_address: 'Straat 1', _wolf_event_zip: '0012 AB', _wolf_event_email: 'public@example.invalid',

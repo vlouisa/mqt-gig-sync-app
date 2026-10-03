@@ -11,7 +11,8 @@ function setup() {
   };
   globalThis.Session = { getScriptTimeZone: () => 'Europe/Brussels',
     getActiveUser: () => ({ getEmail: () => unit.activeEmail }) };
-  globalThis.PropertiesService = { getScriptProperties: () => ({ getProperty: key => unit.properties[key] }) };
+  globalThis.PropertiesService = { getScriptProperties: () => ({ getProperty: key => unit.properties[key],
+    setProperty: (key, value) => { unit.properties[key] = value; } }) };
   globalThis.Utilities = {
     getUuid: () => 'generated-' + (++unit.uuid),
     base64Encode: value => { unit.encoded = value; return 'dummy-base64'; },
@@ -51,7 +52,8 @@ function setup() {
         return this;
       },
       setValue(value) { return this.setValues([[value]]); },
-      setNumberFormat(format) { sheet.formats.push({ row, column, rows, columns, format }); return this; }
+      setNumberFormat(format) { sheet.formats.push({ row, column, rows, columns, format }); return this; },
+      setWrap(value) { sheet.wrap = value; return this; }
     };
   }
   unit.makeSheet = (name, values = []) => {

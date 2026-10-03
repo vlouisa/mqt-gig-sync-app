@@ -42,6 +42,18 @@ const appPropertiesService = (() => {
   }
 
   return {
+    /** Alleen tijdens AI-generatie lezen; ongeldige configuratie blokkeert geen snapshots. */
+    getEventDescriptionSettings() {
+      const props = PropertiesService.getScriptProperties();
+      const provider = (props.getProperty('EVENT_DESCRIPTION_PROVIDER') || 'openai').trim();
+      const apiKey = (props.getProperty('OPENAI_API_KEY') || '').trim();
+      const model = (props.getProperty('OPENAI_MODEL') || 'gpt-5.4-mini').trim();
+      const raw = props.getProperty('EVENT_DESCRIPTION_MAX_CALLS') || '5';
+      if (provider !== 'openai' || !apiKey || !model || !/^\d+$/.test(raw) || Number(raw) < 1 || Number(raw) > 20) {
+        throw new Error('AI-configuratie ontbreekt of is ongeldig.');
+      }
+      return { provider, apiKey, model, maxCalls: Number(raw) };
+    },
     /** Alleen bij handmatig archiveren lezen; ontbrekende properties gebruiken de afgesproken defaults. */
     getAuditArchiveSettings() {
       const props = PropertiesService.getScriptProperties();

@@ -171,3 +171,11 @@ function testAdminPanelDraftErrorResult() {
   assertThrows(() => runAdminPanelPublication('create', expected), 'De publicatie is gewijzigd. Laad de selectie opnieuw en controleer de gegevens.');
   assertEquals(1, unit.requests.length);
 }
+function testAdminPanelDescriptionFeedback() {
+  websiteFixture_();
+  const result = adminPanelService.execute('website');
+  assertEquals('warning', result.tone);
+  assertTrue(result.message.includes('1 nieuwe websitepublicaties'));
+  assertTrue(result.message.includes('1 nog leeg'));
+  assertTrue(result.message.includes('AI-configuratie'));
+}

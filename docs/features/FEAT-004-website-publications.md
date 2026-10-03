@@ -6,7 +6,7 @@ De [volledige oorspronkelijke brief](../implementation-briefs/BRIEF-001-website-
 
 Een gig komt alleen in aanmerking met `Gig Status = CONFIRMED`, een geldige datum van vandaag of later en een `SyncStatus` anders dan `DELETE_REQUESTED` of `DELETED`. Vandaag wordt bepaald in de Apps Script-tijdzone. Bij handmatig aanmaken worden de actuele bron-gig en de snapshotdatum opnieuw gecontroleerd. Een inmiddels ongeschikte gig levert geen WordPress-aanroep op.
 
-De werkvoorraad is een eenmalige snapshot per Gig ID. Synchronisatie wijzigt bestaande regels nooit, ongeacht hun status. Daardoor blijven ook inmiddels historische regels zichtbaar; zij kunnen geen nieuw concept opleveren. Reeds gemaakte WordPress-concepten worden niet automatisch gewijzigd of verwijderd.
+De werkvoorraad is een eenmalige snapshot per Gig ID. Synchronisatie bewaart bestaande regels. Alleen nieuw toegevoegde publicaties krijgen tijdens dezelfde run een AI-beschrijving. Daardoor blijven ook inmiddels historische regels zichtbaar; zij kunnen geen nieuw concept opleveren. Reeds gemaakte WordPress-concepten worden niet automatisch gewijzigd of verwijderd.
 
 Gig ID is een door de applicatie gegenereerde UUID, geen Google Calendar-event-ID. Ontbrekende IDs worden met de bestaande `ensureGigId` ingevuld. De websitefunctie verandert geen Calendar-statussen. Dubbele bron-IDs worden overgeslagen en gelogd.
 
@@ -14,9 +14,9 @@ Gig ID is een door de applicatie gegenereerde UUID, geen Google Calendar-event-I
 
 1. Gebruik de WordPress-supportplugin v0.2.7 zoals hieronder gedocumenteerd, inclusief REST-ondersteuning voor `_wolf_event_map`.
 2. Configureer in Apps Script de Script Properties `WORDPRESS_BASE_URL`, `WORDPRESS_USERNAME` en `WORDPRESS_APPLICATION_PASSWORD`. Gebruik de HTTPS-basis-URL van de WordPress-installatie en een Application Password van een gebruiker die event-concepten mag maken. Zet credentials nooit in Sheets, broncode of logs.
-3. Voer als de geconfigureerde MQT-admin de website-inrichtingsactie uit via **Beheerpaneel > Onderhoud > Richt websitewerkvoorraad in**. Deze maakt `website-publications` aan met 18 headers, inclusief `Google Maps Embed` na `Price`. Het bekende oude schema met 17 headers wordt met behoud van gegevens uitgebreid; overige afwijkingen worden afgewezen. Zie [Google Maps-widget](FEAT-008-google-maps-embed.md).
-4. Synchroniseer de werkvoorraad via het menu. Optioneel installeert dezelfde admin de website-trigger vanuit het Triggers-menu. Deze draait ieder uur en maakt uitsluitend snapshots, nooit WordPress-concepten.
-5. Bewerk zo nodig Title, Contact Email, Contact Website, Ticket URL en Price. Selecteer precies één dataregel met `READY` en kies de actie om een WordPress-concept aan te maken, of de afzonderlijke overslaanactie.
+3. Voer als de geconfigureerde MQT-admin de website-inrichtingsactie uit via **Beheerpaneel > Onderhoud > Richt websitewerkvoorraad in**. Deze maakt `website-publications` aan met 19 headers: na `Price` volgen `Google Maps Embed`, `Event Description` en `WP Event ID`. De bekende schema's met 17 en 18 headers worden met behoud van gegevens uitgebreid; overige afwijkingen worden afgewezen.
+4. Configureer AI volgens [Event Description](FEAT-009-ai-event-description.md). Synchroniseer de werkvoorraad vanuit het beheerpaneel. De optionele website-trigger draait ieder uur, maakt snapshots en genereert beschrijvingen voor die nieuwe publicaties; deze maakt nooit WordPress-concepten.
+5. Bewerk zo nodig Title, Contact Email, Contact Website, Ticket URL, Price en Event Description. Selecteer precies één dataregel met `READY` en kies de actie om een WordPress-concept aan te maken, of de afzonderlijke overslaanactie.
 
 Andere kolommen en de header zijn beschermd. Sheet-eigenaren en de geconfigureerde admin kunnen deze bescherming omzeilen; behandel bron- en technische kolommen ook voor hen als beheerde velden. Herhaal de inrichtingsactie als de bescherming handmatig is aangepast. Datums worden als `dd-MM-yyyy` en tijden als `HH:mm` weergegeven. Overige kolommen zijn tekstvelden, zodat bijvoorbeeld voorloopnullen in postcodes behouden blijven.
 
@@ -28,7 +28,7 @@ De enige create-aanroep is een expliciete menuactie: `POST /wp-json/wp/v2/event`
 
 Title wordt `title`; Date wordt `_wolf_event_start_date` (`dd-MM-yyyy`). Venue, City, Country, Start, Address en Zip worden respectievelijk `_wolf_event_venue`, `_wolf_event_city`, `_wolf_event_country_short`, `_wolf_event_time`, `_wolf_event_address` en `_wolf_event_zip`. Country wordt niet vertaald; `_wolf_event_country` blijft leeg. Contact Email, Contact Website, Ticket URL en Price worden `_wolf_event_email`, `_wolf_event_website`, `_wolf_event_ticket` en `_wolf_event_price`. `_wolf_event_currency` is altijd `EUR`. Contact Name en Contact Phone worden niet verstuurd. Lege waarden blijven leeg; prijs nul blijft behouden.
 
-De mapper stuurt daarnaast Title als `_wolf_event_location` en Google Maps Embed als `_wolf_event_map`. Een lege embed wordt als lege string verstuurd. Bestaande WordPress-concepten worden niet bijgewerkt.
+De mapper stuurt daarnaast Title als `_wolf_event_location` en Google Maps Embed als `_wolf_event_map`. Een lege embed wordt als lege string verstuurd. `Event Description` gaat als gewone tekst met alinea's naar het native veld `content`, ook wanneer leeg. Deze create-actie roept geen AI aan. Voor `content` is geen extra meta-registratie in de plugin nodig. Bestaande WordPress-concepten worden niet bijgewerkt.
 
 De aangeleverde broncode van **Miracle Gig Sync API Support v0.2.7** is opgeslagen als [referentiedocument](../wordpress/miracle-gig-sync-api-support-latest.md). Deze versie registreert onder meer `_wolf_event_email` en `_wolf_event_website` als string-meta voor REST en `_wolf_event_map` met een aparte HTML-sanitizer voor de iframe. De plugin wordt buiten deze repository beheerd en geïnstalleerd.
 

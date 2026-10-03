@@ -105,6 +105,15 @@ coverage en het veilig uitvoeren van integratietests.
 
 ## Synchroniseren met Apps Script
 
+De schrijfregels voor AI-eventteksten staan in
+[knowledge/event-copy-guidelines.md](knowledge/event-copy-guidelines.md).
+Na een wijziging: voer `npm run build:guidelines` uit en neem ook de gegenereerde
+`generated/event-copy-guidelines.js` mee in de wijziging. Pas die resource niet
+handmatig aan. De unit-tests controleren dat bron en resource overeenkomen;
+`npm run check:guidelines` voert alleen deze controle uit.
+Een rechtstreekse `clasp push` voert de build niet uit. Bouw en controleer vóór upload.
+Apps Script gebruikt de gegenereerde resource; de Markdown wordt niet geüpload.
+
 De lokale repository is de broncode. [.clasp.json](.clasp.json) koppelt deze aan
 een bestaand Apps Script-project; controleer de projectkoppeling vóór gebruik.
 [.claspignore](.claspignore) sluit onder meer lokale tooling, npm-bestanden en

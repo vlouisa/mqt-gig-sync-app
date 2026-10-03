@@ -14,8 +14,9 @@ doelwebsite worden gecontroleerd.
 ## Bestaand tabblad migreren
 
 Na deployment voert de beheerder één keer **Beheerpaneel > Onderhoud > Richt
-websitewerkvoorraad in** uit. Alleen het bekende oude schema met 17 headers wordt
-uitgebreid. De nieuwe kolom wordt ingevoegd; overige cellen blijven behouden.
+websitewerkvoorraad in** uit. Bekende schema's met 17 of 18 headers worden
+uitgebreid naar 19 headers, inclusief [Event Description](FEAT-009-ai-event-description.md).
+Ontbrekende kolommen worden ingevoegd; overige cellen blijven behouden.
 De actie stelt de kolombeveiliging opnieuw in. De widgetkolom is een gegenereerd,
 beschermd veld. Een herhaalde inrichting voegt geen tweede kolom toe.
 
