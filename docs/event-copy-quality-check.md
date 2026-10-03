@@ -1,7 +1,12 @@
 # Redactionele kwaliteitscheck voor event-copy
 
-Status: voorbereid; er zijn nog geen live API-proeven uitgevoerd voor deze wijziging.
-Unit-tests bewijzen selectie, requestopbouw en begrenzing, geen betere schrijfstijl.
+Status: goedgekeurd door de gebruiker. De gebruiker heeft de publicaties op de
+website geverifieerd en bevestigd dat ze voldoen aan de Miracle-norm.
+
+Dit is de bevestiging van de redactionele acceptatie. De onderstaande proefset
+blijft beschikbaar voor toekomstige wijzigingen aan de guidelines of generator.
+Unit-tests controleren selectie, requestopbouw en begrenzing; de beoordeling van
+de tekstkwaliteit is door de gebruiker op de website uitgevoerd.
 
 ## Werkwijze na afzonderlijke toestemming voor API-proeven
 

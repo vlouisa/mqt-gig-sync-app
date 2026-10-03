@@ -109,8 +109,7 @@ limieten inclusief kwaliteitsherkansingen, ontbreken van retries bij HTTP-fouten
 configuratiefouten, antwoordvalidatie, gelijktijdige wijzigingen,
 migratie/herstel en de WordPress-payload zonder AI-aanroep.
 
-Na deployment: schema inrichten, key instellen, een representatieve tekst controleren
-en bij een handmatig WordPress-concept bevestigen dat de alinea's correct renderen.
-Live OpenAI-kwaliteit en de WordPress-weergave zijn lokaal niet geverifieerd.
-Gebruik voor de afzonderlijke redactionele proef de
-[kwaliteitscheck](../event-copy-quality-check.md). Deze schrijft geen bestaande publicaties over.
+De gebruiker heeft de publicaties op de website geverifieerd en bevestigd dat ze
+voldoen aan de Miracle-norm. Daarmee is de redactionele acceptatie bevestigd.
+De [kwaliteitscheck](../event-copy-quality-check.md) blijft beschikbaar voor
+toekomstige wijzigingen en schrijft geen bestaande publicaties over.
